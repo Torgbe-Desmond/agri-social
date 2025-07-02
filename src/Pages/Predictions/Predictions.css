@@ -1,0 +1,137 @@
+.predictions {
+    flex: 1;
+    min-width: fit-content;
+    overflow-y: scroll;
+    width: 100%;
+    box-sizing: border-box;
+
+}
+
+.predictions__holder {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(1fr, 100%));
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.predictions::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.predictions {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.predictions__header {
+    position: sticky;
+    top: 0;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 100;
+    border-bottom: 1px solid var(--twitter-background);
+    padding: 15px 20px;
+}
+
+.predictions__header>h2 {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+
+.prediction {
+    flex: 1;
+    flex-direction: column;
+    min-width: fit-content;
+    overflow-y: scroll;
+    /* display: flex;
+  justify-content: center;
+  align-items: center; */
+    width: 100%;
+    box-sizing: border-box;
+
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.prediction::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.prediction {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.prediction__header {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 100;
+    /* border-bottom: 1px solid var(--twitter-background); */
+    padding: 15px 20px;
+}
+
+.prediction__header>h2 {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.prediction_search {
+    flex: 0.25;
+    border-left: 1px solid var(--twitter-background);
+}
+
+.prediction__input {
+    display: flex;
+    align-items: center;
+    background-color: var(--twitter-background);
+    padding-left: 10px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+
+    height: 50px;
+    width: 100%;
+    /* border: 1px solid red; */
+    position: static;
+    box-sizing: border-box;
+}
+
+.prediction__input>input {
+    border: none;
+    background-color: var(--twitter-background);
+}
+
+.prediction__searchIcon {
+    color: gray;
+}
+
+.products__product__widgetContainer {
+    margin-top: 15px;
+    margin-left: 20px;
+    padding: 20px;
+    background-color: #f5f8fa;
+    border-radius: 20px;
+}
+
+.prediction__widgetContainer>h2 {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+
+/* @media screen and (min-width:1200px) {
+  .widgets {
+    display: block;
+  }
+} */

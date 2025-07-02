@@ -1,0 +1,90 @@
+.card {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  border: 1px solid #e1e8ed;
+  border-radius: 16px;
+  padding: 16px;
+  font-family: 'Segoe UI', sans-serif;
+  gap: 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card__user {
+  margin-left: 10px;
+  flex-grow: 1;
+}
+
+.card__user strong {
+  display: block;
+}
+
+.card__user span {
+  font-size: 12px;
+  color: gray;
+}
+
+.card__more {
+  color: gray;
+  cursor: pointer;
+}
+
+.card__text {
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.card__image img {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.card__time {
+  font-size: 12px;
+  color: gray;
+  margin-bottom: 8px;
+}
+
+.card__actions {
+  display: flex;
+  justify-content: flex-start;
+  color: gray;
+  gap: 1.5rem;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.card__actions div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.card__footer {
+  text-align: center;
+  border-top: 1px solid #e1e8ed;
+  padding-top: 8px;
+}
+
+.card__footer button {
+  background: #e8f5fd;
+  border: none;
+  border-radius: 9999px;
+  padding: 6px 16px;
+  font-weight: 600;
+  color: #1da1f2;
+  cursor: pointer;
+}
+
+.card__right {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}

@@ -1,0 +1,70 @@
+.widgets {
+  flex: 0.25;
+  border-left: 1px solid var(--twitter-background);
+}
+
+.widgets__input {
+  display: flex;
+  align-items: center;
+  background-color: var(--twitter-background);
+  padding-left: 10px;
+  border-radius: 20px;
+  margin-top: 10px;
+  margin-left: 20px;
+  height: 50px;
+}
+
+.widgets__input>input {
+  border: none;
+  /* background-color: var(--twitter-background); */
+  
+}
+
+.widgets__searchIcon {
+  color: gray;
+}
+
+.widgets__widgetContainer {
+  margin-top: 15px;
+  margin-left: 20px;
+  padding: 20px;
+  /* background-color: #f5f8fa; */
+  border-radius: 20px;
+}
+
+.widgets__widgetContainer>h2 {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.search-result-item {
+  display: flex;
+  border: 1px solid #ccc;
+  justify-content: center;
+  width: 100%;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  padding: 5px 5px 5px 2px;
+  border-radius: 12px;
+  margin-bottom: 5px;
+}
+
+.search-result-item:hover {
+  background-color: #e8f5fe;
+}
+
+.search-result-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+/* @media screen and (min-width:1200px) {
+  .widgets {
+    display: block;
+  }
+} */

@@ -1,0 +1,67 @@
+.predict {
+  flex: 1;
+  flex-direction: column;
+  min-width: fit-content;
+  overflow-y: scroll;
+  align-items: space-between;
+  justify-content: space-between;
+  width: 100%;
+  display: flex;
+  box-sizing: border-box;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.predict::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.predict {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.predict__header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
+  border-bottom: 1px solid var(--twitter-background);
+  padding: 15px 20px;
+}
+
+.predict__header>h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.predict__preview-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  align-items: flex-end;
+}
+
+.preview-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 32px;
+}
+
+.predict-button {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+
+.predict__chat-container {
+  flex: 1;
+}

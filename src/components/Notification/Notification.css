@@ -1,0 +1,41 @@
+.notifications-panel {
+    width: 100%;
+    background: #fff;
+    font-family: sans-serif;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--twitter-background);
+}
+
+.notification {
+    padding: 20px;
+}
+
+.notification {
+    padding: 10px;
+    position: relative;
+}
+
+.notification.unread {
+    background-color:#088a6a;
+}
+
+.notification .time {
+    font-size: 0.8rem;
+    color: #FFF;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.notification__avatar {
+    padding: 10px;
+}
+
+.notification__headerDescription {
+    margin-top: 5px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 1rem;
+}

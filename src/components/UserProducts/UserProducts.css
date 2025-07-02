@@ -1,0 +1,93 @@
+.user__products {
+    flex: 1;
+    flex-direction: column;
+    min-width: fit-content;
+    overflow-y: scroll;
+    /* display: flex;
+  justify-content: center;
+  align-items: center; */
+    width: 100%;
+    box-sizing: border-box;
+
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.user__products::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.user__products {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.user__products__header {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 100;
+    /* border-bottom: 1px solid var(--twitter-background); */
+    padding: 15px 20px;
+}
+
+.user__products__header>h2 {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.user__products_search {
+    flex: 0.25;
+    border-left: 1px solid var(--twitter-background);
+}
+
+.user__products__input {
+    display: flex;
+    align-items: center;
+    background-color: var(--twitter-background);
+    padding-left: 10px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    height: 50px;
+    width: 100%;
+    /* border: 1px solid red; */
+    position: static;
+    box-sizing: border-box;
+}
+
+.user__products__input>input {
+    border: none;
+    background-color: var(--twitter-background);
+}
+
+.user__products__searchIcon {
+    color: gray;
+}
+
+.products__product__widgetContainer {
+    margin-top: 15px;
+    margin-left: 20px;
+    padding: 20px;
+    background-color: #f5f8fa;
+    border-radius: 20px;
+}
+
+.user__products__widgetContainer>h2 {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.user__actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+/* @media screen and (min-width:1200px) {
+  .widgets {
+    display: block;
+  }
+} */
