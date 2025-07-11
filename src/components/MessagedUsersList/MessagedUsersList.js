@@ -19,7 +19,7 @@ const MessagedUsersList = ({ users }) => {
   const navigate = useNavigate();
 
   return (
-    <Card sx={{ maxWidth: "100%", margin: "auto", p: 2, cursor: "pointer" }}>
+    <Card sx={{ maxWidth: "100%", margin: "auto", p: 2, cursor: "pointer" ,borderRadius:"0px" }}>
       <List>
         {users &&
           users.map((user) => (

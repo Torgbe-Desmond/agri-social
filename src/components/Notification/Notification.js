@@ -77,6 +77,7 @@ function Notification({ notification }) {
           <strong>{notification?.username}</strong>{" "}
           {renderType(notification?.type)} your post.
           <Box
+            sx={{ color: "#000" }}
             className="notification__headerDescription"
             onClick={() =>
               handleNavigate(notification?.type, notification?.entity_type)

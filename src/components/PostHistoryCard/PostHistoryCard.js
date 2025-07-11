@@ -11,7 +11,7 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ComponentStack from "../HandleStack/HandleStack";
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 const PostHistoryCard = forwardRef(({ post }, ref) => {
   const dispatch = useDispatch();
@@ -62,24 +62,53 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
             <p>{post?.content}</p>
           </div>
         </div>
-        {post?.images && <img src={post?.images} alt="Post visual" />}
+        <div className="post__images">
+          {post?.images && (
+            <img
+              style={{
+                width: "100%",
+                objectFit: "cover",
+                borderRadius: 12,
+              }}
+              src={post?.images}
+              alt="Post visual"
+            />
+          )}
+          {post?.videos && (
+            <video
+              style={{
+                width: "100%",
+                objectFit: "cover",
+                borderRadius: 12,
+              }}
+              controls
+            >
+              <source src={post.videos} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          )}
+        </div>
         <div className="post__footer">
           <StatusIcons
+            location={"post"}
             to={`/post/${post?.post_id}`}
             icon={<ChatBubbleOutlineIcon fontSize="small" />}
             count={post?.comments}
           />
           <StatusIcons
+            location={"post"}
             icon={<FavoriteBorderIcon fontSize="small" />}
             count={post?.likes}
             action={handleLikePost}
           />
           <StatusIcons
+            location={"post"}
             icon={<BookmarkBorderIcon fontSize="small" />}
             count={post?.saved}
             action={handleSavePost}
           />
           <StatusIcons
+            location={"post"}
             icon={<DeleteOutlineOutlinedIcon fontSize="small" />}
             action={handlePostDelete}
           />

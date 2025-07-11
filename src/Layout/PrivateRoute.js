@@ -1,45 +1,52 @@
 import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import "../App.css";
+import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../Features/AuthSlice";
-import { useDispatch } from "react-redux";
 import { useSocket } from "../components/Socket/Socket";
-import { Box, CssBaseline, useMediaQuery } from "@mui/material";
 import BottomBar from "../components/BottomBar/BottomBar";
 import Sidebar from "../components/Sidebar/Sidebar";
-import Widgets from "../components/Widgets/Widgets";
+import "../App.css";
 
-function PrivateRoute({
-  isAuthenticated,
-  darkMode,
-  systemPrefersDark,
-  isMobile,
-}) {
+function PrivateRoute({ darkMode, systemPrefersDark, isMobile }) {
   const dispatch = useDispatch();
   const socket = useSocket();
   const navigate = useNavigate();
+  const status = useSelector((state) => state.auth.status);
+  const user_id = localStorage.getItem("cc_ft");
 
-
-  // useEffect(() => {
-  //   if (!socket) return;
-  //   socket.emit("user", { user_id: localStorage.getItem("cc_ft") });
-  // }, [socket]);
-
+  // Fetch user on mount
   useEffect(() => {
-    dispatch(getUser({ user_id: localStorage.getItem("cc_ft") }));
-  }, []);
+    if (user_id) {
+      dispatch(getUser({ user_id }));
+    } else {
+      navigate("/login");
+    }
+  }, [dispatch, navigate, user_id]);
+
+  // Redirect to login if auth failed
+  useEffect(() => {
+    if (status === "failed") {
+      navigate("/login");
+    }
+  }, [status, navigate]);
+
+  // Emit user to socket
+  useEffect(() => {
+    if (socket && user_id) {
+      socket.emit("user", { user_id });
+    }
+  }, [socket, user_id]);
 
   const sharedProps = {
-    user_id: localStorage.getItem("cc_ft"),
+    user_id,
     darkMode,
     systemPrefersDark,
   };
+
   return (
-    <div className={`private-route ${isMobile && "mobile_bottom_padding"}`}>
-      {/* <CssBaseline /> */}
+    <div className={`private-route ${isMobile ? "mobile_bottom_padding" : ""}`}>
       {/* {isMobile ? <BottomBar /> : <Sidebar />} */}
       <Outlet context={sharedProps} />
-      {/* <Widgets /> */}
     </div>
   );
 }

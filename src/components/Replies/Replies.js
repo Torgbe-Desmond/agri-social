@@ -7,12 +7,12 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import StatusIcons from "../StatusIcons/StatusIcons";
 import { likeComment } from "../../Features/CommentSlice";
 import { useDispatch } from "react-redux";
-import { Box } from "@mui/material";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { Box, useMediaQuery } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 function Replies({ reply, user_id }) {
   const dispatch = useDispatch();
-  const { darkMode, systemPrefersDark } = useOutletContext();
+  const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
   const navigate = useNavigate();
 
   const handleLikeComment = () => {
@@ -29,7 +29,6 @@ function Replies({ reply, user_id }) {
 
   return (
     <Box
-      sx={systemPrefersDark && { ...darkMode }}
       id={`post-${reply?.id}`}
       className="post"
     >
@@ -54,13 +53,15 @@ function Replies({ reply, user_id }) {
         {reply?.images && <img src={reply?.images} alt="Post visual" />}
         <div className="post__footer">
           <StatusIcons
+            location={"post"}
             to={`/replies/${reply?.id}`}
             icon={<ChatBubbleOutlineIcon fontSize="small" />}
             count={reply?.comments || reply?.replies}
           />
-          <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} />
+          {/* <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} /> */}
 
           <StatusIcons
+            location={"post"}
             icon={<FavoriteBorderIcon fontSize="small" />}
             count={reply?.likes}
             action={handleLikeComment}

@@ -54,6 +54,42 @@ async function getConversation(formData) {
 }
 
 // Function to add a message
+async function getGroupConversation(formData) {
+  try {
+    const response = await axiosInstance.post(
+      `/get-group-conversations`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Function to add a message
+async function createGroup(formData) {
+  try {
+    const response = await axiosInstance.post(
+      `/create-group-conversation`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Function to add a message
 async function createC(formData, post_id) {
   try {
     const response = await axiosInstance.get(`/get-conversation`, formData, {
@@ -72,4 +108,6 @@ export const ConversationService = {
   getMessages,
   getConversation,
   getMessagedUsers,
+  getGroupConversation,
+  createGroup
 };

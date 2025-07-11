@@ -60,12 +60,14 @@ function Comment({ singleComment, singleCommentStatus }) {
         )}
         <div className="post__footer">
           <StatusIcons
+            location={"post"}
             to={`/replies/${singleComment?.id}`}
             icon={<ChatBubbleOutlineIcon fontSize="small" />}
             count={singleComment?.replies}
           />
           <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} />
           <StatusIcons
+            location={"post"}
             icon={<FavoriteBorderIcon fontSize="small" />}
             count={singleComment?.likes}
             action={handleLikeComment}

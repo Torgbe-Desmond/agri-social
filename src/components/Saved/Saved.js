@@ -6,14 +6,10 @@ import RepeatIcon from "@mui/icons-material/Repeat";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import StatusIcons from "../StatusIcons/StatusIcons";
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 import { useDispatch, useSelector } from "react-redux";
-import {
-  likePost,
-  savePost,
-  unSavePost,
-} from "../../Features/PostSlice";
+import { likePost, savePost, unSavePost } from "../../Features/PostSlice";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -37,7 +33,6 @@ function Saved({ save }) {
     dispatch(unSavePost({ user_id: userDetails?.id, post_id: save?.post_id }));
   };
 
-  
   return (
     <div className="post">
       <div className="post__avatar">
@@ -55,20 +50,50 @@ function Saved({ save }) {
             <p>{save?.content}</p>
           </div>
         </div>
-        {save?.images && <img src={save?.images} alt="Post visual" />}
+        <div className="post__images">
+          {save?.images && (
+            <img
+              style={{
+                width: "100%",
+                objectFit: "cover",
+                borderRadius: 12,
+              }}
+              src={save?.images}
+              alt="save visual"
+            />
+          )}
+          {save?.videos && (
+            <video
+              style={{
+                width: "100%",
+                objectFit: "cover",
+                borderRadius: 12,
+              }}
+              controls
+            >
+              <source src={save.videos} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          )}
+        </div>
+
+        {/* {save?.images && <img src={save?.images} alt="Post visual" />} */}
         <div className="post__footer">
           <StatusIcons
+            location={"post"}
             to={`/post/${save?.post_id}`}
             icon={<ChatBubbleOutlineIcon fontSize="small" />}
             count={save?.comments}
           />
-          <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} />
+          {/* <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} /> */}
           <StatusIcons
+            location={"post"}
             icon={<FavoriteBorderIcon fontSize="small" />}
             action={handleLikePost}
             count={save?.likes}
           />
           <StatusIcons
+            location={"post"}
             icon={<BookmarkBorderIcon fontSize="small" />}
             count={save?.saved}
             action={handleSavePost}

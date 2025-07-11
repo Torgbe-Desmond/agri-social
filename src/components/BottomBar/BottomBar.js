@@ -16,6 +16,8 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import OnlinePredictionOutlinedIcon from "@mui/icons-material/OnlinePredictionOutlined";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
+
 import { useLocation, useOutletContext } from "react-router-dom";
 
 const BottomBar = ({ notifyCounts = 0 }) => {
@@ -129,6 +131,12 @@ const BottomBar = ({ notifyCounts = 0 }) => {
             text="FarmBot"
             to="/predict-disease"
             active={currentPage === "predict-disease"}
+          />
+          <BottomBarOption
+            Icon={VideocamOutlinedIcon}
+            text="Streams"
+            to="/streams"
+            active={currentPage === "streams"}
           />
         </Box>
       </SwipeableDrawer>

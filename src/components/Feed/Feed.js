@@ -6,7 +6,7 @@ import FlipMove from "react-flip-move";
 import { clearPostData, getPosts } from "../../Features/PostSlice";
 import { useOutletContext } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, Button, CircularProgress } from "@mui/material";
 import { useSocket } from "../Socket/Socket";
 
 function Feed() {
@@ -26,6 +26,16 @@ function Feed() {
   useEffect(() => {
     dispatch(getPosts({ user_id, offset: pageNumber, limit: 10 }));
   }, [pageNumber]);
+
+  const reloadAction = () => {
+    dispatch(
+      getPosts({
+        user_id: localStorage.getItem("cc_ft"),
+        offset: pageNumber,
+        limit: 10,
+      })
+    );
+  };
 
   useEffect(() => {
     return () => dispatch(clearPostData());
@@ -65,11 +75,17 @@ function Feed() {
           </div>
         );
       })}
+
       {postStatus === "loading" && (
         <p className="circular__progress">
           <CircularProgress fontSize="small" />
         </p>
       )}
+      {/* {postStatus === "failed" && (
+        <p className="circular__progress">
+          <Button onClick={reloadAction}>Reload</Button>
+        </p>
+      )} */}
     </Box>
   );
 }

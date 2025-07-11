@@ -7,9 +7,12 @@ import { SavedService } from "../Services/savePost";
 
 const initialState = {
   postData: [],
+  streamData: [],
+  streamStatus: "idle",
   numb_found: null,
   post: null,
   hasMore: true,
+  hasMoreStreams: true,
   scrollTo: "",
   postHistory: [],
   userPostHistory: [],
@@ -17,6 +20,7 @@ const initialState = {
   savedHistory: [],
   postCount: 0,
   userPostCount: 0,
+  stream_numb_found: 0,
   comments: [],
   userPostHistoryStatus: "idle",
   createPostStatus: "idle",
@@ -48,6 +52,19 @@ export const getPosts = createAsyncThunk(
   async ({ user_id, offset, limit }, thunkAPI) => {
     try {
       const response = await PostService.getPosts(user_id, offset, limit);
+      return response;
+    } catch (error) {
+      const message = error?.response?.data;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const getStreams = createAsyncThunk(
+  "post/getStreams",
+  async ({ user_id, offset, limit }, thunkAPI) => {
+    try {
+      const response = await PostService.getStreams(user_id, offset, limit);
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -202,6 +219,9 @@ const postSlice = createSlice({
     setPostScrollTo: (state, action) => {
       state.scrollTo = action.payload;
     },
+    clearStreams: (state) => {
+      state.setPostId = [];
+    },
     clearPostScrollToId: (state, action) => {},
     clearStatus: (state) => {
       state.commentStatus = "idle";
@@ -212,6 +232,42 @@ const postSlice = createSlice({
       state.postDeleteStatus = "idle";
       state.unSavePostStatus = "idle";
     },
+    updateStreamLike: (state, action) => {
+      const { post_id, liked } = action.payload;
+      state.streamData = state.streamData?.map((p) => {
+        if (p.post_id === post_id) {
+          return {
+            ...p,
+            likes: liked ? (p.likes || 0) + 1 : p.likes - 1,
+          };
+        }
+        return p;
+      });
+    },
+    updateStreamSaved: (state, action) => {
+      const { post_id, saved } = action.payload;
+      state.streamData = state.streamData?.map((p) => {
+        if (p.post_id === post_id) {
+          return {
+            ...p,
+            saved: saved ? (p.saved || 0) + 1 : p.saved - 1,
+          };
+        }
+        return p;
+      });
+    },
+    updateStreamComment: (state, action) => {
+      const { comment_id } = action.payload;
+      state.streamData = state.streamData?.map((c) => {
+        if (c.id === comment_id) {
+          return {
+            ...c,
+            comment: (c.comment || 0) + 1,
+          };
+        }
+        return c;
+      });
+    },
   },
 
   extraReducers: (builder) => {
@@ -220,7 +276,8 @@ const postSlice = createSlice({
         state.createPostStatus = "loading";
       })
       .addCase(createPost.fulfilled, (state, action) => {
-        state.postData.unshift(action.payload); 
+        state.postData.unshift(action.payload);
+        state.postData = [...state.postData];
         state.createPostStatus = "succeeded";
       })
       .addCase(createPost.rejected, (state, action) => {
@@ -241,6 +298,31 @@ const postSlice = createSlice({
       })
       .addCase(getPosts.rejected, (state, action) => {
         state.postStatus = "failed";
+      })
+
+      .addCase(getStreams.pending, (state, action) => {
+        state.streamStatus = "loading";
+      })
+      .addCase(getStreams.fulfilled, (state, action) => {
+        const { posts, numb_found } = action.payload;
+        state.hasMoreStreams = posts.length > 0;
+
+        if (state.hasMoreStreams) {
+          const existingIds = new Set(
+            state.streamData.map((post) => post.post_id)
+          );
+          const newPosts = posts.filter(
+            (post) => !existingIds.has(post.post_id)
+          );
+          state.streamData = [...state.streamData, ...newPosts];
+        }
+
+        state.stream_numb_found = numb_found;
+        state.streamStatus = "succeeded";
+      })
+
+      .addCase(getStreams.rejected, (state, action) => {
+        state.streamStatus = "failed";
       })
 
       .addCase(getPost.pending, (state, action) => {
@@ -310,7 +392,7 @@ const postSlice = createSlice({
       .addCase(addComment.fulfilled, (state, action) => {
         state.post = {
           ...state.post,
-          comments: (state.post.comments || 0) + 1,
+          comments: (state.post.comment || 0) + 1,
         };
         state.commentStatus = "succeeded";
       })
@@ -396,5 +478,9 @@ export const {
   clearPostData,
   setPostScrollTo,
   clearPostScrollToId,
+  updateStreamLike,
+  updateStreamSaved,
+  updateStreamComment,
+  clearStreams,
 } = postSlice.actions;
 export default postSlice.reducer;

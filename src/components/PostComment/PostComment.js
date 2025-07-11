@@ -58,14 +58,24 @@ function PostComment() {
 
   useEffect(() => {
     if (post_id) {
-      dispatch(getPost({ post_id }));
+      dispatch(getPost({ post_id }))
+        .unwrap()
+        .then(() => {
+          if (post_id) {
+            dispatch(getComments({ post_id }));
+          }
+        })
+        .catch((error) => {
+          // ❌ Failure logic here
+          console.error("Failed to save post:", error);
+        });
     }
   }, []);
 
   useEffect(() => {
-    if (post_id) {
-      dispatch(getComments({ post_id }));
-    }
+    // if (post_id) {
+    //   dispatch(getComments({ post_id }));
+    // }
     return () => {
       dispatch(clearComments());
       dispatch(clearPost());
@@ -214,7 +224,7 @@ function PostComment() {
       /> */}
 
       <Box
-        sx={{ p: 1, bgcolor: systemPrefersDark && "background.paper" }}
+        sx={{ p: 1, bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
         display="flex"
         position="sticky"
         bottom="0"
@@ -225,7 +235,7 @@ function PostComment() {
         borderTop="1px solid #ddd"
       >
         <TextField
-          sx={{ bgcolor: systemPrefersDark && "background.paper" }}
+          sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
           fullWidth
           placeholder="Write a comment..."
           value={comment}

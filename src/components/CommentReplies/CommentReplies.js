@@ -208,7 +208,7 @@ function CommentReplies() {
       </div>
 
     <Box
-        sx={{ p: 1, bgcolor: systemPrefersDark && "background.paper" }}
+        sx={{ p: 1,  bgcolor: systemPrefersDark ? "background.paper" :"#FFF" }}
         display="flex"
         position="sticky"
         bottom="0"
@@ -219,7 +219,7 @@ function CommentReplies() {
         borderTop="1px solid #ddd"
       >
         <TextField
-          sx={{ bgcolor: systemPrefersDark && "background.paper" }}
+          sx={{  bgcolor: systemPrefersDark ? "background.paper" :"#FFF" }}
           fullWidth
           placeholder="Write a comment..."
           value={comment}

@@ -2,7 +2,7 @@ import React from "react";
 import "./StatusIcons.css";
 import { useNavigate } from "react-router-dom";
 
-function StatusIcons({ icon, count, to, action }) {
+function StatusIcons({ icon, count, to, action, location }) {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -14,8 +14,13 @@ function StatusIcons({ icon, count, to, action }) {
     }
   };
 
+  const listOfStyles = {
+    post: "status-icon",
+    video: "video-action-style",
+  };
+  
   return (
-    <div className="status-icon">
+    <div className={`${listOfStyles[location]}`}>
       <div onClick={handleClick}>{icon}</div>
       <div>{count}</div>
     </div>

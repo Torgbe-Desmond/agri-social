@@ -1,0 +1,75 @@
+.group {
+  flex: 1;
+  flex-direction: column;
+  min-width: fit-content;
+  overflow-y: scroll;
+  align-items: space-between;
+  justify-content: space-between;
+  width: 100%;
+  display: flex;
+  box-sizing: border-box;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.group::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.group {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.group__header {
+  position: sticky;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap:1rem;
+  top: 0;
+  background-color: white;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
+  border-bottom: 1px solid var(--twitter-background);
+  padding: 15px 20px;
+}
+
+.group__header>h2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  /* width: 100%; */
+  font-weight: 800;
+}
+
+.group__preview-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  align-items: flex-end;
+}
+
+.preview-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 32px;
+}
+
+.group-button {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+
+.group__chat-container {
+  flex: 1;
+}

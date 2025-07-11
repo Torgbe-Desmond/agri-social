@@ -2,14 +2,18 @@
 import React from "react";
 import { Box, Typography, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { popComponent } from "../../Features/StackSlice";
 
 function BottomBarOption({ Icon, text, to, active, count, onClick }) {
   const navigate = useNavigate();
   const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
+  const dispatch = useDispatch();
 
   const handleClick = () => {
     if (onClick) return onClick();
     if (to) navigate(to);
+    dispatch(popComponent());
   };
 
   return (

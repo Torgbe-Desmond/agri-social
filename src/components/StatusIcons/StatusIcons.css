@@ -1,5 +1,14 @@
-.status-icon{
+.status-icon {
     display: flex;
     gap: 1rem;
+    cursor: pointer;
+}
+
+.video-action-style {
+    display: flex;
+    gap: 0.25rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
 }

@@ -8,6 +8,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import Header from "../Header/Header";
 import MessagedUsersList from "../MessagedUsersList/MessagedUsersList";
 import { getMessagedUsers } from "../../Features/MessageSlice";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import ComponentStack from "../HandleStack/HandleStack";
 
 function Messages() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -41,26 +43,42 @@ function Messages() {
 
   useEffect(() => {
     const formData = new FormData();
-    formData.append("user_id", userDetails?.id);
+    formData.append("user_id", localStorage.getItem("cc_ft"));
     dispatch(getMessagedUsers({ formData }));
   }, []);
+
+  const reloadAction = () => {
+    const formData = new FormData();
+    formData.append("user_id", localStorage.getItem("cc_ft"));
+    dispatch(getMessagedUsers({ formData }));
+  };
 
   useEffect(() => {
     let searchedData;
     searchedData = searchTerm
       ? users?.filter((st) =>
-          st.userName
-            ?.toLocaleLowerCase()
-            ?.includes(searchTerm.toLocaleLowerCase())
+          st?.userName
+            ?.toLowerCase()
+            ?.includes(searchTerm?.toLowerCase())
         )
       : users;
     setFilteredData(searchedData);
   }, [searchTerm, users]);
 
+  const handleCreateGroup = () => {
+    const stack = new ComponentStack(dispatch);
+    stack.handleStack("CreateGroup", {});
+  };
+
   return (
     <Header
+      // icons={[
+      //   { icon: <GroupsOutlinedIcon key="group" />, action: handleCreateGroup },
+      // ]}
       status={getMessagedUsersStatus}
+      allowedSearch={true}
       name={"Messages"}
+      reloadAction={reloadAction}
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
       children={<MessagedUsersList users={filteredData} />}

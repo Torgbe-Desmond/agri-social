@@ -44,6 +44,9 @@ import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
 import { errorMap } from "./components/Errors/ErrorStatus";
 import axiosInstance from "./Services/AxiosInstance";
 import Chat from "./components/Chat/Chat";
+import Streams from "./components/Streams/Streams";
+import Conversations from "./components/Conversations/Conversations";
+import GroupConversation from "./components/GroupConversation/GroupConversation";
 // green
 // background: {
 //     default: "rgb(2, 29, 0)",
@@ -58,6 +61,7 @@ import Chat from "./components/Chat/Chat";
 
 function App() {
   const isAuthenticated = localStorage.getItem("cc_ft") ? true : false;
+  console.log("isAuthenticated", isAuthenticated);
   const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
   const isMobile = useMediaQuery("(max-width:640px)");
   const { components } = useSelector((state) => state.stack);
@@ -106,9 +110,10 @@ function App() {
 
         <Routes>
           {/* Public Route */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
+          {!isAuthenticated && <Route path="/login" element={<Login />} />}
+          {!isAuthenticated && (
+            <Route path="/register" element={<Register />} />
+          )}
           {/* Protected Routes */}
           {isAuthenticated ? (
             <Route
@@ -130,11 +135,16 @@ function App() {
               <Route path="/predict-disease" element={<PredictDisease />} />
               <Route path="/user/:_user_id" element={<User />} />
               <Route path="/notifications" element={<Notifications />} />
-              <Route path="/messages" element={<Messages />} />
+              <Route path="/messages" element={<Conversations />} />
               <Route path="/market-place" element={<MarketPlace />} />
               <Route path="/product/:product_id" element={<ProductDetails />} />
               <Route path="/create-product" element={<CreateProduct />} />
               <Route path="/chat/:recipient_id" element={<Chat />} />
+              <Route
+                path="/group-chat/:conversation_id"
+                element={<GroupConversation />}
+              />
+              <Route path="/streams" element={<Streams />} />
             </Route>
           ) : (
             // Redirect all unmatched routes to /login
@@ -144,14 +154,14 @@ function App() {
 
         {/* Global Widget */}
         {isAuthenticated && <Widgets />}
+        {/* Floating Overlay Components */}
+        <div className="component">
+          {components.map((item) => (
+            <div key={item.id}>{item?.component}</div>
+          ))}
+        </div>
       </Router>
 
-      {/* Floating Overlay Components */}
-      <div className="component">
-        {components.map((item) => (
-          <div key={item.id}>{item?.component}</div>
-        ))}
-      </div>
       <Snackbar
         open={Boolean(errorMessage)}
         autoHideDuration={3000}

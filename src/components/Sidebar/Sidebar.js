@@ -14,6 +14,7 @@ import { Box, Button, Stack, useMediaQuery } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useSocket } from "../Socket/Socket";
+import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 
 function Sidebar() {
   const isMobile = useMediaQuery("(max-width:640px)");
@@ -102,7 +103,7 @@ function Sidebar() {
         unShowIcons={unShowIcons}
         isMobile={isMobile}
         Icon={SmartToyOutlinedIcon}
-        text="FarmBot"
+        text="Farm Model"
         active={currentPage === "predict-disease"}
         to="/predict-disease"
       />
@@ -121,6 +122,14 @@ function Sidebar() {
         active={currentPage === "bookmarks"}
         text="Bookmarks"
         to="/bookmarks"
+      />
+      <SidebarOption
+        unShowIcons={unShowIcons}
+        isMobile={isMobile}
+        Icon={VideocamOutlinedIcon}
+        active={currentPage === "streams"}
+        text="Streams"
+        to="/streams"
       />
       {/* <SidebarOption isMobile={isMobile} Icon={MoreHorizIcon} text="More" /> */}
 

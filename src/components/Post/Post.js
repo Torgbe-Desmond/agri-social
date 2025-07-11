@@ -187,17 +187,20 @@ const Post = forwardRef(({ post }, ref) => {
         )}
         <div className="post__footer">
           <StatusIcons
+            location={"post"}
             to={`/post/${post?.post_id}`}
             icon={<ChatBubbleOutlineIcon fontSize="small" />}
             count={post?.comments}
           />
           <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} />
           <StatusIcons
+            location={"post"}
             icon={<FavoriteBorderIcon fontSize="small" />}
             count={post?.likes}
             action={handleLikePost}
           />
           <StatusIcons
+            location={"post"}
             icon={<BookmarkBorderIcon fontSize="small" />}
             count={post?.saved}
             action={handleSavePost}

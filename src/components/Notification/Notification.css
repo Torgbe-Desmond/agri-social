@@ -16,12 +16,12 @@
 }
 
 .notification.unread {
-    background-color:#088a6a;
+    background-color:#e8fef1;
 }
 
 .notification .time {
     font-size: 0.8rem;
-    color: #FFF;
+    color: #000;
     position: absolute;
     right: 10px;
     top: 10px;
@@ -36,6 +36,11 @@
     font-size: 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
+    color: #000;
     cursor: pointer;
     padding: 1rem;
+}
+
+.notification__headerDescription p {
+    color: #000;
 }

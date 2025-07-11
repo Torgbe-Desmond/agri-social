@@ -29,12 +29,6 @@ const Login = () => {
   const error = useSelector((state) => state.auth.error);
   const isAuthenticated = localStorage.getItem("cc_ft") ? true : false;
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated]);
-
   const handleChange = (e) => {
     setCredentials({
       ...credentials,
@@ -93,8 +87,8 @@ const Login = () => {
         <Box mt={4} p={4}>
           <form className="login-form" onSubmit={handleSubmit}>
             <Box
-              // sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
-              // className="login__input"
+            // sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
+            // className="login__input"
             >
               <TextField
                 placeholder="Email"
@@ -127,8 +121,8 @@ const Login = () => {
               />
             </Box>
             <Box
-              // sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
-              // className="login__input"
+            // sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
+            // className="login__input"
             >
               <TextField
                 // sx={{

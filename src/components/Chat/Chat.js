@@ -208,8 +208,8 @@ function Chat() {
           >
             {/* Avatar */}
             <Avatar
-              src={msg.profilePicture}
-              alt={msg.sender_id}
+              src={msg?.user_image}
+              alt={msg?.sender_id}
               sx={{ width: 40, height: 40 }}
             />
 
@@ -240,6 +240,7 @@ function Chat() {
                   color: systemPrefersDark && "#000",
                 }}
               >
+              
                 {msg?.content}
               </Box>
             )}
@@ -248,7 +249,7 @@ function Chat() {
             {msg.sender_id !== userDetails?.id && (
               <Box
                 sx={{
-                  background: systemPrefersDark ? "#eaf4ff" : "#fff",
+                  background: systemPrefersDark ? "#e8fef1" : "#e8fef1",
                   borderRadius: 2,
                   p: 1.5,
                   maxWidth: "70%",
@@ -335,18 +336,20 @@ function Chat() {
             multiline
             minRows={1}
             maxRows={3}
-            InputProps={{
-              // endAdornment: (
-              //   <IconButton onClick={openEmojiPicker}>
-              //     <InsertEmoticonIcon />
-              //   </IconButton>
-              // ),
-              startAdornment: (
-                <IconButton ref={fileInputRef} onClick={handleAddFile}>
-                  <InsertPhotoOutlinedIcon />
-                </IconButton>
-              ),
-            }}
+            InputProps={
+              {
+                // endAdornment: (
+                //   <IconButton onClick={openEmojiPicker}>
+                //     <InsertEmoticonIcon />
+                //   </IconButton>
+                // ),
+                // startAdornment: (
+                //   <IconButton ref={fileInputRef} onClick={handleAddFile}>
+                //     <InsertPhotoOutlinedIcon />
+                //   </IconButton>
+                // ),
+              }
+            }
           />
 
           <IconButton onClick={handleSend}>

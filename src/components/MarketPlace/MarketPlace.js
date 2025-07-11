@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   CircularProgress,
   Grid,
   List,
@@ -88,6 +89,10 @@ function MarketPlace() {
     stack.handleStack("SearchModal", {});
   };
 
+  const reloadAction = () => {
+    dispatch(fetchProducts({ offset: pageNumber, limit: 6 }));
+  };
+
   return (
     <Box
       sx={{
@@ -117,7 +122,7 @@ function MarketPlace() {
                   borderColor: "transparent",
                 },
                 "& .MuiInputBase-input": {
-                  width: { xs: "100%", sm: "100%", md: "500px", lg: "500px" },
+                  width: { xs: "300px", sm: "300px", md: "500px", lg: "500px" },
                   boxSizing: "border-box",
                 },
                 "&:hover fieldset": {
@@ -154,6 +159,11 @@ function MarketPlace() {
       {loading === "loading" && (
         <p className="circular__progress">
           <CircularProgress fontSize="small" />
+        </p>
+      )}
+      {loading === "failed" && (
+        <p className="circular__progress">
+          <Button onClick={reloadAction}>Reload</Button>
         </p>
       )}
     </Box>

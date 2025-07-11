@@ -32,6 +32,22 @@ async function getPosts(user_id, offset = 1, limit = 10) {
   }
 }
 
+
+async function getStreams(user_id, offset = 1, limit = 10) {
+  try {
+    const response = await axiosInstance.get(`/get-streams/${user_id}`, {
+      params: {
+        offset,
+        limit
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
 // Function tp get post
 async function getPost(post_id) {
   try {
@@ -71,4 +87,5 @@ export const PostService = {
   getPosts,
   getPost,
   deletePost,
+  getStreams,
 };

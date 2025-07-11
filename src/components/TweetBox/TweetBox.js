@@ -73,6 +73,9 @@ function TweetBox() {
     const formData = new FormData();
     formData.append("content", content);
     formData.append("user_id", userDetails?.id);
+    if (mediaType === "video") {
+      formData.append("has_video", 1);
+    }
     if (selectedTags.length) formData.append("tags", selectedTags.join(","));
     if (file) formData.append("file", file);
 

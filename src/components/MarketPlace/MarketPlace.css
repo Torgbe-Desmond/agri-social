@@ -60,6 +60,7 @@
 
 .market_place__input>input {
     border: none;
+    background: red;
 
     /* background-color: var(--twitter-background); */
 }
