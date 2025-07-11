@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Header.css";
 import {
   Box,
@@ -8,6 +8,8 @@ import {
   Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { useDispatch } from "react-redux";
+import { setScrolling } from "../../Features/StackSlice";
 
 function Header({
   icons,
@@ -19,8 +21,31 @@ function Header({
   children,
   reloadAction,
 }) {
+  const lastScrollTop = useRef(0);
+  const [showBottomBar, setShowBottomBar] = useState(false);
+  const feedRef = useRef(null);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const feedNode = feedRef.current;
+    if (!feedNode) return;
+
+    const handleScroll = () => {
+      const scrollTop = feedNode.scrollTop;
+      if (scrollTop < lastScrollTop.current) {
+        dispatch(setScrolling(true)); // scrolling down
+      } else {
+        dispatch(setScrolling(false)); // scrolling up
+      }
+      lastScrollTop.current = scrollTop;
+    };
+
+    feedNode.addEventListener("scroll", handleScroll);
+    return () => feedNode.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <Box className="resuable">
+    <Box ref={feedRef} className="resuable">
       <Box className="resuable__header">
         <Typography variant="h2">
           {name}{" "}

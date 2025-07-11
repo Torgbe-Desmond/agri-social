@@ -58,13 +58,11 @@ import GroupConversation from "./components/GroupConversation/GroupConversation"
 //   default: "rgb(4, 4, 4)",
 //   paper: "rgb(23, 24, 24)",
 // },
-
 function App() {
   const isAuthenticated = localStorage.getItem("cc_ft") ? true : false;
-  console.log("isAuthenticated", isAuthenticated);
   const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
   const isMobile = useMediaQuery("(max-width:640px)");
-  const { components } = useSelector((state) => state.stack);
+  const { components, scrolling } = useSelector((state) => state.stack);
   const [errorMessage, setErrorMessage] = useState(null);
   const dispatch = useDispatch();
 
@@ -72,49 +70,19 @@ function App() {
     setErrorMessage(null);
   };
 
-  axiosInstance.interceptors.response.use(
-    (response) => {
-      return response;
-    },
-    (error) => {
-      if (error) {
-        if (error.code === "ERR_BAD_RESPONSE" || error.code === "ERR_NETWORK") {
-          setErrorMessage(
-            "You are currently offline. Please try connection to the internet"
-          );
-        }
-      }
-    }
-  );
-
-  // useEffect(()=>{
-
-  // },[])
-
-  useEffect(() => {
-    if (systemPrefersDark) {
-      // Example: document.body.classList.add("__darkmode");
-    }
-
-    return () => {
-      document.body.style.backgroundColor = "";
-      document.body.style.color = "";
-    };
-  }, [systemPrefersDark]);
-
   return (
     <div className="app">
       <Router>
         {/* Authenticated layout */}
-        {isAuthenticated && (isMobile ? <BottomBar /> : <Sidebar />)}
+        {isAuthenticated &&
+          (isMobile ? scrolling && <BottomBar /> : <Sidebar />)}
 
         <Routes>
-          {/* Public Route */}
           {!isAuthenticated && <Route path="/login" element={<Login />} />}
           {!isAuthenticated && (
             <Route path="/register" element={<Register />} />
           )}
-          {/* Protected Routes */}
+
           {isAuthenticated ? (
             <Route
               element={
@@ -147,14 +115,11 @@ function App() {
               <Route path="/streams" element={<Streams />} />
             </Route>
           ) : (
-            // Redirect all unmatched routes to /login
             <Route path="*" element={<Navigate to="/login" replace />} />
           )}
         </Routes>
 
-        {/* Global Widget */}
         {isAuthenticated && <Widgets />}
-        {/* Floating Overlay Components */}
         <div className="component">
           {components.map((item) => (
             <div key={item.id}>{item?.component}</div>

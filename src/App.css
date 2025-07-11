@@ -28,6 +28,22 @@ body {
   /* border: 1px solid red; */
 }
 
+.bottom-bar-container {
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.bottom-bar-container.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
 
 .glass-card {}
 

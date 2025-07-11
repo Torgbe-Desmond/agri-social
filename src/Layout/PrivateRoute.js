@@ -44,7 +44,7 @@ function PrivateRoute({ darkMode, systemPrefersDark, isMobile }) {
   };
 
   return (
-    <div className={`private-route ${isMobile ? "mobile_bottom_padding" : ""}`}>
+    <div className={`private-route ${isMobile ? "" : ""}`}>
       {/* {isMobile ? <BottomBar /> : <Sidebar />} */}
       <Outlet context={sharedProps} />
     </div>

@@ -7,12 +7,16 @@ const stackSlice = createSlice({
     components: [],
     mainPathIndex: 0,
     stackState: "",
+    scrolling: false,
   },
   reducers: {
     pushComponent: (state, action) => {
       // state.components.shift();
       state.components.push(action.payload);
       state.stackState = "mounted";
+    },
+    setScrolling: (state, action) => {
+      state.scrolling = action.payload;
     },
     popComponent: (state) => {
       state.components.pop();
@@ -36,5 +40,6 @@ export const {
   clearStack,
   toggleSearch,
   setMainPathIndex,
+  setScrolling,
 } = stackSlice.actions;
 export default stackSlice.reducer;

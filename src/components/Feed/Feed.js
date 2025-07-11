@@ -2,56 +2,42 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import TweetBox from "../TweetBox/TweetBox";
 import Post from "../Post/Post";
 import "./Feed.css";
-import FlipMove from "react-flip-move";
 import { clearPostData, getPosts } from "../../Features/PostSlice";
 import { useOutletContext } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Button, CircularProgress } from "@mui/material";
 import { useSocket } from "../Socket/Socket";
+import { setScrolling } from "../../Features/StackSlice";
 
 function Feed() {
-  const { user_id, darkMode, systemPrefersDark } = useOutletContext();
+  const { user_id } = useOutletContext();
   const { postData, hasMore, postStatus } = useSelector((state) => state.post);
   const [pageNumber, setPageNumber] = useState(1);
-  const [tabIndex, setTabIndex] = useState(0);
-  const socket = useSocket();
-  const { userDetails } = useSelector((state) => state.auth);
-  const observer = useRef();
   const dispatch = useDispatch();
+  const socket = useSocket();
+  const observer = useRef();
 
-  const handleTabChange = (event, newValue) => {
-    setTabIndex(newValue);
-  };
+  const feedRef = useRef(null);
+  const lastScrollTop = useRef(0);
+  const [showBottomBar, setShowBottomBar] = useState(false);
 
+  // Fetch posts when page number changes
   useEffect(() => {
     dispatch(getPosts({ user_id, offset: pageNumber, limit: 10 }));
-  }, [pageNumber]);
+  }, [pageNumber, dispatch, user_id]);
 
-  const reloadAction = () => {
-    dispatch(
-      getPosts({
-        user_id: localStorage.getItem("cc_ft"),
-        offset: pageNumber,
-        limit: 10,
-      })
-    );
-  };
-
+  // Clear posts on unmount
   useEffect(() => {
     return () => dispatch(clearPostData());
-  }, []);
+  }, [dispatch]);
 
-  const lasPostRef = useCallback(
+  // Infinite scroll ref
+  const lastPostRef = useCallback(
     (node) => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
+      if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
           setPageNumber((prev) => prev + 1);
-          // socket.emit("new_notification", {
-          //   user_id: userDetails?.id,
-          // });
         }
       });
       if (node) observer.current.observe(node);
@@ -59,18 +45,39 @@ function Feed() {
     [hasMore]
   );
 
-  return (
-    <Box className="feed">
-      {/* <Box  className="feed__header">
-        <h2>Home</h2>
-      </Box> */}
+  // Scroll detection for showing/hiding bottom tab
+  useEffect(() => {
+    const feedNode = feedRef.current;
+    if (!feedNode) return;
 
+    const handleScroll = () => {
+      const scrollTop = feedNode.scrollTop;
+      if (scrollTop < lastScrollTop.current) {
+        dispatch(setScrolling(true)); // scrolling down
+      } else {
+        dispatch(setScrolling(false)); // scrolling up
+      }
+      lastScrollTop.current = scrollTop;
+    };
+
+    feedNode.addEventListener("scroll", handleScroll);
+    return () => feedNode.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // console.log("showBottomBar:", showBottomBar);
+
+  return (
+    <Box
+      className="feed"
+      ref={feedRef}
+      sx={{ height: "100vh", overflowY: "auto" }}
+    >
       <TweetBox />
 
       {postData?.map((post, index) => {
         const isLast = index === postData.length - 1;
         return (
-          <div key={index} ref={isLast ? lasPostRef : null}>
+          <div key={index} ref={isLast ? lastPostRef : null}>
             <Post post={post} />
           </div>
         );
@@ -81,11 +88,6 @@ function Feed() {
           <CircularProgress fontSize="small" />
         </p>
       )}
-      {/* {postStatus === "failed" && (
-        <p className="circular__progress">
-          <Button onClick={reloadAction}>Reload</Button>
-        </p>
-      )} */}
     </Box>
   );
 }
