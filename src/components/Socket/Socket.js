@@ -19,7 +19,7 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:8000", {
+    socketRef.current = io("https://agri-social-backend.onrender.com", {
       transports: ["websocket"],
       withCredentials: true,
     });

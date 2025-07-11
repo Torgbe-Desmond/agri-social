@@ -27,7 +27,7 @@
     -webkit-backdrop-filter: blur(10px);
     z-index: 100;
     border-bottom: 1px solid var(--twitter-background);
-    padding: 15px 20px;
+    padding: 20px 15px 20px 15px;
 }
 
 .resuable__header>h2 {

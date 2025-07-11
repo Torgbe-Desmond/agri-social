@@ -66,10 +66,9 @@ body {
   border-right: 1px solid var(--twitter-background);
   border-left: 1px solid var(--twitter-background);
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   width: 100%;
   box-sizing: border-box;
-  height: 100vh;
   /* margin-bottom: 100px; */
 }
 
@@ -80,6 +79,8 @@ body {
   margin-left: auto;
   margin-right: auto;
   padding: 0 10px;
+  height: 100vh;
+
   /* margin-bottom: 56px !important; */
 }
 

@@ -31,8 +31,8 @@ function Main() {
   };
 
   return (
-    <Box  className="main">
-      <Box  className={`main__header`}>
+    <Box className="main">
+      {/* <Box className={`main__header`}>
         <Box
           sx={{
             borderBottom: 0.5,
@@ -44,15 +44,20 @@ function Main() {
             alignItems: "flex-start",
           }}
         >
-          <Tabs textColor="inherit" value={mainPathIndex} onChange={handleTabChange} sx={{}}>
+          <Tabs
+            textColor="inherit"
+            value={mainPathIndex}
+            onChange={handleTabChange}
+            // sx={{ padding: "0px", background:"red" }}
+          >
             <Tab label="Home" />
             <Tab label="Market Place" />
           </Tabs>
         </Box>
-      </Box>
-
-      <Box>{mainPathIndex === 0 && <Feed />}</Box>
-      <Box>{mainPathIndex === 1 && <MarketPlace />}</Box>
+      </Box> */}
+      <Feed />
+      {/* <Box>{mainPathIndex === 0 && <Feed />}</Box> */}
+      {/* <Box>{mainPathIndex === 1 && <MarketPlace />}</Box> */}
     </Box>
   );
 }
