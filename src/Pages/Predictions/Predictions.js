@@ -7,6 +7,7 @@ import { getPredictions } from "../../Features/PredictionSlice";
 import { Box, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import Header from "../../components/Header/Header";
+import { setScrolling } from "../../Features/StackSlice";
 
 function Predictions() {
   const { user_id } = useOutletContext();
@@ -21,6 +22,11 @@ function Predictions() {
   const { darkMode, systemPrefersDark } = useOutletContext();
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    dispatch(setScrolling(true));
+    return () => dispatch(setScrolling(false));
+  }, []);
 
   useEffect(() => {
     dispatch(getPredictions({ user_id }));

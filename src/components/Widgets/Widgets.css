@@ -1,6 +1,6 @@
 .widgets {
   flex: 0.25;
-  border-left: 1px solid var(--twitter-background);
+  border-left: 0.5px solid var(--twitter-background);
 }
 
 .widgets__input {

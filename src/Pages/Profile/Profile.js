@@ -10,6 +10,7 @@ import TwitterProfileUI from "../../components/TopProfile/TopProfile";
 import MarketPlace from "../../components/MarketPlace/MarketPlace";
 import UserProducts from "../../components/UserProducts/UserProducts";
 import { clearProducts } from "../../Features/ProductSlice";
+import { setScrolling } from "../../Features/StackSlice";
 
 function Profile() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -17,6 +18,11 @@ function Profile() {
   const observer = useRef();
   const dispatch = useDispatch();
   const { user_id, darkMode, systemPrefersDark } = useOutletContext();
+
+  useEffect(() => {
+    dispatch(setScrolling(true));
+    return () => dispatch(setScrolling(false));
+  }, []);
 
   // alert(systemPrefersDark)
 
@@ -39,7 +45,10 @@ function Profile() {
 
   return (
     <Box className="profile">
-      <Box sx={{bgcolor: systemPrefersDark &&  "background.paper" }} className={`profile__header`}>
+      <Box
+        sx={{ bgcolor: systemPrefersDark && "background.paper" }}
+        className={`profile__header`}
+      >
         <h2>Profile</h2>
         <TwitterProfileUI />
         <Box

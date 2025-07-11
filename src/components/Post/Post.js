@@ -192,7 +192,7 @@ const Post = forwardRef(({ post }, ref) => {
             icon={<ChatBubbleOutlineIcon fontSize="small" />}
             count={post?.comments}
           />
-          <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} />
+          {/* <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} /> */}
           <StatusIcons
             location={"post"}
             icon={<FavoriteBorderIcon fontSize="small" />}

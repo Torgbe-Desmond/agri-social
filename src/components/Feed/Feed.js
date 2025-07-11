@@ -28,7 +28,10 @@ function Feed() {
 
   // Clear posts on unmount
   useEffect(() => {
-    return () => dispatch(clearPostData());
+    return () => {
+      dispatch(clearPostData());
+      dispatch(setScrolling(false));
+    };
   }, [dispatch]);
 
   // Infinite scroll ref

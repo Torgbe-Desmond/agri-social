@@ -12,6 +12,7 @@ import InsertPhotoOutlinedIcon from "@mui/icons-material/InsertPhotoOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { predictImage } from "../../Features/PredictionSlice";
 import { useOutletContext } from "react-router-dom";
+import { setScrolling } from "../../Features/StackSlice";
 
 function PredictDisease() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -159,7 +160,7 @@ function PredictDisease() {
       {/* Input Section */}
       {/* Input Section */}
       <Box
-        sx={{ p: 1, bgcolor:systemPrefersDark && "background.color" }}
+        sx={{ p: 1, bgcolor: systemPrefersDark && "background.color" }}
         display="flex"
         position="sticky"
         bottom="0"

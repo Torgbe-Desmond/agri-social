@@ -1,6 +1,6 @@
 .sidebar {
   display: grid;
-  border-right: 1px solid var(--twitter-background);
+  border-right: 0.5px solid var(--twitter-background);
   flex: 0.25;
   min-width: 100px;
   padding-top: 20px;

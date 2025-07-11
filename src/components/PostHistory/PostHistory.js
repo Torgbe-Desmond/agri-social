@@ -47,7 +47,7 @@ function PostHistory() {
     <>
       <Box className="post__history__header">
         <Box
-          sx={{ bgcolor: "background.paper" , border:"1px solid #ccc" }}
+          sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
           className="user__products__input"
         >
           <SearchIcon className="market_place__searchIcon" />
@@ -80,8 +80,8 @@ function PostHistory() {
       {filteredData?.length === 0 ? (
         <p style={{ padding: "1rem", color: "#555" }}>No posts yet.</p>
       ) : (
-        filteredData.map((post) => (
-          <PostHistoryCard key={post.id || post._id} post={post} />
+        filteredData.map((post, index) => (
+          <PostHistoryCard key={index} post={post} />
         ))
       )}
     </>

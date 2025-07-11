@@ -32,7 +32,7 @@ function Main() {
 
   return (
     <Box className="main">
-      {/* <Box className={`main__header`}>
+      <Box className={`main__header`}>
         <Box
           sx={{
             borderBottom: 0.5,
@@ -54,10 +54,9 @@ function Main() {
             <Tab label="Market Place" />
           </Tabs>
         </Box>
-      </Box> */}
-      <Feed />
-      {/* <Box>{mainPathIndex === 0 && <Feed />}</Box> */}
-      {/* <Box>{mainPathIndex === 1 && <MarketPlace />}</Box> */}
+      </Box>
+      <Box>{mainPathIndex === 0 && <Feed />}</Box>
+      <Box>{mainPathIndex === 1 && <MarketPlace />}</Box>
     </Box>
   );
 }

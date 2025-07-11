@@ -11,6 +11,7 @@ import {
 } from "../../Features/notificationSlice";
 import Notification from "../../components/Notification/Notification";
 import { useSocket } from "../../components/Socket/Socket";
+import { setScrolling } from "../../Features/StackSlice";
 
 function Notifications() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -27,6 +28,11 @@ function Notifications() {
   const scrollRef = useRef();
   const [notification_ids, setNotification_ids] = useState([]);
   const [scrolling, setScroll] = useState(0);
+
+  useEffect(() => {
+    dispatch(setScrolling(true));
+    return () => dispatch(setScrolling(true));
+  }, []);
 
   useEffect(() => {
     return () => {

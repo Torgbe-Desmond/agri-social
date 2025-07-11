@@ -18,7 +18,7 @@ import OnlinePredictionOutlinedIcon from "@mui/icons-material/OnlinePredictionOu
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
 
-import { useLocation, useOutletContext } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const BottomBar = ({ notifyCounts = 0 }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -26,7 +26,7 @@ const BottomBar = ({ notifyCounts = 0 }) => {
   const currentPage = location.pathname.split("/")[1];
   const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
 
-  const toggleDrawer = (state) => () => setOpenDrawer(state);
+  const toggleDrawer = (value) => () => setOpenDrawer(value);
 
   return (
     <>
@@ -37,8 +37,9 @@ const BottomBar = ({ notifyCounts = 0 }) => {
           left: 0,
           right: 0,
           zIndex: 1400,
-          borderTop: "1px solid #e6ecf0",
-          background: "transparent",
+          borderTop: 0.5,
+          borderColor: "divider",
+          bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
         }}
         elevation={0}
       >
@@ -47,46 +48,36 @@ const BottomBar = ({ notifyCounts = 0 }) => {
             backgroundColor: "rgba(255, 255, 255, 0.15)",
             backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
-            // borderRadius: "12px 12px 0 0", // top rounded only
-            // border: "1px solid rgba(255, 255, 255, 0.2)",
             transition: "background-color 0.3s ease",
           }}
         >
-          <BottomBarOption
-            Icon={HomeIcon}
-            // text="Home"
-            to="/"
-            active={currentPage === ""}
-          />
+          <BottomBarOption Icon={HomeIcon} to="/" active={currentPage === ""} />
           <BottomBarOption
             Icon={PermIdentityIcon}
-            // text="Profile"
             to="/you"
             active={currentPage === "you"}
           />
           <BottomBarOption
             Icon={NotificationsNoneIcon}
-            // text="Notifications"
             to="/notifications"
             count={notifyCounts}
             active={currentPage === "notifications"}
           />
           <BottomBarOption
             Icon={MailOutlineIcon}
-            // text="Messages"
             to="/messages"
             active={currentPage === "messages"}
           />
           <BottomBarOption
             Icon={MoreHorizIcon}
-            // text="More"
-            to=""
+            to="#"
             active={false}
-            onClick={toggleDrawer(true)}
+            onClick={toggleDrawer(true)} // ✅ wrapped in function
           />
         </BottomNavigation>
       </Box>
 
+      {/* Uncomment to use SwipeableDrawer */}
       <SwipeableDrawer
         anchor="bottom"
         open={openDrawer}
@@ -98,22 +89,13 @@ const BottomBar = ({ notifyCounts = 0 }) => {
             px: 2,
             pt: 2,
             pb: 10,
+            display: "flex",
             background: systemPrefersDark ? "background.paper" : "#FFF",
             borderTopLeftRadius: 8,
             borderTopRightRadius: 8,
-            position: "fixed",
-            bottom: 0,
-            left: 0,
-            display: "flex",
-            right: 0,
-            zIndex: 1600,
-            // bgcolor:systemPrefersDark && "background.paper",
+            color: "inherit",
           }}
         >
-          {/* <Typography variant="subtitle1" sx={{ mb: 2 }}>
-            More Options
-          </Typography> */}
-
           <BottomBarOption
             Icon={BookmarkBorderIcon}
             text="Bookmarks"

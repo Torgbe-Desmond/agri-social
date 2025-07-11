@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../Features/AuthSlice";
 import { useSocket } from "../components/Socket/Socket";
@@ -42,6 +42,10 @@ function PrivateRoute({ darkMode, systemPrefersDark, isMobile }) {
     darkMode,
     systemPrefersDark,
   };
+  const location = useLocation();
+
+  const currentPage = location.pathname.split("/")[1];
+  console.log("currentPage", currentPage);
 
   return (
     <div className={`private-route ${isMobile ? "" : ""}`}>

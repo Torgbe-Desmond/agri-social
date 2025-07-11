@@ -123,11 +123,11 @@ function TweetBox() {
             onChange={(e) => setContent(e.target.value)}
             InputProps={{
               endAdornment: (
-                <Tooltip title="Add emoji">
-                  <IconButton onClick={openEmojiPicker}>
+                <IconButton onClick={openEmojiPicker}>
+                  <Tooltip title="Add emoji">
                     <InsertEmoticonIcon />
-                  </IconButton>
-                </Tooltip>
+                  </Tooltip>
+                </IconButton>
               ),
             }}
             sx={{
@@ -138,7 +138,9 @@ function TweetBox() {
                 "&:hover fieldset": { borderColor: "transparent" },
                 "&.Mui-focused fieldset": { borderColor: "transparent" },
               },
-              "& .MuiInputBase-input": { color: "#FFF" },
+              "& .MuiInputBase-input": {
+                color: systemPrefersDark ? "#FFF" : "#000",
+              },
             }}
           />
           <EmojiPickerPopover
@@ -232,20 +234,20 @@ function TweetBox() {
               />
             </Tooltip>
 
-            <Tooltip title="Add Video">
-              <label htmlFor="video-upload">
-                <IconButton color="primary" component="span">
+            <label htmlFor="video-upload">
+              <IconButton color="primary" component="span">
+                <Tooltip title="Add Video">
                   <VideoLibraryIcon />
-                </IconButton>
-              </label>
-              <input
-                id="video-upload"
-                type="file"
-                accept="video/*"
-                hidden
-                onChange={(e) => handleMediaUpload(e, "video")}
-              />
-            </Tooltip>
+                </Tooltip>
+              </IconButton>
+            </label>
+            <input
+              id="video-upload"
+              type="file"
+              accept="video/*"
+              hidden
+              onChange={(e) => handleMediaUpload(e, "video")}
+            />
           </Box>
 
           <Button

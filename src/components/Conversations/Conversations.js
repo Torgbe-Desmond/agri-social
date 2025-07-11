@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Tabs, Tab, Box, Typography, CircularProgress } from "@mui/material";
 import Messages from "../Messages/Messages";
 import GroupMessages from "../GroupMessages/GroupMessages";
+import { setScrolling } from "../../Features/StackSlice";
 // import PostHistory from "../../components/PostHistory/PostHistory";
 // import TwitterProfileUI from "../../components/TopProfile/TopProfile";
 // import MarketPlace from "../../components/MarketPlace/MarketPlace";
@@ -39,9 +40,17 @@ function Conversations() {
     setTabIndex(newValue);
   };
 
+  useEffect(() => {
+    dispatch(setScrolling(true));
+    return () => dispatch(setScrolling(true));
+  }, []);
+
   return (
     <Box className="profile">
-      <Box sx={{bgcolor: systemPrefersDark &&  "background.paper" }} className={`profile__header`}>
+      <Box
+        sx={{ bgcolor: systemPrefersDark && "background.paper" }}
+        className={`profile__header`}
+      >
         <h2>Chats</h2>
         <Box
           sx={{
