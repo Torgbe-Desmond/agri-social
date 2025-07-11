@@ -3,14 +3,14 @@ import SuccessMessage from "../components/SuccessMessage/SuccessMessage";
 import { errorMap } from "../components/Errors/ErrorStatus";
 import { Alert } from "@mui/material";
 const url = [
-  "https://file-transfer-app-backend.onrender.com/api/v1",
+  "https://agri-social-backend.onrender.com",
   "http://localhost:8000",
 ];
 
 // Create an Axios instance
 
 export const axiosInstance = axios.create({
-  baseURL: url[1],
+  baseURL: url[0],
   headers: {
     "Content-Type": "application/json",
   },
