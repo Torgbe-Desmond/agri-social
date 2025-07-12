@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Box, CircularProgress } from "@mui/material";
 import { useSocket } from "../Socket/Socket";
 import { setScrolling } from "../../Features/StackSlice";
+import TweetBox from "../TweetBox/TweetBox";
 
 function Feed() {
   const { user_id } = useOutletContext();
@@ -118,6 +119,7 @@ function Feed() {
       ref={feedRef}
       sx={{ height: "100vh", overflowY: "auto", padding: 1 }}
     >
+      <TweetBox />
       {postData?.map((post, index) => {
         const isLast = index === postData.length - 1;
         return (

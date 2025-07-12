@@ -183,12 +183,12 @@ function VideoCard({
 
   return (
     <div className={`videoCard is-stuckToBottom`}>
-      <VideoHeader
+      {/* <VideoHeader
         toggleMute={toggleMute}
         isMuted={isMuted}
         username={username}
         handleToggleDialog={handleToggleDialog}
-      />
+      /> */}
 
       <AutoplayVideo
         videoRef={videoRef}
