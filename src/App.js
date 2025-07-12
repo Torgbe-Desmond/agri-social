@@ -47,6 +47,7 @@ import Chat from "./components/Chat/Chat";
 import Streams from "./components/Streams/Streams";
 import Conversations from "./components/Conversations/Conversations";
 import GroupConversation from "./components/GroupConversation/GroupConversation";
+import { clearOnLineStatus } from "./Features/StackSlice";
 // green
 // background: {
 //     default: "rgb(2, 29, 0)",
@@ -62,11 +63,14 @@ function App() {
   const isAuthenticated = localStorage.getItem("cc_ft") ? true : false;
   const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
   const isMobile = useMediaQuery("(max-width:640px)");
-  const { components, scrolling } = useSelector((state) => state.stack);
+  const { components, scrolling, onlineStatus, message } = useSelector(
+    (state) => state.stack
+  );
   const [errorMessage, setErrorMessage] = useState(null);
   const dispatch = useDispatch();
 
   const handleSnackbarClose = () => {
+    dispatch(clearOnLineStatus())
     setErrorMessage(null);
   };
 
@@ -134,6 +138,19 @@ function App() {
       >
         <Alert onClose={handleSnackbarClose} severity="error">
           {errorMessage}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={Boolean(message)}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={onlineStatus === true ? `success` : "error"}
+        >
+          {message}
         </Alert>
       </Snackbar>
     </div>

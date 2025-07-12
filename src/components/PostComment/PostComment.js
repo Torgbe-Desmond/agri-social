@@ -201,7 +201,10 @@ function PostComment() {
         </h2>
       </Box>
       <Post post={post} />
-      <Box className="post__comment__replies">
+      <Box
+        sx={{ borderBottom: 1, borderColor: "divider", p: 1 }}
+        className="post__comment__replies"
+      >
         <h2>
           Replies <KeyboardArrowDownIcon />
         </h2>
@@ -224,7 +227,12 @@ function PostComment() {
       /> */}
 
       <Box
-        sx={{ p: 1, bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
+        sx={{
+          p: 1,
+          bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
+          borderTop: 1,
+          borderColor: "divider",
+        }}
         display="flex"
         position="sticky"
         bottom="0"
@@ -232,7 +240,6 @@ function PostComment() {
         gap={1}
         alignItems="center"
         pt={1}
-        borderTop="1px solid #ddd"
       >
         <TextField
           sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}

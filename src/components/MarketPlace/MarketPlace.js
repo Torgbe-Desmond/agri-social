@@ -20,6 +20,7 @@ import {
   searchProducts,
 } from "../../Features/ProductSlice";
 import ComponentStack from "../HandleStack/HandleStack";
+import Header from "../Header/Header";
 
 function MarketPlace() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -94,79 +95,35 @@ function MarketPlace() {
   };
 
   return (
-    <Box
-      sx={{
-        padding: 3,
-      }}
-      className="market__place"
-    >
-      <Box className="market__place__header">
-        <Box
-          sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
-          className="market_place__input"
-        >
-          <SearchIcon
-            cursor="pointer"
-            className="widgets__searchIcon"
-            // onClick={handleSearchProduct}
-          />
-          <TextField
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            // onFocus={() => handleSearchProduct()}
-            placeholder="Search for a product"
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "transparent",
-                },
-                "& .MuiInputBase-input": {
-                  width: { xs: "300px", sm: "300px", md: "500px", lg: "500px" },
-                  boxSizing: "border-box",
-                },
-                "&:hover fieldset": {
-                  borderColor: "transparent",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "transparent",
-                },
-              },
-            }}
-          />
+    <Header
+      status={loading}
+      allowedSearch={true}
+      reloadAction={reloadAction}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+      children={
+        <Box sx={{ padding: 3 }} className="market__place">
+          <Grid container spacing={3}>
+            {products.map((product, index) => {
+              const isLast = index === products.length - 1;
+              return (
+                <Grid
+                  ref={isLast ? lastProductRef : null}
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={3}
+                  key={index}
+                >
+                  <ProductCard {...product} />
+                </Grid>
+              );
+            })}
+          </Grid>
         </Box>
-      </Box>
-
-      <Grid container spacing={3}>
-        {products.map((product, index) => {
-          const isLast = index === products.length - 1;
-
-          return (
-            <Grid
-              ref={isLast ? lastProductRef : null}
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
-              key={index}
-            >
-              <ProductCard {...product} />
-            </Grid>
-          );
-        })}
-      </Grid>
-      {loading === "loading" && (
-        <p className="circular__progress">
-          <CircularProgress fontSize="small" />
-        </p>
-      )}
-      {loading === "failed" && (
-        <p className="circular__progress">
-          <Button onClick={reloadAction}>Reload</Button>
-        </p>
-      )}
-    </Box>
+      }
+    />
   );
 }
 

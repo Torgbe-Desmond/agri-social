@@ -14,7 +14,7 @@ import { Box, Button, Stack, useMediaQuery } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useSocket } from "../Socket/Socket";
-import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
+import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
 
 function Sidebar() {
   const isMobile = useMediaQuery("(max-width:640px)");
@@ -56,7 +56,10 @@ function Sidebar() {
   }, [location]);
 
   return (
-    <Box className="sidebar">
+    <Box
+     
+      className="sidebar"
+    >
       {/* <Box className="logo">
         <img
           src={require("../../assets/icons8-farmer-64.png")}

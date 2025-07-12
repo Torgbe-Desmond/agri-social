@@ -48,7 +48,7 @@ function Header({
     <Box ref={feedRef} className="resuable">
       <Box className="resuable__header">
         <Typography variant="h2">
-          {name}{" "}
+          {name}
           {icons?.map((i, index) => (
             <Box sx={{ cursor: "pointer" }} onClick={i.action} key={index}>
               {i.icon}

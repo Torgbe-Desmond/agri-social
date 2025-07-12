@@ -230,7 +230,6 @@ function SwipeableEdgeDrawer(props) {
       sx={{
         background: "red",
         "& .css-4nmryk-MuiBackdrop-root-MuiModal-backdrop": {
-          background: "red",
         },
       }}
     >
@@ -267,6 +266,7 @@ function SwipeableEdgeDrawer(props) {
             borderTopLeftRadius: 8,
             borderTopRightRadius: 8,
             visibility: "visible",
+            fontSize:"12px",
             right: 0,
             left: 0,
             // background:"red"
@@ -279,7 +279,7 @@ function SwipeableEdgeDrawer(props) {
           <Button onClick={() => dispatch(popComponent())}>Close</Button>
         </StyledBox>
         <StyledBox
-          sx={{ width: "100%", overflow: "auto", marginBottom: "56px" }}
+          sx={{ width: "100%", overflow: "auto" }}
         >
           <div className="stream_comment">
             <div ref={chatContainerRef}>

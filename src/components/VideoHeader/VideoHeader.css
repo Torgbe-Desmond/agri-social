@@ -1,29 +1,32 @@
 .videoHeader {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position:absolute;
-    width: 100%;
-    color: #FFF;
-    z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
+  border-bottom: 1px solid var(--twitter-background);
 }
- 
-  .videoHeader-title {
-    font-size: 24px;
-    flex: 1;
-    text-align: center;
-    max-width: 400px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  }
-  
-  .shadow-v {
-    font-size: 24px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  }
 
-.videoHeader > * {
-    padding:20px;
+.videoHeader-title {
+  font-size: 24px;
+  flex: 1;
+  text-align: center;
+  max-width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.shadow-v {
+  font-size: 24px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.videoHeader>* {
+  padding: 10px;
 }

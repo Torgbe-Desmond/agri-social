@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { likePost, savePost, unSavePost } from "../../Features/PostSlice";
 
 import DeleteIcon from "@mui/icons-material/Delete";
+import { Box } from "@mui/material";
 
 function Saved({ save }) {
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ function Saved({ save }) {
   };
 
   return (
-    <div className="post">
+    <Box sx={{ borderBottom: 1, borderColor: "divider" }} className="post">
       <div className="post__avatar">
         <Avatar src={save?.user_image} />
       </div>
@@ -105,7 +106,7 @@ function Saved({ save }) {
           /> */}
         </div>
       </div>
-    </div>
+    </Box>
   );
 }
 

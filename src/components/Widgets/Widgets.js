@@ -71,7 +71,10 @@ function Widgets() {
   );
 
   return (
-    <Box className="widgets">
+    <Box
+     
+      className="widgets"
+    >
       <Box
         sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
         className="widgets__input"
@@ -79,7 +82,7 @@ function Widgets() {
         <SearchIcon className="widgets__searchIcon" />
         <TextField
           placeholder="What's happening?"
-          variant="outlined"  
+          variant="outlined"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           inputProps={{ "aria-label": "search" }}

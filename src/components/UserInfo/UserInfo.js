@@ -48,8 +48,8 @@ const UserInfo = ({ _userDetails, _userDetailsStatus }) => {
         background: "inherit",
         fontFamily: "Arial, sans-serif",
         boxSizing: "border-box",
-        // background: "rgba(255, 255, 255, 0.2)",
-        // backdropFilter: "blur(10px)",
+        display: "flex",
+        justifyContent: "flex-start",
       }}
     >
       <Box sx={{ position: "relative", px: 2, pb: 2 }}>
@@ -99,7 +99,7 @@ const UserInfo = ({ _userDetails, _userDetailsStatus }) => {
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 2,
+            gap: 0.5,
             mt: 1,
             color: "gray",
           }}
@@ -120,7 +120,7 @@ const UserInfo = ({ _userDetails, _userDetailsStatus }) => {
           </Typography>
         </Box>
 
-        <Box sx={{ display: "flex", gap: 3, mt: 1 }}>
+        <Box sx={{ display: "flex", gap: 3, mt: 1, pl: 0.5, color: "gray" }}>
           <Typography variant="body2">
             <strong>{_userDetails?.following}</strong> Following
           </Typography>

@@ -1,4 +1,10 @@
-import React, { forwardRef, useCallback, useEffect, useState } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import "./Post.css";
 import Avatar from "@mui/material/Avatar";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
@@ -9,14 +15,13 @@ import StatusIcons from "../StatusIcons/StatusIcons";
 import { useDispatch, useSelector } from "react-redux";
 import { deletePost, likePost, savePost } from "../../Features/PostSlice";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import { Button, CircularProgress, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import { predictImageInPost } from "../../Features/PredictionSlice";
 import SuccessMessage from "../SuccessMessage/SuccessMessage";
 
 const Post = forwardRef(({ post }, ref) => {
   const dispatch = useDispatch();
-  // const { user_id } = useOutletContext();
   const { userDetails } = useSelector((state) => state.auth);
   const { singlePostStatus } = useSelector((state) => state.post);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -123,7 +128,12 @@ const Post = forwardRef(({ post }, ref) => {
   }
 
   return (
-    <div className="post" id={`post-${post?.post_id}`} ref={ref}>
+    <Box
+      sx={{ borderBottom: 1, borderColor: "divider" }}
+      className="post"
+      id={`post-${post?.post_id}`}
+      ref={ref}
+    >
       <div className="post__avatar">
         <Avatar src={post?.user_image} />
       </div>
@@ -169,12 +179,18 @@ const Post = forwardRef(({ post }, ref) => {
           )}
           {post?.videos && (
             <video
+              type="video/mp4"
+              className="post-video"
+              loop
+              playsInline
+              muted
+              controls
               style={{
                 width: "100%",
                 objectFit: "cover",
                 borderRadius: 12,
               }}
-              controls
+              preload="none"
             >
               <source src={post.videos} type="video/mp4" />
               Your browser does not support the video tag.
@@ -214,7 +230,7 @@ const Post = forwardRef(({ post }, ref) => {
           handleSnackbarClose={handleSnackbarClose}
         />
       )}
-    </div>
+    </Box>
   );
 });
 

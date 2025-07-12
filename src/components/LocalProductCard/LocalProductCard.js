@@ -43,7 +43,7 @@ const LocalProductCard = ({
   return (
     <Card
       sx={{
-        width: 220,
+        width: "auto",
         borderRadius: 4,
         boxShadow: 3,
         padding: 2,

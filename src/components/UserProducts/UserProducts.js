@@ -12,6 +12,7 @@ import LocalProductCard from "../LocalProductCard/LocalProductCard";
 import ComponentStack from "../HandleStack/HandleStack";
 import { clearProducts, fetchUserProducts } from "../../Features/ProductSlice";
 import { popComponent } from "../../Features/StackSlice";
+import Header from "../Header/Header";
 
 function UserProducts() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -46,60 +47,43 @@ function UserProducts() {
     setFilteredData(searchedData);
   }, [searchTerm, products]);
 
+  const reloadAction = () => {
+    dispatch(fetchUserProducts({ user_id: userDetails?.id }));
+  };
+
   return (
-    <Box
-      sx={{
-        ...(systemPrefersDark ? darkMode : {}),
-        padding: 3,
-      }}
-      className="market__place"
-    >
-      <Box className="market__header">
-        <div className="user__actions">
-          <StatusIcons
-            icon={
-              <AddOutlinedIcon onClick={handleCreateProduct} fontSize="small" />
-            }
-          />
-        </div>
+    <Header
+      icons={[
+        {
+          icon: <AddOutlinedIcon key="product" />,
+          action: handleCreateProduct,
+        },
+      ]}
+      status={loading}
+      allowedSearch={true}
+      name={"Products"}
+      reloadAction={reloadAction}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+      children={
         <Box
-          sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
-          className="user__products__input"
+          sx={{
+            ...(systemPrefersDark ? darkMode : {}),
+            padding: 3,
+          }}
+          className="market__place"
         >
-          <SearchIcon className="market_place__searchIcon" />
-          <TextField
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search for a product"
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "transparent",
-                },
-                "& .MuiInputBase-input": {
-                  width: { xs: "100%", sm: "100%", md: "500px", lg: "500px" },
-                  boxSizing: "border-box",
-                },
-                "&:hover fieldset": {
-                  borderColor: "transparent",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "transparent",
-                },
-              },
-            }}
-          />{" "}
-        </Box>
-      </Box>
-      <Grid container spacing={3}>
-        {filteredData?.map((product, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-            <LocalProductCard {...product} />
+          <Box className="market__header"></Box>
+          <Grid sx={{ width: "100%" }} container spacing={3}>
+            {filteredData?.map((product, index) => (
+              <Grid item xs={12} sm={12} md={4} lg={3} key={index}>
+                <LocalProductCard {...product} />
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
-    </Box>
+        </Box>
+      }
+    />
   );
 }
 

@@ -6,6 +6,7 @@ import { useSocket } from "../components/Socket/Socket";
 import BottomBar from "../components/BottomBar/BottomBar";
 import Sidebar from "../components/Sidebar/Sidebar";
 import "../App.css";
+import { Box } from "@mui/material";
 
 function PrivateRoute({ darkMode, systemPrefersDark, isMobile }) {
   const dispatch = useDispatch();
@@ -48,10 +49,17 @@ function PrivateRoute({ darkMode, systemPrefersDark, isMobile }) {
   console.log("currentPage", currentPage);
 
   return (
-    <div className={`private-route ${isMobile ? "" : ""}`}>
+    <Box
+      sx={{
+        borderLeft: 1,
+        borderRight: 1,
+        borderColor: "divider",
+      }}
+      className={`private-route ${isMobile ? "" : ""}`}
+    >
       {/* {isMobile ? <BottomBar /> : <Sidebar />} */}
       <Outlet context={sharedProps} />
-    </div>
+    </Box>
   );
 }
 

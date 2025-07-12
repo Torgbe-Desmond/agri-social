@@ -8,6 +8,8 @@ const stackSlice = createSlice({
     mainPathIndex: 0,
     stackState: "",
     scrolling: false,
+    message: "",
+    onlineStatus: null,
   },
   reducers: {
     pushComponent: (state, action) => {
@@ -25,6 +27,15 @@ const stackSlice = createSlice({
       state.components = [];
       state.stackState = "dropped";
     },
+    clearOnLineStatus: (state) => {
+      state.message = "";
+      state.onlineStatus = null;
+    },
+    onlineStatus: (state, action) => {
+      const { status, message } = action.payload;
+      state.message = message;
+      state.onlineStatus = status;
+    },
     toggleSearch: (state) => {
       state.search = !state.search;
     },
@@ -41,5 +52,7 @@ export const {
   toggleSearch,
   setMainPathIndex,
   setScrolling,
+  onlineStatus,
+  clearOnLineStatus,
 } = stackSlice.actions;
 export default stackSlice.reducer;

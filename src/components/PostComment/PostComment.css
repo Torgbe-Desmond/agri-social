@@ -3,7 +3,6 @@
     min-width: fit-content;
     overflow-y: scroll;
     width: 100%;
-
 }
 
 
@@ -45,7 +44,7 @@
 .post__comment__replies {
     /* background-color: white; */
     z-index: 100;
-    border-bottom: 1px solid var(--twitter-background);
+    /* border-bottom: 1px solid var(--twitter-background); */
     padding: 5px 0px 0px 20px;
 
 }

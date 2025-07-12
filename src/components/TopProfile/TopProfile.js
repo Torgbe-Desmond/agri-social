@@ -43,6 +43,8 @@ const TwitterProfileUI = () => {
         background: "inherit",
         fontFamily: "Arial, sans-serif",
         boxSizing: "border-box",
+        display: "flex",
+        justifyContent: "flex-start",
       }}
     >
       <Box sx={{ position: "relative", px: 2, pb: 2 }}>
@@ -57,30 +59,26 @@ const TwitterProfileUI = () => {
         />
       </Box>
 
-      <Box sx={{ px: 2, pt: 2 }}>
-        <Box sx={{ float: "right", display: "flex", gap: 3, mt: 1 }}>
-          <Button
-            onClick={handleEditProfile}
-            variant="outlined"
-            sx={{
-              borderRadius: 5,
-            }}
-          >
-            Edit profile
-          </Button>
-        </Box>
-       
-
-        <Typography variant="h6" fontWeight="bold">
+      <Box
+        sx={{
+          px: 2,
+          pt: 2,
+          // border: "1px solid red",
+          display: "flex",
+          justifyContent: "flex-start",
+          flexDirection: "column",
+        }}
+      >
+        {/* <Typography variant="h6" fontWeight="bold">
           {userDetails?.username}
-        </Typography>
+        </Typography> */}
         <Typography color="gray">@{userDetails?.username}</Typography>
 
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 2,
+            gap: 0.5,
             mt: 1,
             color: "gray",
           }}
@@ -101,13 +99,25 @@ const TwitterProfileUI = () => {
           </Typography>
         </Box>
 
-        <Box sx={{ display: "flex", gap: 3, mt: 1, color: "gray" }}>
+        <Box sx={{ display: "flex", gap: 3, mt: 1, color: "gray", pl: 0.5 }}>
           <Typography variant="body2">
             <strong>{userDetails?.following}</strong> Following
           </Typography>
           <Typography variant="body2">
             <strong>{userDetails?.followers}</strong> Followers
           </Typography>
+        </Box>
+
+        <Box sx={{ display: "flex", gap: 3, mt: 1 }}>
+          <Button
+            onClick={handleEditProfile}
+            variant="outlined"
+            sx={{
+              borderRadius: 5,
+            }}
+          >
+            Edit profile
+          </Button>
         </Box>
       </Box>
     </Box>

@@ -183,7 +183,9 @@ function CommentReplies() {
   return (
     <Box className="comment__replies">
       <Box
-        sx={{ background: systemPrefersDark && "background.paper" }}
+        sx={{
+          background: systemPrefersDark && "background.paper",
+        }}
         className="comment__replies__header"
       >
         <h2>
@@ -194,11 +196,14 @@ function CommentReplies() {
         singleComment={singleComment}
         singleCommentStatus={singleCommentStatus}
       />
-      <div className="comment__replies__replies">
+      <Box
+        sx={{ borderBottom: 1, borderColor: "divider", p: 1 }}
+        className="comment__replies__replies"
+      >
         <h2>
           Replies <KeyboardArrowDownIcon />
         </h2>
-      </div>
+      </Box>
 
       <div ref={chatContainerRef}>
         {togetherComments?.map((reply, index) => (
@@ -207,8 +212,13 @@ function CommentReplies() {
         <div ref={scrollAnchorRef} />
       </div>
 
-    <Box
-        sx={{ p: 1,  bgcolor: systemPrefersDark ? "background.paper" :"#FFF" }}
+      <Box
+        sx={{
+          p: 1,
+          bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
+          borderTop: 1,
+          borderColor: "divider",
+        }}
         display="flex"
         position="sticky"
         bottom="0"
@@ -216,10 +226,9 @@ function CommentReplies() {
         gap={1}
         alignItems="center"
         pt={1}
-        borderTop="1px solid #ddd"
       >
         <TextField
-          sx={{  bgcolor: systemPrefersDark ? "background.paper" :"#FFF" }}
+          sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
           fullWidth
           placeholder="Write a comment..."
           value={comment}

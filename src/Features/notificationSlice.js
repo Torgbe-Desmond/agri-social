@@ -54,14 +54,29 @@ const notificationSlice = createSlice({
         state.notificationStatus = "loading";
       })
       .addCase(getNofitications.fulfilled, (state, action) => {
+        // const { notifications, numb_found } = action.payload;
+
+        // // First update `hasMore`
+        // state.hasMore = notifications.length > 0 && notifications.length >= 10;
+
+        // // Then append based on actual result
+        // if (notifications.length > 0) {
+        //   state.notifications = [...state.notifications, ...notifications];
+        // }
+
+        // state.notificationStatus = "succeeded";
+
         const { notifications, numb_found } = action.payload;
+        state.hasMore = notifications.length > 0;
 
-        // First update `hasMore`
-        state.hasMore = notifications.length > 0 && notifications.length >= 10;
-
-        // Then append based on actual result
-        if (notifications.length > 0) {
-          state.notifications = [...state.notifications, ...notifications];
+        if (state.hasMore) {
+          const existingIds = new Set(
+            state.notifications.map((notification) => notification.id)
+          );
+          const newNotification = notifications.filter(
+            (notification) => !existingIds.has(notification.id)
+          );
+          state.notifications = [...state.notifications, ...newNotification];
         }
 
         state.notificationStatus = "succeeded";

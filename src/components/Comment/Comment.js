@@ -6,7 +6,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 // import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import StatusIcons from "../StatusIcons/StatusIcons";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import "./Comment.css";
 import { likeComment } from "../../Features/CommentSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,7 +37,7 @@ function Comment({ singleComment, singleCommentStatus }) {
   };
 
   return (
-    <div className="post">
+    <Box sx={{ borderBottom: 1, borderColor: "divider" }} className="post">
       <div className="post__avatar">
         <Avatar src={singleComment?.user_image} />
       </div>
@@ -65,7 +65,7 @@ function Comment({ singleComment, singleCommentStatus }) {
             icon={<ChatBubbleOutlineIcon fontSize="small" />}
             count={singleComment?.replies}
           />
-          <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} />
+          {/* <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} /> */}
           <StatusIcons
             location={"post"}
             icon={<FavoriteBorderIcon fontSize="small" />}
@@ -78,7 +78,7 @@ function Comment({ singleComment, singleCommentStatus }) {
           /> */}
         </div>
       </div>
-    </div>
+    </Box>
   );
 }
 

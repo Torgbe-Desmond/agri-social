@@ -6,6 +6,7 @@ import { useOutletContext } from "react-router-dom";
 import { Box, CircularProgress, TextField } from "@mui/material";
 import PostHistoryCard from "../PostHistoryCard/PostHistoryCard";
 import SearchIcon from "@mui/icons-material/Search";
+import Header from "../Header/Header";
 
 function PostHistory() {
   const { user_id } = useOutletContext();
@@ -43,48 +44,30 @@ function PostHistory() {
     );
   }
 
-  return (
-    <>
-      <Box className="post__history__header">
-        <Box
-          sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
-          className="user__products__input"
-        >
-          <SearchIcon className="market_place__searchIcon" />
-          <TextField
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search for a post"
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "transparent",
-                },
-                "& .MuiInputBase-input": {
-                  width: { xs: "100%", sm: "100%", md: "500px", lg: "500px" },
-                  boxSizing: "border-box",
-                },
-                "&:hover fieldset": {
-                  borderColor: "transparent",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "transparent",
-                },
-              },
-            }}
-          />{" "}
-        </Box>
-      </Box>
+  const reloadAction = () => {
+    dispatch(getPostHistory({ user_id }));
+  };
 
-      {filteredData?.length === 0 ? (
-        <p style={{ padding: "1rem", color: "#555" }}>No posts yet.</p>
-      ) : (
-        filteredData.map((post, index) => (
-          <PostHistoryCard key={index} post={post} />
-        ))
-      )}
-    </>
+  return (
+    <Header
+      status={postHistoryStatus}
+      allowedSearch={true}
+      name={"Posts"}
+      reloadAction={reloadAction}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+      children={
+        <>
+          {filteredData?.length === 0 ? (
+            <p style={{ padding: "1rem", color: "#555" }}>No posts yet.</p>
+          ) : (
+            filteredData.map((post, index) => (
+              <PostHistoryCard key={index} post={post} />
+            ))
+          )}
+        </>
+      }
+    />
   );
 }
 

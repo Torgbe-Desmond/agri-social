@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import TweetBox from "../TweetBox/TweetBox";
 import Post from "../Post/Post";
 import "./Feed.css";
 import { clearPostData, getPosts } from "../../Features/PostSlice";
 import { useOutletContext } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, Button, CircularProgress } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { useSocket } from "../Socket/Socket";
 import { setScrolling } from "../../Features/StackSlice";
 
@@ -19,14 +18,15 @@ function Feed() {
 
   const feedRef = useRef(null);
   const lastScrollTop = useRef(0);
-  const [showBottomBar, setShowBottomBar] = useState(false);
+  const [scrolling, setScroll] = useState(0);
 
-  // Fetch posts when page number changes
+  const itemRefs = useRef([]);
+  const [visiblePostId, setVisiblePostId] = useState(null);
+
   useEffect(() => {
     dispatch(getPosts({ user_id, offset: pageNumber, limit: 10 }));
   }, [pageNumber, dispatch, user_id]);
 
-  // Clear posts on unmount
   useEffect(() => {
     return () => {
       dispatch(clearPostData());
@@ -34,7 +34,6 @@ function Feed() {
     };
   }, [dispatch]);
 
-  // Infinite scroll ref
   const lastPostRef = useCallback(
     (node) => {
       if (observer.current) observer.current.disconnect();
@@ -48,39 +47,87 @@ function Feed() {
     [hasMore]
   );
 
-  // Scroll detection for showing/hiding bottom tab
   useEffect(() => {
-    const feedNode = feedRef.current;
-    if (!feedNode) return;
+    const node = feedRef.current;
+    if (!node) return;
 
     const handleScroll = () => {
-      const scrollTop = feedNode.scrollTop;
-      if (scrollTop < lastScrollTop.current) {
-        dispatch(setScrolling(true)); // scrolling down
-      } else {
-        dispatch(setScrolling(false)); // scrolling up
-      }
+      const scrollTop = node.scrollTop;
+      dispatch(setScrolling(scrollTop > lastScrollTop.current));
       lastScrollTop.current = scrollTop;
+      setScroll((prev) => prev + 1);
     };
 
-    feedNode.addEventListener("scroll", handleScroll);
-    return () => feedNode.removeEventListener("scroll", handleScroll);
-  }, []);
+    node.addEventListener("scroll", handleScroll);
+    return () => node.removeEventListener("scroll", handleScroll);
+  }, [dispatch]);
 
-  // console.log("showBottomBar:", showBottomBar);
+  // Detect visible post
+  useEffect(() => {
+    const visible = itemRefs.current.find((el) => {
+      if (!el) return false;
+      const rect = el.getBoundingClientRect();
+      return (
+        rect.top >= parseInt(window.innerHeight / 50) &&
+        rect.bottom <= window.innerHeight
+      );
+    });
+
+    itemRefs.current.forEach((el) => el?.classList.remove("visible-post"));
+
+    const videoIds = postData.filter((p) => p.has_video).map((p) => p.post_id);
+
+    const id = visible
+      ?.querySelector(".post")
+      ?.getAttribute("id")
+      ?.replace("post-", "");
+
+    if (videoIds.includes(id)) {
+      // If new post is different from currently playing
+      if (visiblePostId && visiblePostId !== id) {
+        // Pause the previously playing video
+        const oldVideo = document.querySelector(`#post-${visiblePostId} video`);
+        if (oldVideo) oldVideo.pause();
+      }
+
+      visible.classList.add("visible-post");
+
+      const newVideo = document.querySelector(`#post-${id} video`);
+      if (newVideo) {
+        newVideo.play().catch((err) => {
+          console.warn("Autoplay failed:", err);
+        });
+      }
+
+      setVisiblePostId(id); // Update the currently playing video ID
+    } else {
+      // If visible post is not a video, pause previously playing video
+      if (visiblePostId) {
+        const prevVideo = document.querySelector(
+          `#post-${visiblePostId} video`
+        );
+        if (prevVideo) prevVideo.pause();
+        setVisiblePostId(null);
+      }
+    }
+  }, [scrolling, postData]);
 
   return (
     <Box
       className="feed"
       ref={feedRef}
-      sx={{ height: "100vh", overflowY: "auto" }}
+      sx={{ height: "100vh", overflowY: "auto", padding: 1 }}
     >
-      <TweetBox />
-
       {postData?.map((post, index) => {
         const isLast = index === postData.length - 1;
         return (
-          <div key={index} ref={isLast ? lastPostRef : null}>
+          <div
+            key={index}
+            ref={(el) => {
+              itemRefs.current[index] = el;
+              if (isLast) lastPostRef(el);
+            }}
+          >
             <Post post={post} />
           </div>
         );
@@ -88,7 +135,7 @@ function Feed() {
 
       {postStatus === "loading" && (
         <p className="circular__progress">
-          <CircularProgress fontSize="small" />
+          <CircularProgress size={20} />
         </p>
       )}
     </Box>

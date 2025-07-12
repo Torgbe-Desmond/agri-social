@@ -38,7 +38,7 @@
 
 .comment__replies__replies {
     z-index: 100;
-    border-bottom: 1px solid var(--twitter-background);
+    /* border-bottom: 1px solid var(--twitter-background); */
     padding: 5px 20px;
 }
 

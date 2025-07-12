@@ -37,7 +37,6 @@ const Streams = () => {
     );
   }, [pageNumber]);
 
-
   // Filter data based on search term
   useEffect(() => {
     const searchedData = searchTerm
@@ -46,7 +45,7 @@ const Streams = () => {
         )
       : streamData;
     setFilteredData(searchedData);
-  }, [searchTerm]);
+  }, [searchTerm, streamData]);
 
   const lasStreamRef = useCallback(
     (node) => {
