@@ -30,7 +30,11 @@ const DeletePostModal = ({ post_id }) => {
   const dispatch = useDispatch();
 
   const handlePostDelete = () => {
-    dispatch(deletePost({ post_id }));
+    dispatch(deletePost({ post_id }))
+      .unwrap()
+      .then(() => {
+        dispatch(popComponent());
+      });
   };
 
   return (

@@ -94,7 +94,10 @@ function PredictDisease() {
 
   return (
     <Box className="predict">
-      <Box className="predict__header">
+      <Box
+        sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
+        className="predict__header"
+      >
         <h2>Predict Disease</h2>
         <div className="message">
           Chat will be saved and can be viewed in predictions
@@ -160,7 +163,7 @@ function PredictDisease() {
       {/* Input Section */}
       {/* Input Section */}
       <Box
-        sx={{ p: 1, bgcolor: systemPrefersDark && "background.color" }}
+        sx={{ p: 1, bgcolor: systemPrefersDark && "background.color",borderTop: 1, borderColor: "divider" }}
         display="flex"
         position="sticky"
         bottom="0"
@@ -168,7 +171,6 @@ function PredictDisease() {
         gap={1}
         alignItems="center"
         pt={1}
-        borderTop="1px solid #ddd"
         bgcolor="#FFF"
       >
         {/* Image Preview and Remove Button */}

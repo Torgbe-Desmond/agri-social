@@ -91,7 +91,7 @@ function Feed() {
         if (oldVideo) oldVideo.pause();
       }
 
-      visible.classList.add("visible-post");
+      // visible.classList.add("visible-post");
 
       const newVideo = document.querySelector(`#post-${id} video`);
       if (newVideo) {
@@ -137,7 +137,7 @@ function Feed() {
 
       {postStatus === "loading" && (
         <p className="circular__progress">
-          <CircularProgress size={20} />
+          <CircularProgress fontSize="large" />
         </p>
       )}
     </Box>

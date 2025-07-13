@@ -45,7 +45,7 @@ const BottomBar = ({ notifyCounts = 0 }) => {
       >
         <BottomNavigation
           sx={{
-            backgroundColor: "rgba(255, 255, 255, 0.15)",
+            // backgroundColor: "rgba(255, 255, 255, 0.15)",
             backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
             transition: "background-color 0.3s ease",
@@ -90,10 +90,9 @@ const BottomBar = ({ notifyCounts = 0 }) => {
             pt: 2,
             pb: 10,
             display: "flex",
-            background: systemPrefersDark ? "background.paper" : "#FFF",
+            // background: systemPrefersDark ? "background.paper" : "#FFF",
             borderTopLeftRadius: 8,
             borderTopRightRadius: 8,
-            color: "inherit",
           }}
         >
           <BottomBarOption

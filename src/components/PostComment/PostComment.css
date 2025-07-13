@@ -6,6 +6,12 @@
 }
 
 
+.text-field {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(1000px);
+    -webkit-backdrop-filter: blur(500px);
+}
+
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .post__comment::-webkit-scrollbar {

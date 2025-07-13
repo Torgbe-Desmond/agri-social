@@ -36,13 +36,13 @@ function BottomBarOption({ Icon, text, to, active, count, onClick }) {
         color: active ? "#088A6A" : "inherit",
 
         // Translucent glass effect
-        backgroundColor: "rgba(255, 255, 255, 0.15)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
+        // backgroundColor: "rgba(255, 255, 255, 0.15)",
+        // backdropFilter: "blur(12px)",
+        // WebkitBackdropFilter: "blur(12px)",
 
         // Optional: smooth transition
         transition: "background-color 0.3s ease",
-        bgcolor: systemPrefersDark && "background.paper",
+        // bgcolor: systemPrefersDark && "background.paper",
       }}
     >
       <Icon />
@@ -50,7 +50,6 @@ function BottomBarOption({ Icon, text, to, active, count, onClick }) {
       {count > 0 && (
         <Box
           sx={{
-            backgroundColor: "red",
             color: "white",
             borderRadius: "50%",
             padding: "0 6px",

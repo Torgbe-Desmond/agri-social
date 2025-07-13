@@ -1,16 +1,28 @@
 import React, { useState } from "react";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
   Box,
+  Button,
+  Stack,
+  TextField,
+  Typography,
+  Modal,
+  Paper,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { createGroup } from "../../Features/MessageSlice";
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  borderRadius: 2,
+  boxShadow: 24,
+  p: 4,
+};
 
 const CreateGroupModal = () => {
   const [groupName, setGroupName] = useState("");
@@ -24,10 +36,10 @@ const CreateGroupModal = () => {
     formData.append("name", groupName.trim());
     // formData.append("description", description.trim());
     formData.append("sender_id", localStorage.getItem("cc_ft"));
-    formData.append("is_group", "1"); // Set to 1 for group
+    formData.append("is_group", "1");
 
     dispatch(createGroup({ formData }));
-    dispatch(popComponent()); // Close modal after creating
+    dispatch(popComponent());
   };
 
   const handleCancel = () => {
@@ -35,10 +47,13 @@ const CreateGroupModal = () => {
   };
 
   return (
-    <Dialog open fullWidth maxWidth="sm">
-      <DialogTitle>Create Group</DialogTitle>
-      <DialogContent>
-        <Box display="flex" flexDirection="column" gap={2} mt={1}>
+    <Modal open={true} onClose={handleCancel}>
+      <Box sx={modalStyle}>
+        <Typography variant="h6" mb={2}>
+          Create Group
+        </Typography>
+
+        <Box display="flex" flexDirection="column" gap={2}>
           <TextField
             label="Group Name"
             value={groupName}
@@ -55,21 +70,35 @@ const CreateGroupModal = () => {
             fullWidth
           />
         </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel} color="error">
-          Cancel
-        </Button>
-        <Button
-          onClick={handleCreate}
-          variant="contained"
-          color="primary"
-          disabled={!groupName.trim()}
+
+        <Stack
+          direction="row"
+          spacing={2}
+          justifyContent="flex-end"
+          alignItems="flex-end"
+          mt={3}
         >
-          Create
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <Button
+            onClick={handleCancel}
+            variant="outlined"
+            color="secondary"
+            className="sidebar__tweet__outlined"
+            sx={{ borderRadius: "32px" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleCreate}
+            variant="contained"
+            className="sidebar__tweet"
+            disabled={!groupName.trim()}
+            sx={{ borderRadius: "32px" }}
+          >
+            Create
+          </Button>
+        </Stack>
+      </Box>
+    </Modal>
   );
 };
 

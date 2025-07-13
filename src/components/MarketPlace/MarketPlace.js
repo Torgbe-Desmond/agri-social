@@ -32,25 +32,6 @@ function MarketPlace() {
     useSelector((state) => state.product);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const style = {
-    // position: "absolute",
-    // top: "30%",
-    // right: "0",
-    // transform: "translate(-50%, -50%)",
-    width: "100%",
-    // bgcolor: "background.paper",
-    boxSizing: "border-box",
-    // boxShadow: 1,
-    gap: 1,
-    zIndex: 1000,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    // p: 1,
-    background: "#ccc",
-    // maxHeight: "80vh",
-    overflowY: "auto",
-  };
   useEffect(() => {
     dispatch(fetchProducts({ offset: pageNumber, limit: 6 }));
   }, [pageNumber]);
@@ -103,11 +84,22 @@ function MarketPlace() {
       setSearchTerm={setSearchTerm}
       children={
         <Box sx={{ padding: 3 }} className="market__place">
-          <Grid container spacing={3}>
+          <Grid
+            container
+            sx={{
+              width: "100%",
+              justifyContent: "center",
+            }}
+            spacing={3}
+          >
             {products.map((product, index) => {
               const isLast = index === products.length - 1;
               return (
                 <Grid
+                  sx={{
+                    height: "auto",
+                    boxSizing: "border-box",
+                  }}
                   ref={isLast ? lastProductRef : null}
                   item
                   xs={12}

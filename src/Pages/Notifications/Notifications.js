@@ -145,7 +145,10 @@ function Notifications() {
 
   return (
     <Box ref={scrollRef} className="notifications">
-      <Box className="notifications__header">
+      <Box
+        sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
+        className="notifications__header"
+      >
         <h2>Notifications</h2>
       </Box>
       {notifications.map((notification, index) => {

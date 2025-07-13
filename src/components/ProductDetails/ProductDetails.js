@@ -162,7 +162,7 @@ function ProductDetails() {
 
       {/* Sticky Bottom Input */}
       <Box
-        sx={systemPrefersDark ? { ...darkMode, p: 1 } : { p: 1 }}
+        sx={systemPrefersDark ? { p: 1 } : { p: 1 }}
         display="flex"
         position="sticky"
         bottom="0"
@@ -170,8 +170,8 @@ function ProductDetails() {
         gap={1}
         alignItems="center"
         pt={1}
-        borderTop="1px solid #ddd"
-        bgcolor={systemPrefersDark ? darkMode.background : "#FFF"}
+        // borderTop="1px solid #ddd"
+        // bgcolor={systemPrefersDark ? darkMode.background : "#FFF"}
       >
         <TextField
           fullWidth

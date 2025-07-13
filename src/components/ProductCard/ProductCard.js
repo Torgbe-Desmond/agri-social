@@ -32,7 +32,7 @@ const ProductCard = ({
     <Card
       onClick={handleNavigate}
       sx={{
-        width: 220,
+        width: 250,
         borderRadius: 4,
         boxShadow: 3,
         padding: 2,

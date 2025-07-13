@@ -242,7 +242,7 @@ function PostComment() {
         pt={1}
       >
         <TextField
-          sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
+          // sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
           fullWidth
           placeholder="Write a comment..."
           value={comment}

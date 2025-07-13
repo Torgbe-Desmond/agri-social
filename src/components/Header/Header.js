@@ -10,6 +10,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { useDispatch } from "react-redux";
 import { setScrolling } from "../../Features/StackSlice";
+import { useOutletContext } from "react-router-dom";
 
 function Header({
   icons,
@@ -25,6 +26,7 @@ function Header({
   const [showBottomBar, setShowBottomBar] = useState(false);
   const feedRef = useRef(null);
   const dispatch = useDispatch();
+  const { user_id, darkMode, systemPrefersDark } = useOutletContext();
 
   useEffect(() => {
     const feedNode = feedRef.current;
@@ -46,7 +48,10 @@ function Header({
 
   return (
     <Box ref={feedRef} className="resuable">
-      <Box className="resuable__header">
+      <Box
+        sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
+        className="resuable__header"
+      >
         <Typography variant="h2">
           {name}
           {icons?.map((i, index) => (

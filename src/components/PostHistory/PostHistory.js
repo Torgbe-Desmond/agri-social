@@ -7,6 +7,7 @@ import { Box, CircularProgress, TextField } from "@mui/material";
 import PostHistoryCard from "../PostHistoryCard/PostHistoryCard";
 import SearchIcon from "@mui/icons-material/Search";
 import Header from "../Header/Header";
+import { setScrolling } from "../../Features/StackSlice";
 
 function PostHistory() {
   const { user_id } = useOutletContext();
@@ -15,10 +16,29 @@ function PostHistory() {
   const { postHistory, postHistoryStatus } = useSelector((state) => state.post);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const feedRef = useRef(null);
+  const lastScrollTop = useRef(0);
+  const [scrolling, setScroll] = useState(0);
 
   useEffect(() => {
     dispatch(getPostHistory({ user_id }));
   }, [dispatch, user_id]);
+
+  useEffect(() => {
+    const node = feedRef.current;
+    if (!node) return;
+
+    const handleScroll = () => {
+      const scrollTop = node.scrollTop;
+      dispatch(setScrolling(scrollTop > lastScrollTop.current));
+      lastScrollTop.current = scrollTop;
+      setScroll((prev) => prev + 1);
+      console.log("eeee");
+    };
+
+    node.addEventListener("scroll", handleScroll);
+    return () => node.removeEventListener("scroll", handleScroll);
+  }, [dispatch]);
 
   useEffect(() => {
     let searchedData;
@@ -57,15 +77,19 @@ function PostHistory() {
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
       children={
-        <>
+        <Box ref={feedRef} sx={{ height: "100%", overflowY: "auto" }}>
           {filteredData?.length === 0 ? (
             <p style={{ padding: "1rem", color: "#555" }}>No posts yet.</p>
           ) : (
-            filteredData.map((post, index) => (
-              <PostHistoryCard key={index} post={post} />
-            ))
+            filteredData.map((post, index) => {
+              return (
+                <div key={index}>
+                  <PostHistoryCard post={post} />
+                </div>
+              );
+            })
           )}
-        </>
+        </Box>
       }
     />
   );

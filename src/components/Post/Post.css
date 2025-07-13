@@ -1,8 +1,9 @@
 .post {
   /* display: flex; */
   /* align-items: flex-start; */
-  border-bottom: 0px
+  border-bottom: 0px;
   /* padding-bottom: 10px; */
+  width: 100%
 }
 
 .post__body {

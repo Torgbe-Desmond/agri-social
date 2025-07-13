@@ -19,10 +19,10 @@ function Profile() {
   const dispatch = useDispatch();
   const { user_id, darkMode, systemPrefersDark } = useOutletContext();
 
-  useEffect(() => {
-    dispatch(setScrolling(true));
-    return () => dispatch(setScrolling(false));
-  }, []);
+  // useEffect(() => {
+  //   dispatch(setScrolling(true));
+  //   return () => dispatch(setScrolling(false));
+  // }, []);
 
   // alert(systemPrefersDark)
 

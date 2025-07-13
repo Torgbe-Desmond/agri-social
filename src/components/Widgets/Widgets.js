@@ -72,7 +72,6 @@ function Widgets() {
 
   return (
     <Box
-     
       className="widgets"
     >
       <Box

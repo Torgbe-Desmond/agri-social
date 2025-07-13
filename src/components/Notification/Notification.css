@@ -1,6 +1,6 @@
 .notifications-panel {
     width: 100%;
-    background: #fff;
+    /* background: #fff; */
     font-family: sans-serif;
     box-sizing: border-box;
     border-bottom: 1px solid var(--twitter-background);
@@ -16,12 +16,12 @@
 }
 
 .notification.unread {
-    background-color:#e8fef1;
+    background-color:#648572;
 }
 
 .notification .time {
     font-size: 0.8rem;
-    color: #000;
+    color: #FFF;
     position: absolute;
     right: 10px;
     top: 10px;
@@ -36,7 +36,7 @@
     font-size: 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    color: #000;
+    color: #FFF;
     cursor: pointer;
     padding: 1rem;
 }

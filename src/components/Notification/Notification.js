@@ -65,7 +65,7 @@ function Notification({ notification }) {
   }
 
   return (
-    <Box>
+    <Box >
       <Box class="notifications-panel">
         <Box
           class={`notification ${!notification?.is_read && "unread"}`}

@@ -8,7 +8,7 @@ import StatusIcons from "../StatusIcons/StatusIcons";
 import { useDispatch, useSelector } from "react-redux";
 import { deletePost, likePost, savePost } from "../../Features/PostSlice";
 import { useLocation, useOutletContext } from "react-router-dom";
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ComponentStack from "../HandleStack/HandleStack";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
@@ -46,7 +46,11 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
   }
 
   return (
-    <div className="post" ref={ref}>
+    <Box
+      className="post"
+      ref={ref}
+      sx={{ borderBottom: 1, borderColor: "divider" }}
+    >
       <div className="post__avatar">
         <Avatar src={post?.user_image} />
       </div>
@@ -114,7 +118,7 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
           />
         </div>
       </div>
-    </div>
+    </Box>
   );
 });
 

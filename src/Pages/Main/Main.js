@@ -32,9 +32,13 @@ function Main() {
 
   return (
     <Box className="main">
-      <Box className={`main__header`}>
+      <Box
+        sx={{ bgcolor: systemPrefersDark && "background.paper" }}
+        className={`main__header`}
+      >
         <Box
           sx={{
+            display:"none",
             borderBottom: 0.5,
             borderColor: "divider",
             display: "flex",
