@@ -33,7 +33,6 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     z-index: 100;
-    border-bottom: 1px solid var(--twitter-background);
     padding: 15px 20px;
 }
 

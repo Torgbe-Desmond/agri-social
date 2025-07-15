@@ -1,24 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./VideoCard.css";
+import "./FeedVideoCard.css";
 import VideoHeader from "../VideoHeader/VideoHeader";
 import CircularProgress from "@mui/material/CircularProgress";
 import AutoplayVideo from "../AutoplayVideo/AutoplayVideo";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import VideoActions from "../VideoActions/VideoActions";
+import FeedAutoplayVideo from "../FeedAutoPlay/FeedAutoPlayVideo";
+import FeedFooter from "../FeedFooter/FeedFooter";
 
-function VideoCard({
-  url,
-  id,
-  user_id,
-  comments,
-  likes,
-  post_id,
-  saved,
-  user_image,
-  username,
-  handleToggleDialog,
-}) {
+function FeedVideoCard({ url }) {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [isVideoBuffering, setIsVideoBuffering] = useState(false);
@@ -182,15 +173,8 @@ function VideoCard({
   let videoProgress = (currentTime / duration) * 100;
 
   return (
-    <div className={`videoCard`}>
-      {/* <VideoHeader
-        toggleMute={toggleMute}
-        isMuted={isMuted}
-        username={username}
-        handleToggleDialog={handleToggleDialog}
-      /> */}
-
-      <AutoplayVideo
+    <div>
+      <FeedAutoplayVideo
         videoRef={videoRef}
         onVideoPress={onVideoPress}
         url={url}
@@ -200,25 +184,9 @@ function VideoCard({
         isVideoLoading={isVideoLoading}
         isVideoPlaying={isVideoPlaying}
       />
-
-      {/* <VideoActions
-        saved={saved}
-        likes={likes}
-        user_id={user_id}
-        post_id={post_id}
-        user_image={user_image}
-        toggleMute={toggleMute}
-        isMuted={isMuted}
-        comments={comments}
-        username={username}
-        handleToggleDialog={handleToggleDialog}
-      /> */}
-
-      <div className="video-progress-bar">
-        <div className="progress" style={{ width: `${videoProgress}%` }} />
-      </div>
+      <FeedFooter toggleMute={toggleMute} isMuted={isMuted} />
     </div>
   );
 }
 
-export default VideoCard;
+export default FeedVideoCard;

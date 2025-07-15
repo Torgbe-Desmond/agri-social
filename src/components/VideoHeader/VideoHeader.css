@@ -3,12 +3,13 @@
   justify-content: center;
   align-items: center;
   position: sticky;
-  top: 0;
+  bottom: 0;
   /* background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px); */
   z-index: 100;
   /* border-bottom: 1px solid var(--twitter-background); */
+  border: 1px solid red;
 }
 
 .videoHeader-title {

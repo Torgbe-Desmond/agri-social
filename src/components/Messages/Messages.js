@@ -6,7 +6,7 @@ import { useOutletContext } from "react-router-dom";
 import { Box, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import Header from "../Header/Header";
-import MessagedUsersList from "../MessagedUsersList/MessagedUsersList";
+import MessagedUsersList from "./MessagedUsersList";
 import { getMessagedUsers } from "../../Features/MessageSlice";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import ComponentStack from "../HandleStack/HandleStack";

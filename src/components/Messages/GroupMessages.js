@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import "./GroupMessages.css";
 import { useDispatch, useSelector } from "react-redux";
 import Chat from "../Chat/Chat";
 import { useOutletContext } from "react-router-dom";
 import { Box, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import Header from "../Header/Header";
-import MessagedUsersList from "../MessagedUsersList/MessagedUsersList";
+import MessagedUsersList from "./MessagedUsersList";
 import { clearGroups, getGroupConversation } from "../../Features/MessageSlice";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import ComponentStack from "../HandleStack/HandleStack";

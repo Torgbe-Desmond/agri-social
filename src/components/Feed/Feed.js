@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Post from "../Post/Post";
 import "./Feed.css";
-import { clearPostData, getPosts } from "../../Features/PostSlice";
+import { clearPostData, getPosts, setOffset } from "../../Features/PostSlice";
 import { useOutletContext } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, CircularProgress } from "@mui/material";
@@ -11,7 +11,9 @@ import TweetBox from "../TweetBox/TweetBox";
 
 function Feed() {
   const { user_id } = useOutletContext();
-  const { postData, hasMore, postStatus } = useSelector((state) => state.post);
+  const { postData, hasMore, postStatus, offset } = useSelector(
+    (state) => state.post
+  );
   const [pageNumber, setPageNumber] = useState(1);
   const dispatch = useDispatch();
   const socket = useSocket();
@@ -25,12 +27,12 @@ function Feed() {
   const [visiblePostId, setVisiblePostId] = useState(null);
 
   useEffect(() => {
-    dispatch(getPosts({ user_id, offset: pageNumber, limit: 10 }));
+    dispatch(getPosts({ user_id, offset, limit: 10 }));
   }, [pageNumber, dispatch, user_id]);
 
   useEffect(() => {
     return () => {
-      dispatch(clearPostData());
+      // dispatch(clearPostData());
       dispatch(setScrolling(false));
     };
   }, [dispatch]);
@@ -40,7 +42,8 @@ function Feed() {
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          setPageNumber((prev) => prev + 1);
+          // setPageNumber((prev) => prev + 1);
+          dispatch(setOffset());
         }
       });
       if (node) observer.current.observe(node);
@@ -69,14 +72,50 @@ function Feed() {
       if (!el) return false;
       const rect = el.getBoundingClientRect();
       return (
-        rect.top >= parseInt(window.innerHeight / 50) &&
+        rect.top >= parseInt(window.innerHeight / 10) &&
         rect.bottom <= window.innerHeight
       );
     });
 
-    itemRefs.current.forEach((el) => el?.classList.remove("visible-post"));
+    const visibleItems = itemRefs.current.filter((el) => {
+      if (!el) return false;
 
-    const videoIds = postData.filter((p) => p.has_video).map((p) => p.post_id);
+      const rect = el.getBoundingClientRect();
+      return (
+        rect.top >= window.innerHeight / 10 && rect.bottom <= window.innerHeight
+      );
+    });
+
+    visibleItems.unshift();
+
+    visibleItems.forEach((el) => {
+      const id = el
+        ?.querySelector(".post")
+        ?.getAttribute("id")
+        ?.replace("post-", "");
+
+      const postEl = document.querySelector(`#post-${id}`);
+      // console.log("postEl", postEl);
+
+      if (!id || !postEl) return;
+
+      const hasImage = postEl.querySelector(".post__images .post_media img");
+
+      // const hasVideo = el.querySelector(`#post-${id} video`);
+
+      // postEl.classList.add("visible-post-next");
+
+      if (hasImage) {
+        console.log("has image");
+        hasImage.style.display = "flex";
+      }
+    });
+
+    // itemRefs.current.forEach((el) => el?.classList.remove("visible-post"));
+
+    const videoIds = postData
+      // .filter((p) => p.has_video)
+      .map((p) => p.post_id);
 
     const id = visible
       ?.querySelector(".post")
@@ -100,6 +139,11 @@ function Feed() {
         });
       }
 
+      const newImage = document.querySelector(`#post-${id} img`);
+      if (newImage) {
+        newImage.style.display = "flex";
+      }
+
       setVisiblePostId(id); // Update the currently playing video ID
     } else {
       // If visible post is not a video, pause previously playing video
@@ -121,7 +165,7 @@ function Feed() {
     >
       <TweetBox />
       {postData?.map((post, index) => {
-        const isLast = index === postData.length - 1;
+        const isLast = index === postData.length - 3;
         return (
           <div
             key={index}

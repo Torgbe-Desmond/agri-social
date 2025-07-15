@@ -1,15 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Tabs,
-  Tab,
-  Box,
-  Typography,
-  CircularProgress,
-  TextField,
-  IconButton,
-} from "@mui/material";
+import { Box } from "@mui/material";
 import {
   addComment,
   clearPost,
@@ -18,15 +10,13 @@ import {
 } from "../../Features/PostSlice";
 import { clearComments, likeComment } from "../../Features/CommentSlice";
 import { popComponent } from "../../Features/StackSlice";
-import Replies from "../Replies/Replies";
 import "./PostComment.css";
-import SendIcon from "@mui/icons-material/Send";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Post from "../Post/Post";
-import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CommentTextBox from "../CommentTextBox/CommentTextBox";
+import CommentChat from "../Comment/commentChat";
+import CommentReplyList from "../CommentReplies/CommentReplyList";
+import ReplyIndicator from "../CommentReplies/ReplyIndicator";
+import Comment_Header from "../CommentReplies/Comment_Header";
 
 function PostComment() {
   const { post_id } = useParams();
@@ -192,78 +182,32 @@ function PostComment() {
 
   return (
     <Box className="post__comment">
-      <Box
-        sx={{ background: systemPrefersDark && "background.paper" }}
-        className="post__comment__header"
-      >
-        <h2>
-          <ArrowBackIcon cursor="pointer" onClick={handleGoBack} /> Post
-        </h2>
-      </Box>
-      <Post post={post} />
-      <Box
-        sx={{ borderBottom: 1, borderColor: "divider", p: 1 }}
-        className="post__comment__replies"
-      >
-        <h2>
-          Replies <KeyboardArrowDownIcon />
-        </h2>
-      </Box>
-
-      <div ref={chatContainerRef}>
-        {togetherComments?.map((reply, index) => (
-          <Replies key={index} reply={reply} user_id={userDetails?.id} />
-        ))}
-        <div ref={scrollAnchorRef} />
-      </div>
-
-      {/* <CommentTextBox
-        setComment={setComment}
-        comment={comment}
+      <Comment_Header
         systemPrefersDark={systemPrefersDark}
+        handleGoBack={handleGoBack}
+      />
+
+      <Post post={post} />
+
+      <ReplyIndicator />
+
+      <CommentReplyList
+        chatContainerRef={chatContainerRef}
+        commentReplies={togetherComments}
+        scrollAnchorRef={scrollAnchorRef}
+        user_id={userDetails?.id}
+      />
+
+      <CommentChat
+        message={comment}
+        setMessage={setComment}
         handleAddComment={handleAddComment}
-        darkMode={darkMode}
+        systemPrefersDark={systemPrefersDark}
+        emojiAnchor={emojiAnchor}
+        closeEmojiPicker={closeEmojiPicker}
+        onEmojiSelect={onEmojiSelect}
         openEmojiPicker={openEmojiPicker}
-      /> */}
-
-      <Box
-        sx={{
-          p: 1,
-          bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
-          borderTop: 1,
-          borderColor: "divider",
-        }}
-        display="flex"
-        position="sticky"
-        bottom="0"
-        zIndex="100"
-        gap={1}
-        alignItems="center"
-        pt={1}
-      >
-        <TextField
-          // sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
-          fullWidth
-          placeholder="Write a comment..."
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          size="small"
-          multiline
-          minRows={1}
-          maxRows={3}
-          InputProps={{
-            endAdornment: (
-              <IconButton onClick={openEmojiPicker}>
-                <InsertEmoticonIcon />
-              </IconButton>
-            ),
-          }}
-        />
-
-        <IconButton onClick={handleAddComment} disabled={!comment.trim()}>
-          <SendIcon />
-        </IconButton>
-      </Box>
+      />
 
       <EmojiPickerPopover
         anchorEl={emojiAnchor}

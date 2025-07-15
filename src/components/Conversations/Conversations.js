@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 // import Post from "../../components/Post/Post";
 import { Tabs, Tab, Box, Typography, CircularProgress } from "@mui/material";
 import Messages from "../Messages/Messages";
-import GroupMessages from "../GroupMessages/GroupMessages";
+import GroupMessages from "../Messages/GroupMessages";
 import { setScrolling } from "../../Features/StackSlice";
 // import PostHistory from "../../components/PostHistory/PostHistory";
 // import TwitterProfileUI from "../../components/TopProfile/TopProfile";

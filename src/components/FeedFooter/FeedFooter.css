@@ -1,0 +1,19 @@
+.feed-footer-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    width: 100%;
+
+}
+
+.feed-title {
+    font-size: 24px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}

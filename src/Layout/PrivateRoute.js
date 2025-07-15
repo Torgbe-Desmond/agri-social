@@ -45,9 +45,6 @@ function PrivateRoute({ darkMode, systemPrefersDark, isMobile }) {
   };
   const location = useLocation();
 
-  const currentPage = location.pathname.split("/")[1];
-  console.log("currentPage", currentPage);
-
   return (
     <Box
       sx={{

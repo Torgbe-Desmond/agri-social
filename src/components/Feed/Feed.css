@@ -19,6 +19,11 @@
   transition: outline 0.3s ease-in-out;
 }
 
+.visible-post-next {
+  outline: 2px solid rgb(205, 156, 50);
+  border-radius: 8px;
+  transition: outline 0.3s ease-in-out;
+}
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .feed {

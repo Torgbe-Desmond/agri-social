@@ -19,6 +19,8 @@ import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import { predictImageInPost } from "../../Features/PredictionSlice";
 import SuccessMessage from "../SuccessMessage/SuccessMessage";
+import FeedVideoCard from "../FeedVideoCard/FeedVideoCard";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow"; // Material UI Play Icon
 
 const Post = forwardRef(({ post }, ref) => {
   const dispatch = useDispatch();
@@ -39,7 +41,6 @@ const Post = forwardRef(({ post }, ref) => {
     } with a confidence of ${(imageInPostPrediction?.confidence * 100).toFixed(
       2
     )}%.`;
-    console.log("how many times");
     if (imageInPostPredictionStatus === "succeeded") {
       setSuccessMessage(responseText);
     }
@@ -166,36 +167,55 @@ const Post = forwardRef(({ post }, ref) => {
           </div>
         </div>
         <div className="post__images">
-          {post?.images && (
-            <img
-              style={{
-                width: "100%",
-                objectFit: "cover",
-                borderRadius: 12,
-              }}
-              src={post?.images}
-              alt="Post visual"
-            />
-          )}
-          {post?.videos && (
-            <video
-              type="video/mp4"
-              className="post-video"
-              loop
-              playsInline
-              muted
-              controls
-              style={{
-                width: "100%",
-                objectFit: "cover",
-                borderRadius: 12,
-              }}
-              preload="none"
-            >
-              <source src={post.videos} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          )}
+          <div className="post_media">
+            {post?.images && (
+              <img
+                style={{
+                  display: "none",
+                  width: "100%",
+                  objectFit: "contain",
+                  borderRadius: 12,
+                }}
+                src={post?.images}
+                alt="Post visual"
+              />
+            )}
+
+            {post?.videos && (
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  overflow: "hidden",
+                  borderRadius: 12,
+                }}
+              >
+                {/* <video
+                  type="video/mp4"
+                  className="post-video"
+                  loop
+                  playsInline
+                  muted
+                  controls
+                  preload="none"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover", // key style: like Twitter
+                  }}
+                >
+                  <source src={post.videos} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video> */}
+                {/* <PlayArrowIcon fontSize="large" color="#FFF" sx={{ zIndex:1200 }} /> */}
+
+                <FeedVideoCard url={post.videos} />
+              </div>
+            )}
+          </div>
         </div>
 
         {post?.tags && (

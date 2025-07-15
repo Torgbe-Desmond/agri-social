@@ -1,9 +1,12 @@
 .post {
   display: flex;
   align-items: flex-start;
-  border-bottom: 1px solid var(--twitter-background);
-  padding-bottom: 10px;
-  max-width: 600px;
+  /* padding-bottom: 10px; */
+  /* gap: 20px; */
+  justify-content: space-evenly;
+  width: 100%;
+  border: 1px solid red;
+  /* max-width: 600px; */
 }
 
 .post__body {

@@ -7,6 +7,7 @@ import { SavedService } from "../Services/savePost";
 
 const initialState = {
   postData: [],
+  offset: 1,
   streamData: [],
   streamStatus: "idle",
   numb_found: null,
@@ -232,6 +233,9 @@ const postSlice = createSlice({
       state.postDeleteStatus = "idle";
       state.unSavePostStatus = "idle";
     },
+    setOffset: (state) => {
+      state.offset = state.offset + 1;
+    },
     updateStreamLike: (state, action) => {
       const { post_id, liked } = action.payload;
       state.streamData = state.streamData?.map((p) => {
@@ -287,7 +291,6 @@ const postSlice = createSlice({
         state.postStatus = "loading";
       })
       .addCase(getPosts.fulfilled, (state, action) => {
-        console.log(action.payload);
         const { posts, numb_found } = action.payload;
         state.hasMore = posts.length > 0;
         if (state.hasMore) {
@@ -482,5 +485,6 @@ export const {
   updateStreamSaved,
   updateStreamComment,
   clearStreams,
+  setOffset,
 } = postSlice.actions;
 export default postSlice.reducer;

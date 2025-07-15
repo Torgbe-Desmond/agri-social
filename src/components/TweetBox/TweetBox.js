@@ -219,20 +219,20 @@ function TweetBox() {
 
         <Box className="tweetBox__tweetButton__container">
           <Box className="icon__container">
-            <Tooltip title="Add Image">
-              <label htmlFor="image-upload">
+            <label htmlFor="image-upload">
+              <Tooltip title="Add Image">
                 <IconButton color="primary" component="span">
                   <InsertPhotoOutlinedIcon />
                 </IconButton>
-              </label>
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={(e) => handleMediaUpload(e, "image")}
-              />
-            </Tooltip>
+              </Tooltip>
+            </label>
+            <input
+              id="image-upload"
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) => handleMediaUpload(e, "image")}
+            />
 
             <label htmlFor="video-upload">
               <IconButton color="primary" component="span">

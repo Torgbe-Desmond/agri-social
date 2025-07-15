@@ -2,11 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./Main.css";
 import { useOutletContext } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import Saved from "../../components/Saved/Saved";
-import Post from "../../components/Post/Post";
 import { Tabs, Tab, Box, Typography, CircularProgress } from "@mui/material";
-import PostHistory from "../../components/PostHistory/PostHistory";
-import TwitterProfileUI from "../../components/TopProfile/TopProfile";
 import Feed from "../../components/Feed/Feed";
 import MarketPlace from "../../components/MarketPlace/MarketPlace";
 import { clearProducts } from "../../Features/ProductSlice";
@@ -33,12 +29,12 @@ function Main() {
   return (
     <Box className="main">
       <Box
-        sx={{ bgcolor: systemPrefersDark && "background.paper" }}
+        sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
         className={`main__header`}
       >
         <Box
           sx={{
-            display:"none",
+            display: "none",
             borderBottom: 0.5,
             borderColor: "divider",
             display: "flex",

@@ -113,12 +113,12 @@ const BottomBar = ({ notifyCounts = 0 }) => {
             to="/predict-disease"
             active={currentPage === "predict-disease"}
           />
-          <BottomBarOption
+          {/* <BottomBarOption
             Icon={VideocamOutlinedIcon}
             text="Streams"
             to="/streams"
             active={currentPage === "streams"}
-          />
+          /> */}
         </Box>
       </SwipeableDrawer>
     </>

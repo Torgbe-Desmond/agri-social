@@ -8,6 +8,7 @@ import PostHistoryCard from "../PostHistoryCard/PostHistoryCard";
 import SearchIcon from "@mui/icons-material/Search";
 import Header from "../Header/Header";
 import { setScrolling } from "../../Features/StackSlice";
+// import './PostHistory.css'
 
 function PostHistory() {
   const { user_id } = useOutletContext();
