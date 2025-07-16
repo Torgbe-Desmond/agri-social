@@ -3,7 +3,6 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow"; // Material UI Play I
 import { CircularProgress } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
-
 const FeedAutoplayVideo = ({
   videoRef,
   onVideoPress,
@@ -28,22 +27,22 @@ const FeedAutoplayVideo = ({
           playsInline
           preload="metadata"
         />
-        
+
         {!isVideoPlaying && !isVideoBuffering ? (
           <div className="play-button-overlay">
-            <PlayArrowIcon style={{ fontSize: 50, color: "white" }} />
+            <PlayArrowIcon fontSize="small" style={{ color: "white" }} />
           </div>
         ) : null}
 
         {isVideoLoading ? (
           <div className="video-loading">
-            <CircularProgress size={75} color="inherit" />
+            <CircularProgress fontSize="small" color="inherit" />
           </div>
         ) : null}
 
         {isVideoBuffering && isVideoPlaying ? (
           <div className="video-loading">
-            <CircularProgress size={75} color="inherit" />
+            <CircularProgress fontSize="small" color="inherit" />
           </div>
         ) : null}
       </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import "./Saved.css";
+// import "./Saved.css";
 import Avatar from "@mui/material/Avatar";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import RepeatIcon from "@mui/icons-material/Repeat";
@@ -13,6 +13,11 @@ import { likePost, savePost, unSavePost } from "../../Features/PostSlice";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Box } from "@mui/material";
+import FeedVideoCard from "../FeedVideoCard/FeedVideoCard";
+// import "./Saved.css";
+import HeaderPost from "../Post/HeaderPost";
+import BodyPost from "../Post/BodyPost";
+import FooterPost from "../Post/FooterPost";
 
 function Saved({ save }) {
   const dispatch = useDispatch();
@@ -34,78 +39,40 @@ function Saved({ save }) {
     dispatch(unSavePost({ user_id: userDetails?.id, post_id: save?.post_id }));
   };
 
+  const actions = [
+    {
+      id: "comment",
+      location: "post",
+      to: `/post/${save?.post_id}`,
+      icon: <ChatBubbleOutlineIcon fontSize="small" />,
+      count: save?.comments,
+    },
+    {
+      id: "like",
+      location: "post",
+      icon: <FavoriteBorderIcon fontSize="small" />,
+      count: save?.likes,
+      action: () => handleLikePost(),
+    },
+    {
+      id: "bookmark",
+      location: "post",
+      icon: <BookmarkBorderIcon fontSize="small" />,
+      count: save?.saved,
+      action: () => handleUnsaved(),
+    },
+  ];
+
   return (
-    <Box sx={{ borderBottom: 1, borderColor: "divider" }} className="post">
-      <div className="post__avatar">
-        <Avatar src={save?.user_image} />
-      </div>
-      <div className="post__body">
-        <div className="post__header">
-          <div className="post__headerText">
-            <h3>
-              {save?.username}{" "}
-              <span className="post__headerSpecial">@{save?.username}</span>
-            </h3>
-          </div>
-          <div className="post__headerDescription">
-            <p>{save?.content}</p>
-          </div>
-        </div>
-        <div className="post__images">
-          {save?.images && (
-            <img
-              style={{
-                width: "100%",
-                objectFit: "cover",
-                borderRadius: 12,
-              }}
-              src={save?.images}
-              alt="save visual"
-            />
-          )}
-          {save?.videos && (
-            <video
-              style={{
-                width: "100%",
-                objectFit: "cover",
-                borderRadius: 12,
-              }}
-              controls
-            >
-              <source src={save.videos} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          )}
-        </div>
-
-        {/* {save?.images && <img src={save?.images} alt="Post visual" />} */}
-        <div className="post__footer">
-          <StatusIcons
-            location={"post"}
-            to={`/post/${save?.post_id}`}
-            icon={<ChatBubbleOutlineIcon fontSize="small" />}
-            count={save?.comments}
-          />
-          {/* <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} /> */}
-          <StatusIcons
-            location={"post"}
-            icon={<FavoriteBorderIcon fontSize="small" />}
-            action={handleLikePost}
-            count={save?.likes}
-          />
-          <StatusIcons
-            location={"post"}
-            icon={<BookmarkBorderIcon fontSize="small" />}
-            count={save?.saved}
-            action={handleSavePost}
-          />
-
-          {/* <StatusIcons
-            icon={<DeleteOutlineOutlinedIcon fontSize="small" />}
-            action={handleUnsaved}
-          /> */}
-        </div>
-      </div>
+    <Box
+      sx={{ borderBottom: 1, borderColor: "divider" }}
+      className="post"
+      id={`post-bookmarks-${save?.post_id}`}
+      // ref={ref}
+    >
+      <HeaderPost post={save} />
+      <BodyPost post={save} />
+      <FooterPost actions={actions} />
     </Box>
   );
 }

@@ -56,7 +56,7 @@ function User() {
           <ArrowBackIcon cursor="pointer" onClick={handleGoBack} />
           User
         </h2>
-        
+
         <UserInfo
           _userDetails={_userDetails}
           _userDetailsStatus={_userDetailsStatus}
@@ -72,13 +72,21 @@ function User() {
             gap: "50px",
           }}
         >
-          <Tabs value={tabIndex} onChange={handleTabChange} sx={{}}>
+          <Tabs value={tabIndex} onChange={handleTabChange}>
             <Tab label="Posts" />
+            <Tab label="Getto" />
           </Tabs>
         </Box>
       </Box>
 
-      <Box>{tabIndex === 0 && <UserFeed user_id={_userDetails?.id} />}</Box>
+      <Box
+      // sx={{
+      //   height: "calc(100vh - 250px)", // adjust based on your header height
+      //   overflowY: "auto",
+      // }}
+      >
+        {tabIndex === 0 && <UserFeed user_id={_userDetails?.id} />}
+      </Box>
     </div>
   );
 }

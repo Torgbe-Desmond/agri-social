@@ -1,5 +1,5 @@
 .post {
-  /* display: flex; */
+  display: grid;
   /* align-items: flex-start; */
   border-bottom: 0px;
   /* padding-bottom: 10px; */
@@ -17,8 +17,10 @@
 
 .post__footer {
   display: flex;
+  align-items: center;
+  width: 100%;
   justify-content: space-between;
-  margin-top: 20px;
+  padding: 10px;
 }
 
 .post__headerDescription {
@@ -29,12 +31,24 @@
 .post__headerText {
   display: flex;
   justify-content: space-between;
-  padding: 0px 10px 0px 0px;
+  flex-direction: row;
+  font-size: 12px;
+  /* padding: 0px 10px 0px 0px; */
+  /* border: 1px solid red; */
 }
 
 .post__headerText>h3 {
   font-size: 15px;
   margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.post__headerRight {
+  font-size: 15px;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
 }
 
@@ -60,7 +74,11 @@
 }
 
 .post__avatar {
-  padding: 20px;
+  display: flex;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
 }
 
 .post_tags {

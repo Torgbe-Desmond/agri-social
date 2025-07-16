@@ -135,33 +135,37 @@ const Post = forwardRef(({ post }, ref) => {
       id={`post-${post?.post_id}`}
       ref={ref}
     >
-      <div className="post__avatar">
-        <Avatar src={post?.user_image} />
+      <div className="post__headerText">
+        
+        <div className="post__avatar">
+          <Avatar src={post?.user_image} />
+          <h3 onClick={handleNavigateToProfile}>
+            {post?.username}{" "}
+            <span className="post__headerSpecial">
+              <span>@{post?.username} </span>
+              <span>{timeAgo(new Date(post?.created_at))}</span>
+            </span>
+          </h3>
+        </div>
+
+        <div className="post__headerRight">
+          {post?.images ? (
+            imageInPostPredictionStatus === "loading" ? (
+              <CircularProgress />
+            ) : (
+              <SmartToyOutlinedIcon
+                onClick={handlePredictImageInPost}
+                cursor="pointer"
+                fontSize="small"
+              />
+            )
+          ) : (
+            <div></div>
+          )}
+        </div>
       </div>
       <div className="post__body">
         <div className="post__header">
-          <div className="post__headerText">
-            <h3 onClick={handleNavigateToProfile}>
-              {post?.username}{" "}
-              <span className="post__headerSpecial">
-                <span>@{post?.username} </span>
-                <span>{timeAgo(new Date(post?.created_at))}</span>
-              </span>
-            </h3>
-            {post?.images ? (
-              imageInPostPredictionStatus === "loading" ? (
-                <CircularProgress />
-              ) : (
-                <SmartToyOutlinedIcon
-                  onClick={handlePredictImageInPost}
-                  cursor="pointer"
-                  fontSize="small"
-                />
-              )
-            ) : (
-              <div></div>
-            )}
-          </div>
           <div className="post__headerDescription">
             <p>{post?.content}</p>
           </div>
@@ -190,28 +194,6 @@ const Post = forwardRef(({ post }, ref) => {
                   borderRadius: 12,
                 }}
               >
-                {/* <video
-                  type="video/mp4"
-                  className="post-video"
-                  loop
-                  playsInline
-                  muted
-                  controls
-                  preload="none"
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover", // key style: like Twitter
-                  }}
-                >
-                  <source src={post.videos} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video> */}
-                {/* <PlayArrowIcon fontSize="large" color="#FFF" sx={{ zIndex:1200 }} /> */}
-
                 <FeedVideoCard url={post.videos} />
               </div>
             )}

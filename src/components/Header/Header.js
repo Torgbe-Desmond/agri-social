@@ -21,35 +21,36 @@ function Header({
   allowedSearch,
   children,
   reloadAction,
+  feedRef,
+  setScroll,
 }) {
   const lastScrollTop = useRef(0);
-  const [showBottomBar, setShowBottomBar] = useState(false);
-  const feedRef = useRef(null);
   const dispatch = useDispatch();
-  const { user_id, darkMode, systemPrefersDark } = useOutletContext();
+  const { systemPrefersDark } = useOutletContext();
 
   useEffect(() => {
-    const feedNode = feedRef.current;
-    if (!feedNode) return;
+    const scrollContainer = document.querySelector(".resuable");
+    if (!scrollContainer) return;
 
     const handleScroll = () => {
-      const scrollTop = feedNode.scrollTop;
-      if (scrollTop < lastScrollTop.current) {
-        dispatch(setScrolling(true)); // scrolling down
-      } else {
-        dispatch(setScrolling(false)); // scrolling up
-      }
+      const scrollTop = scrollContainer.scrollTop;
+      setScroll((prev) => prev + 1);
       lastScrollTop.current = scrollTop;
+      console.log("ddddd");
     };
 
-    feedNode.addEventListener("scroll", handleScroll);
-    return () => feedNode.removeEventListener("scroll", handleScroll);
-  }, []);
+    scrollContainer.addEventListener("scroll", handleScroll);
+    return () => scrollContainer.removeEventListener("scroll", handleScroll);
+  }, [dispatch]);
 
   return (
     <Box ref={feedRef} className="resuable">
       <Box
-        sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
+        sx={{
+          borderBottom: 1,
+          borderColor: "divider",
+          bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
+        }}
         className="resuable__header"
       >
         <Typography variant="h2">
@@ -69,37 +70,36 @@ function Header({
             <TextField
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={`Search ${name ? name?.toLowerCase() : ""}`}
+              placeholder={`Search ${name?.toLowerCase() || ""}`}
               variant="outlined"
               sx={{
                 "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "transparent",
-                  },
+                  "& fieldset": { borderColor: "transparent" },
                   "& .MuiInputBase-input": {
-                    width: { xs: "100%", sm: "100%", md: "500px", lg: "500px" },
-                    boxSizing: "border-box",
+                    width: { xs: "100%", md: "500px" },
                   },
-                  "&:hover fieldset": {
-                    borderColor: "transparent",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "transparent",
-                  },
+                  "&:hover fieldset": { borderColor: "transparent" },
+                  "&.Mui-focused fieldset": { borderColor: "transparent" },
                 },
               }}
-            />{" "}
+            />
           </Box>
         )}
       </Box>
 
-      {status && status === "loading" ? (
+      {status === "loading" ? (
         <p className="circular__progress">
-          <CircularProgress fontSize="small" />
+          <CircularProgress size={20} />
         </p>
       ) : (
-        children
+        <Box
+          className="scrolling-component"
+          // sx={{ height: "100%", overflowY: "auto" }}
+        >
+          {children}
+        </Box>
       )}
+
       {reloadAction && status === "failed" && (
         <p className="circular__progress">
           <Button onClick={reloadAction}>Reload</Button>

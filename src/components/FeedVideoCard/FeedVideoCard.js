@@ -184,7 +184,12 @@ function FeedVideoCard({ url }) {
         isVideoLoading={isVideoLoading}
         isVideoPlaying={isVideoPlaying}
       />
-      <FeedFooter toggleMute={toggleMute} isMuted={isMuted} />
+      <FeedFooter
+        toggleMute={toggleMute}
+        isMuted={isMuted}
+        duration={duration}
+        currentTime={currentTime}
+      />
     </div>
   );
 }
