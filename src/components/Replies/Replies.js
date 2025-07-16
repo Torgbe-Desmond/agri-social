@@ -9,6 +9,9 @@ import { likeComment } from "../../Features/CommentSlice";
 import { useDispatch } from "react-redux";
 import { Box, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import HeaderPost from "../Post/HeaderPost";
+import BodyPost from "../Post/BodyPost";
+import FooterPost from "../Post/FooterPost";
 
 function Replies({ reply, user_id }) {
   const dispatch = useDispatch();
@@ -23,9 +26,35 @@ function Replies({ reply, user_id }) {
     dispatch(likeComment({ comment_id: reply?.id, formData }));
   };
 
+  console.log("reply", reply);
+
   const handleNavigateToProfile = () => {
     navigate(`/user/${reply?.user_id}`);
   };
+
+  const actions = [
+    {
+      id: "comment",
+      location: "post",
+      to: `/replies/${reply?.id}`,
+      icon: <ChatBubbleOutlineIcon fontSize="small" />,
+      count: reply?.comments,
+    },
+    {
+      id: "like",
+      location: "post",
+      icon: <FavoriteBorderIcon fontSize="small" />,
+      count: reply?.likes,
+      action: () => handleLikeComment(),
+    },
+    // {
+    //   id: "bookmark",
+    //   location: "post",
+    //   icon: <BookmarkBorderIcon fontSize="small" />,
+    //   count: save?.saved,
+    //   action: () => handleUnsaved(),
+    // },
+  ];
 
   return (
     <Box
@@ -33,46 +62,9 @@ function Replies({ reply, user_id }) {
       id={`post-${reply?.id}`}
       className="post"
     >
-      <Box
-        sx={{ background: systemPrefersDark && "background.paper" }}
-        className="post__avatar"
-      >
-        <Avatar src={reply?.user_image} />
-      </Box>
-      <div className="post__body">
-        <div className="post__header">
-          <div className="post__headerText">
-            <h3 onClick={handleNavigateToProfile}>
-              {reply?.username}{" "}
-              <span className="post__headerSpecial">@{reply?.username}</span>
-            </h3>
-          </div>
-          <div className="post__headerDescription">
-            <p>{reply?.content}</p>
-          </div>
-        </div>
-        {reply?.images && <img src={reply?.images} alt="Post visual" />}
-        <div className="post__footer">
-          <StatusIcons
-            location={"post"}
-            to={`/replies/${reply?.id}`}
-            icon={<ChatBubbleOutlineIcon fontSize="small" />}
-            count={reply?.comments || reply?.replies}
-          />
-          {/* <StatusIcons icon={<RepeatIcon fontSize="small" />} count={10} /> */}
-
-          <StatusIcons
-            location={"post"}
-            icon={<FavoriteBorderIcon fontSize="small" />}
-            count={reply?.likes}
-            action={handleLikeComment}
-          />
-          {/* <StatusIcons
-                  icon={<BookmarkBorderIcon fontSize="small" />}
-                  count={savedCount}
-                /> */}
-        </div>
-      </div>
+      <HeaderPost post={reply} />
+      <BodyPost post={reply} />
+      <FooterPost actions={actions} />
     </Box>
   );
 }

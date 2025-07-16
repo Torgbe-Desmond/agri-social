@@ -47,23 +47,20 @@ const TwitterProfileUI = () => {
         justifyContent: "flex-start",
       }}
     >
-      <Box sx={{ position: "relative", px: 2, pb: 2 }}>
+      <Box sx={{ position: "relative", px: 2, pb: 0 }}>
         <Avatar
           src={userDetails?.user_image}
           sx={{
             width: 100,
             height: 100,
             border: "4px solid black",
-            top: 20,
           }}
         />
       </Box>
 
       <Box
         sx={{
-          px: 2,
-          pt: 2,
-          // border: "1px solid red",
+          // px: 2,
           display: "flex",
           justifyContent: "flex-start",
           flexDirection: "column",

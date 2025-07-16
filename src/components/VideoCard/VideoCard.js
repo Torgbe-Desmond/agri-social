@@ -6,6 +6,7 @@ import AutoplayVideo from "../AutoplayVideo/AutoplayVideo";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import VideoActions from "../VideoActions/VideoActions";
+import PostInfo from "../PostInfo/PostInfo";
 
 function VideoCard({
   url,
@@ -16,6 +17,7 @@ function VideoCard({
   post_id,
   saved,
   user_image,
+  content,
   username,
   handleToggleDialog,
 }) {
@@ -201,7 +203,7 @@ function VideoCard({
         isVideoPlaying={isVideoPlaying}
       />
 
-      {/* <VideoActions
+      <VideoActions
         saved={saved}
         likes={likes}
         user_id={user_id}
@@ -212,7 +214,9 @@ function VideoCard({
         comments={comments}
         username={username}
         handleToggleDialog={handleToggleDialog}
-      /> */}
+      />
+
+      <PostInfo content={content} />
 
       <div className="video-progress-bar">
         <div className="progress" style={{ width: `${videoProgress}%` }} />

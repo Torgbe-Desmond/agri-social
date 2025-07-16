@@ -126,14 +126,14 @@ function Sidebar() {
         text="Bookmarks"
         to="/bookmarks"
       />
-      {/* <SidebarOption
+      <SidebarOption
         unShowIcons={unShowIcons}
         isMobile={isMobile}
         Icon={VideocamOutlinedIcon}
         active={currentPage === "streams"}
         text="Streams"
         to="/streams"
-      /> */}
+      />
       {/* <SidebarOption isMobile={isMobile} Icon={MoreHorizIcon} text="More" /> */}
 
       {/* Button -> Tweet */}

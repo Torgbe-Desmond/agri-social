@@ -15,7 +15,7 @@ const FeedAutoplayVideo = ({
 }) => {
   return (
     <>
-      <div className="video-container" onClick={onVideoPress}>
+      <div className="feed-video-container" onClick={onVideoPress}>
         <video
           ref={videoRef}
           type="video/mp4"
@@ -51,3 +51,4 @@ const FeedAutoplayVideo = ({
 };
 
 export default FeedAutoplayVideo;
+

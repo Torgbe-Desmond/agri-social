@@ -34,6 +34,10 @@ import Comment from "../Comment/Comment";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
+import Comment_Header from "./Comment_Header";
+import ReplyIndicator from "./ReplyIndicator";
+import CommentReplyList from "./CommentReplyList";
+import CommentChat from "../Comment/commentChat";
 
 function CommentReplies() {
   const { comment_id } = useParams();
@@ -182,75 +186,33 @@ function CommentReplies() {
 
   return (
     <Box className="comment__replies">
-      <Box
-        sx={{
-          background: systemPrefersDark && "background.paper",
-        }}
-        className="comment__replies__header"
-      >
-        <h2>
-          <ArrowBackIcon cursor="pointer" onClick={handleGoBack} /> Replies
-        </h2>
-      </Box>
-      <Comment
-        singleComment={singleComment}
-        singleCommentStatus={singleCommentStatus}
+      <Comment_Header
+        name="Replies"
+        systemPrefersDark={systemPrefersDark}
+        handleGoBack={handleGoBack}
       />
-      <Box
-        sx={{ borderBottom: 1, borderColor: "divider", p: 1 }}
-        className="comment__replies__replies"
-      >
-        <h2>
-          Replies <KeyboardArrowDownIcon />
-        </h2>
-      </Box>
 
-      <div ref={chatContainerRef}>
-        {togetherComments?.map((reply, index) => (
-          <Replies key={index} reply={reply} user_id={userDetails?.id} />
-        ))}
-        <div ref={scrollAnchorRef} />
-      </div>
+      <Post post={singleComment} />
 
-      <Box
-        sx={{
-          p: 1,
-          bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
-          borderTop: 1,
-          borderColor: "divider",
-        }}
-        display="flex"
-        position="sticky"
-        bottom="0"
-        zIndex="100"
-        gap={1}
-        alignItems="center"
-        pt={1}
-      >
-        <TextField
-          sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
-          fullWidth
-          placeholder="Write a comment..."
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          size="small"
-          multiline
-          minRows={1}
-          maxRows={3}
-          InputProps={{
-            endAdornment: (
-              <IconButton onClick={openEmojiPicker}>
-                <InsertEmoticonIcon />
-              </IconButton>
-            ),
-          }}
-        />
+      <ReplyIndicator />
 
-        <IconButton onClick={handleAddComment} disabled={!comment.trim()}>
-          <SendIcon />
-        </IconButton>
-      </Box>
+      <CommentReplyList
+        chatContainerRef={chatContainerRef}
+        commentReplies={togetherComments}
+        scrollAnchorRef={scrollAnchorRef}
+        user_id={userDetails?.id}
+      />
 
+      <CommentChat
+        message={comment}
+        setMessage={setComment}
+        handleAddComment={handleAddComment}
+        systemPrefersDark={systemPrefersDark}
+        emojiAnchor={emojiAnchor}
+        closeEmojiPicker={closeEmojiPicker}
+        onEmojiSelect={onEmojiSelect}
+        openEmojiPicker={openEmojiPicker}
+      />
       <EmojiPickerPopover
         anchorEl={emojiAnchor}
         onClose={closeEmojiPicker}

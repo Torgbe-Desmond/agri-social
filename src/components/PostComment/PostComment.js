@@ -183,6 +183,7 @@ function PostComment() {
   return (
     <Box className="post__comment">
       <Comment_Header
+        name="Post"
         systemPrefersDark={systemPrefersDark}
         handleGoBack={handleGoBack}
       />
