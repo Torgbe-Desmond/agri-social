@@ -4,10 +4,12 @@ import { useOutletContext } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import PredictionCard from "../../components/PredictionCard/PredictionCard";
 import { getPredictions } from "../../Features/PredictionSlice";
-import { Box, TextField } from "@mui/material";
+import { Box, CircularProgress, TextField, Typography } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import Header from "../../components/Header/Header";
 import { setScrolling } from "../../Features/StackSlice";
+import PredictionHeader from "./PredictionHeader";
+import PredictionList from "./PredictionList";
 
 function Predictions() {
   const { user_id } = useOutletContext();
@@ -22,6 +24,8 @@ function Predictions() {
   const { darkMode, systemPrefersDark } = useOutletContext();
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [scrolling, setScroll] = useState(0);
+  const lastScrollTop = useRef(0);
 
   useEffect(() => {
     dispatch(setScrolling(true));
@@ -46,6 +50,21 @@ function Predictions() {
   //   );
 
   useEffect(() => {
+    const scrollContainer = document.querySelector(".resuable");
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      const scrollTop = scrollContainer.scrollTop;
+      setScroll((prev) => prev + 1);
+      lastScrollTop.current = scrollTop;
+      console.log("ddddd");
+    };
+
+    scrollContainer.addEventListener("scroll", handleScroll);
+    return () => scrollContainer.removeEventListener("scroll", handleScroll);
+  }, [dispatch]);
+
+  useEffect(() => {
     let searchedData;
     searchedData = searchTerm
       ? prediction?.filter((st) =>
@@ -62,40 +81,31 @@ function Predictions() {
   };
 
   return (
-    <Header
-      name={"Predictions"}
-      searchTerm={searchTerm}
-      setSearchTerm={setSearchTerm}
-      status={predictionStatus}
-      children={
-        <div className="predictions__holder">
-          {filteredData.length > 0 &&
-            filteredData?.map(
-              ({
-                created_at,
-                user_id,
-                generated_name,
-                confidence,
-                prediction_label,
-                image_url,
-                id,
-              }) => (
-                <PredictionCard
-                  userDetails={userDetails}
-                  key={id}
-                  created_at={created_at}
-                  user_id={user_id}
-                  generated_name={generated_name}
-                  confidence={confidence}
-                  prediction_label={prediction_label}
-                  image_url={image_url}
-                  id={id}
-                />
-              )
-            )}
-        </div>
-      }
-    />
+    <Box className="predictions">
+      <PredictionHeader
+        systemPrefersDark={systemPrefersDark}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
+
+      {predictionStatus === "loading" ? (
+        <p className="circular__progress">
+          <CircularProgress size={20} />
+        </p>
+      ) : (
+        <PredictionList
+          predictionStatus={predictionStatus}
+          filteredData={filteredData}
+          userDetails={userDetails}
+        />
+      )}
+
+      {predictionStatus === "failed" && (
+        <p className="circular__progress">
+          {/* Error message or retry button */}
+        </p>
+      )}
+    </Box>
   );
 }
 

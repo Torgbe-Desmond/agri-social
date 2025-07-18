@@ -103,10 +103,9 @@ function MarketPlace() {
                   ref={isLast ? lastProductRef : null}
                   item
                   xs={12}
-                  sm={6}
+                  sm={12}
                   md={4}
                   lg={3}
-                  key={index}
                 >
                   <ProductCard {...product} />
                 </Grid>

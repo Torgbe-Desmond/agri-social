@@ -57,7 +57,7 @@ function Feed() {
 
     const handleScroll = () => {
       const scrollTop = node.scrollTop;
-      dispatch(setScrolling(scrollTop > lastScrollTop.current));
+      dispatch(setScrolling(scrollTop < lastScrollTop.current));
       lastScrollTop.current = scrollTop;
       setScroll((prev) => prev + 1);
     };
@@ -163,7 +163,7 @@ function Feed() {
       ref={feedRef}
       sx={{ height: "100vh", overflowY: "auto", padding: 1 }}
     >
-      <TweetBox />
+      {/* <TweetBox /> */}
       {postData?.map((post, index) => {
         const isLast = index === postData.length - 3;
         return (

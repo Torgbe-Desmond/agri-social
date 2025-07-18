@@ -4,16 +4,17 @@
     overflow-y: scroll;
     width: 100%;
     box-sizing: border-box;
-
 }
 
 .predictions__holder {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(1fr, 100%));
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     gap: 1rem;
     padding: 1rem;
+    height: 100vh;
+
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */

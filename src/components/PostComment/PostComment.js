@@ -190,7 +190,7 @@ function PostComment() {
 
       <Post post={post} />
 
-      <ReplyIndicator />
+      {togetherComments.length > 0 &&<ReplyIndicator />}
 
       <CommentReplyList
         chatContainerRef={chatContainerRef}

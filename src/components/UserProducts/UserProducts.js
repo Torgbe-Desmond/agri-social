@@ -25,6 +25,7 @@ function UserProducts() {
   const { products, hasMore, loading } = useSelector((state) => state.product);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const [scrolling, setScroll] = useState(0);
 
   useEffect(() => {
     dispatch(fetchUserProducts({ user_id: userDetails?.id }));
@@ -65,6 +66,7 @@ function UserProducts() {
       reloadAction={reloadAction}
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
+      setScroll={setScroll}
       children={
         <Box
           sx={{
@@ -76,7 +78,7 @@ function UserProducts() {
           <Box className="market__header"></Box>
           <Grid sx={{ width: "100%" }} container spacing={3}>
             {filteredData?.map((product, index) => (
-              <Grid item xs={12} sm={12} md={4} lg={3} key={index}>
+              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                 <LocalProductCard {...product} />
               </Grid>
             ))}

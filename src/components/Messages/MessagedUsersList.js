@@ -14,18 +14,34 @@ import {
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import { useNavigate } from "react-router-dom";
+import { setConversaionId } from "../../Features/MessageSlice";
+import { useDispatch } from "react-redux";
 
 const MessagedUsersList = ({ users }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
+
+  const handleNavigateToChat = (user) => {
+    dispatch(setConversaionId(user?.conversation_id));
+    navigate(`/chat/${user?.user_id}`);
+  };
 
   return (
-    <Card sx={{ maxWidth: "100%", margin: "auto", p: 2, cursor: "pointer" ,borderRadius:"0px" }}>
+    <Card
+      sx={{
+        maxWidth: "100%",
+        margin: "auto",
+        p: 2,
+        cursor: "pointer",
+        borderRadius: "0px",
+      }}
+    >
       <List>
         {users &&
           users.map((user) => (
             <React.Fragment key={user.user_id}>
               <ListItem
-                onClick={() => navigate(`/chat/${user.user_id}`)}
+                onClick={() => handleNavigateToChat(user)}
                 alignItems="flex-start"
               >
                 <ListItemAvatar>

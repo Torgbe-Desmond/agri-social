@@ -10,7 +10,12 @@ const ChatHeader = ({ userImage }) => {
         <ArrowBackIcon cursor="pointer" onClick={() => navigate(-1)} />
         <Avatar
           src={userImage}
-          sx={{ width: 45, height: 45, border: "4px solid black" }}
+          sx={{
+            width: 45,
+            height: 45,
+            borderBottom: 1,
+            borderColor: "divider",
+          }}
         />
       </h2>
       <span>Desmond</span>

@@ -90,7 +90,7 @@ export default function VideoActions({
   const style = {
     fontSize: "32px",
     cursor: "pointer",
-    filter: "drop-shadow(2px 2px 4px rgba(9, 8, 8, 0.5))",
+    filter: "drop-shadow(2px 2px 4px rgba(9, 8, 8, 0.5))",  
   };
 
   return (
@@ -132,7 +132,7 @@ export default function VideoActions({
           <StatusIcons
             sx={style}
             location={"video"}
-            icon={<VolumeUpIcon fontSize="large" />}
+            icon={<VolumeUpIcon fontSize="large" />}  
             action={toggleMute}
           />
         )}

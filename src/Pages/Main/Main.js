@@ -57,6 +57,7 @@ function Main() {
       </Box>
       <Box>{mainPathIndex === 0 && <Feed />}</Box>
       <Box>{mainPathIndex === 1 && <MarketPlace />}</Box>
+      {/* <Feed /> */}
     </Box>
   );
 }

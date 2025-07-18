@@ -42,7 +42,7 @@ function Conversations() {
 
   useEffect(() => {
     dispatch(setScrolling(true));
-    return () => dispatch(setScrolling(true));
+    return () => dispatch(setScrolling(false));
   }, []);
 
   return (

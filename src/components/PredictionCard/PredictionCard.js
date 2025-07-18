@@ -32,7 +32,7 @@ const PredictionCard = ({
   };
 
   return (
-    <Box sx={systemPrefersDark && { ...darkMode }} className="card">
+    <Box sx={{border: 1, borderColor: "divider"}} className="card">
       <Box className="card__image">
         <img src={image_url} alt="Prediction" />
       </Box>

@@ -37,17 +37,20 @@ function Chat() {
     setChatMessages(messages);
   }, [messages]);
 
-  useEffect(() => {
-    if (recipient_id && userDetails?.id) {
-      const member_ids = [recipient_id, userDetails.id];
-      const formData = new FormData();
-      member_ids.forEach((id) => formData.append("member_ids", id));
-      dispatch(getConversation({ formData }));
-    }
-  }, [recipient_id, userDetails?.id]);
+  console.log("conversation_id",conversation_id)
+
+  // useEffect(() => {
+  //   if (recipient_id && userDetails?.id) {
+  //     const member_ids = [recipient_id, userDetails?.id];
+  //     console.log("member_ids", member_ids);
+  //     const formData = new FormData();
+  //     member_ids.forEach((id) => formData.append("member_ids", id));
+  //     dispatch(getConversation({ formData }));
+  //   }
+  // }, [recipient_id, userDetails?.id]);
 
   useEffect(() => {
-    if (conversation_id && getConversationStatus === "succeeded") {
+    if (conversation_id) {
       dispatch(getdMessages({ conversation_id }));
     }
   }, [getConversationStatus]);

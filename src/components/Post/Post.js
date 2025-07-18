@@ -17,6 +17,8 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import HeaderPost from "../Post/HeaderPost";
 import BodyPost from "./BodyPost";
 import FooterPost from "./FooterPost";
+import RePosts from "./RePosts";
+import GroupPost from "./GroupPost";
 
 const Post = forwardRef(({ post }, ref) => {
   const dispatch = useDispatch();
@@ -80,7 +82,7 @@ const Post = forwardRef(({ post }, ref) => {
       location: "post",
       to: `/post/${post?.post_id}`,
       icon: <ChatBubbleOutlineIcon fontSize="small" />,
-      count: post?.comments,
+      count: post?.replies,
     },
     {
       id: "like",
@@ -106,6 +108,8 @@ const Post = forwardRef(({ post }, ref) => {
     );
   }
 
+  const handleJoin = () => {};
+
   return (
     <Box
       sx={{ borderBottom: 1, borderColor: "divider" }}
@@ -113,6 +117,7 @@ const Post = forwardRef(({ post }, ref) => {
       id={`post-${post?.post_id}`}
       ref={ref}
     >
+      {/* <RePosts /> */}
       <HeaderPost post={post} />
       <BodyPost post={post} />
       <FooterPost actions={actions} />

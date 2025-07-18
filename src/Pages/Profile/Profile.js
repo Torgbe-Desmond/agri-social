@@ -66,6 +66,7 @@ function Profile() {
             <Tab label="Posts" />
             {/* <Tab label="Replies" /> */}
             <Tab label="Products" />
+            <Tab label="Groups" />
           </Tabs>
         </Box>
       </Box>

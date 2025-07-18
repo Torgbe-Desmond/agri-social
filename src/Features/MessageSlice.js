@@ -112,6 +112,9 @@ const messageSlice = createSlice({
         // profilePicture: require("../../assets/icons8-farmer-64.png"),
       });
     },
+    setConversaionId: (state, action) => {
+      state.conversation_id = action.payload;
+    },
     clearMessages: (state) => {
       state.messages = [];
     },
@@ -122,17 +125,17 @@ const messageSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // get conversation
-      .addCase(getConversation.pending, (state) => {
-        state.getConversationStatus = "loading";
-      })
-      .addCase(getConversation.fulfilled, (state, action) => {
-        state.conversation_id = action.payload;
-        state.getConversationStatus = "succeeded";
-      })
-      .addCase(getConversation.rejected, (state, action) => {
-        state.error = action.error.message;
-        state.getConversationStatus = "failed";
-      })
+      // .addCase(getConversation.pending, (state) => {
+      //   state.getConversationStatus = "loading";
+      // })
+      // .addCase(getConversation.fulfilled, (state, action) => {
+      //   state.conversation_id = action.payload;
+      //   state.getConversationStatus = "succeeded";
+      // })
+      // .addCase(getConversation.rejected, (state, action) => {
+      //   state.error = action.error.message;
+      //   state.getConversationStatus = "failed";
+      // })
 
       .addCase(createGroup.pending, (state) => {
         state.createGroupStatus = "loading";
@@ -182,6 +185,11 @@ const messageSlice = createSlice({
   },
 });
 
-export const { addUserMessage, addBotMessage, clearMessages, clearGroups } =
-  messageSlice.actions;
+export const {
+  addUserMessage,
+  addBotMessage,
+  clearMessages,
+  clearGroups,
+  setConversaionId,
+} = messageSlice.actions;
 export default messageSlice.reducer;

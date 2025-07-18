@@ -4,8 +4,8 @@ import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 
 const CommentChat = ({
-  comment,
-  setComment,
+  message,
+  setMessage,
   handleAddComment,
   handleAddFile,
   systemPrefersDark,
@@ -33,8 +33,8 @@ const CommentChat = ({
       <TextField
         fullWidth
         placeholder="Write a comment..."
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
         size="small"
         multiline
         minRows={1}

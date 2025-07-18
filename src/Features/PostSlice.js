@@ -395,7 +395,7 @@ const postSlice = createSlice({
       .addCase(addComment.fulfilled, (state, action) => {
         state.post = {
           ...state.post,
-          comments: (state.post.comment || 0) + 1,
+          comments: (state.post.comments || 0) + 1,
         };
         state.commentStatus = "succeeded";
       })

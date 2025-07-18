@@ -48,17 +48,7 @@ import Streams from "./components/Streams/Streams";
 import Conversations from "./components/Conversations/Conversations";
 import GroupConversation from "./components/GroupConversation/GroupConversation";
 import { clearOnLineStatus } from "./Features/StackSlice";
-// green
-// background: {
-//     default: "rgb(2, 29, 0)",
-//     paper: "rgb(1, 46, 34)",
-//   },
 
-// dark
-//   background: {
-//   default: "rgb(4, 4, 4)",
-//   paper: "rgb(23, 24, 24)",
-// },
 function App() {
   const isAuthenticated = localStorage.getItem("cc_ft") ? true : false;
   const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
@@ -70,7 +60,7 @@ function App() {
   const dispatch = useDispatch();
 
   const handleSnackbarClose = () => {
-    dispatch(clearOnLineStatus())
+    dispatch(clearOnLineStatus());
     setErrorMessage(null);
   };
 
