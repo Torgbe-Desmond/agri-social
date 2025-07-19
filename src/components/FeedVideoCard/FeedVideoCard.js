@@ -171,7 +171,13 @@ function FeedVideoCard({ url }) {
   };
 
   let videoProgress = (currentTime / duration) * 100;
-
+  const handleSeek = (newTime) => {
+    const videoElement = videoRef.current;
+    if (videoElement) {
+      videoElement.currentTime = newTime;
+      setCurrentTime(newTime); // update local state
+    }
+  };
   return (
     <div>
       <FeedAutoplayVideo
@@ -189,6 +195,7 @@ function FeedVideoCard({ url }) {
         isMuted={isMuted}
         duration={duration}
         currentTime={currentTime}
+        onSeek={handleSeek}
       />
     </div>
   );

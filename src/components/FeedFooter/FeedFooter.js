@@ -12,24 +12,42 @@ function FeedFooter({
   handleToggleDialog,
   currentTime,
   duration,
+  onSeek,
 }) {
+  const handleChange = (e) => {
+    const newTime = parseFloat(e.target.value);
+    onSeek(newTime);
+  };
   const style = {
     fontSize: "32px",
     filter: "drop-shadow(2px 2px 4px rgba(9, 8, 8, 0.5))",
   };
 
   return (
-    <div className="feed-footer-container">
-      <div className="timestamp">
-        {Math.floor(currentTime)}:{Math.floor(duration)}
+    <div className="feed-footer-holder">
+      <div className="feed-footer-container">
+        <div className="timestamp">
+          {Math.floor(currentTime)}:{Math.floor(duration)}
+        </div>
+
+        <IconButton sx={{p:0}} onClick={() => toggleMute()}>
+          {isMuted ? (
+            <VolumeOffIcon style={{ color: "white" }} />
+          ) : (
+            <VolumeUpIcon style={{ color: "white" }} />
+          )}
+        </IconButton>
       </div>
-      <IconButton onClick={() => toggleMute()}>
-        {isMuted ? (
-          <VolumeOffIcon style={{ color: "white" }} />
-        ) : (
-          <VolumeUpIcon style={{ color: "white" }} />
-        )}
-      </IconButton>
+      <input
+        className="video-seek"
+        type="range"
+        min={0}
+        max={duration}
+        step={0.1}
+        value={currentTime}
+        onChange={handleChange}
+        style={{ width: "100%", color:"#FFF" }}
+      />
     </div>
   );
 }

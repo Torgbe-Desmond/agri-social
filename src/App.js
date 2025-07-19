@@ -101,7 +101,10 @@ function App() {
               <Route path="/market-place" element={<MarketPlace />} />
               <Route path="/product/:product_id" element={<ProductDetails />} />
               <Route path="/create-product" element={<CreateProduct />} />
-              <Route path="/chat/:recipient_id" element={<Chat />} />
+              <Route
+                path="/chat/:conversation_id/c/:recipient_id"
+                element={<Chat />}
+              />
               <Route
                 path="/group-chat/:conversation_id"
                 element={<GroupConversation />}

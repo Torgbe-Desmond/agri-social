@@ -109,7 +109,7 @@ function PostHistory() {
       }
     });
 
-    itemRefs.current.forEach((el) => el?.classList.remove("visible-post"));
+    // itemRefs.current.forEach((el) => el?.classList.remove("visible-post"));
 
     const videoIds = postHistory
       // .filter((p) => p.has_video)
@@ -155,8 +155,6 @@ function PostHistory() {
       }
     }
   }, [scrolling, postHistory]);
-
-  console.log(scrolling)
 
   if (postHistoryStatus === "loading") {
     return (

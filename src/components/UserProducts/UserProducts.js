@@ -68,21 +68,11 @@ function UserProducts() {
       setSearchTerm={setSearchTerm}
       setScroll={setScroll}
       children={
-        <Box
-          sx={{
-            ...(systemPrefersDark ? darkMode : {}),
-            padding: 3,
-          }}
-          className="market__place"
-        >
-          <Box className="market__header"></Box>
-          <Grid sx={{ width: "100%" }} container spacing={3}>
-            {filteredData?.map((product, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                <LocalProductCard {...product} />
-              </Grid>
-            ))}
-          </Grid>
+        <Box sx={{ padding: 3 }} className="user__products">
+          {products.map((product, index) => {
+            const isLast = index === products.length - 1;
+            return <LocalProductCard {...product} />;
+          })}
         </Box>
       }
     />

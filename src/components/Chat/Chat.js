@@ -19,7 +19,7 @@ function Chat() {
   const { predictionStatus, prediction } = useSelector(
     (state) => state.prediction
   );
-  const { conversation_id, getConversationStatus, messages } = useSelector(
+  const { getConversationStatus, messages } = useSelector(
     (state) => state.message
   );
   const [chatMessages, setChatMessages] = useState([]);
@@ -31,29 +31,20 @@ function Chat() {
   const socket = useSocket();
   const dispatch = useDispatch();
   const { darkMode, systemPrefersDark } = useOutletContext();
-  const { recipient_id } = useParams();
+  const { conversation_id, recipient_id } = useParams();
+  console.log(conversation_id, recipient_id);
 
   useEffect(() => {
     setChatMessages(messages);
   }, [messages]);
 
-  console.log("conversation_id",conversation_id)
-
-  // useEffect(() => {
-  //   if (recipient_id && userDetails?.id) {
-  //     const member_ids = [recipient_id, userDetails?.id];
-  //     console.log("member_ids", member_ids);
-  //     const formData = new FormData();
-  //     member_ids.forEach((id) => formData.append("member_ids", id));
-  //     dispatch(getConversation({ formData }));
-  //   }
-  // }, [recipient_id, userDetails?.id]);
+ 
 
   useEffect(() => {
     if (conversation_id) {
       dispatch(getdMessages({ conversation_id }));
     }
-  }, [getConversationStatus]);
+  }, [conversation_id]);
 
   useEffect(() => {
     if (scrollAnchorRef.current) {
@@ -88,6 +79,26 @@ function Chat() {
     setUploadedFiles([]);
   };
 
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("chat_response", (data) => {
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          sender_id: data?.sender_id,
+          conversation_id: data?.conversation_id,
+          content: data?.content,
+          profilePicture: "/user-avatar.png",
+        },
+      ]);
+      // "id": str(row.id),
+      // "conversation_id": str(row.conversation_id),
+      // "sender_id": str(row.sender_id),
+      // "content": row.content,
+      // "created_at": row.created_at.isoformat(),
+    });
+  }, [socket]);
+
   const handleAddFile = useCallback(() => {
     const inputElement = document.createElement("input");
     inputElement.type = "file";
@@ -111,7 +122,7 @@ function Chat() {
 
   return (
     <Box className="chat">
-      <ChatHeader userImage={userDetails?.user_image} />
+      <ChatHeader userImage={userDetails?.user_image} onlineStatus={socket} />
       <ChatMessageList
         messages={chatMessages}
         userDetails={userDetails}

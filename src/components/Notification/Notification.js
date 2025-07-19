@@ -83,9 +83,9 @@ function Notification({ notification }) {
               handleNavigate(notification?.type, notification?.entity_type)
             }
           >
-            <p>{notification?.message}</p>
-          </Box>{" "}
-          <span class="time">
+            <p className="message">{notification?.message}</p>
+          </Box>
+          <span className="time">
             {timeAgo(new Date(notification?.created_at))}
           </span>
         </Box>

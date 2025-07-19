@@ -161,11 +161,11 @@ function Feed() {
     <Box
       className="feed"
       ref={feedRef}
-      sx={{ height: "100vh", overflowY: "auto", padding: 1 }}
+      sx={{ height: "90vh", overflowY: "auto", padding: 1 }}
     >
       {/* <TweetBox /> */}
       {postData?.map((post, index) => {
-        const isLast = index === postData.length - 3;
+        const isLast = index === postData.length - 1;
         return (
           <div
             key={index}

@@ -409,6 +409,7 @@ const postSlice = createSlice({
       })
       .addCase(likePost.fulfilled, (state, action) => {
         const { post_id, liked } = action.payload;
+        console.log(action.payload)
         state.postData = state.postData?.map((p) => {
           if (p.post_id === post_id) {
             return {

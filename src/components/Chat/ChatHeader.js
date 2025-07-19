@@ -1,8 +1,10 @@
 import { Avatar, Box } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
+import CircleIcon from "@mui/icons-material/Circle";
+import { Socket } from "socket.io-client";
 
-const ChatHeader = ({ userImage }) => {
+const ChatHeader = ({ userImage, onlineStatus }) => {
   const navigate = useNavigate();
   return (
     <Box className="chat__header">
@@ -19,6 +21,7 @@ const ChatHeader = ({ userImage }) => {
         />
       </h2>
       <span>Desmond</span>
+      {/* <CircleIcon sx={{ color: onlineStatus ? "green" : "red" }} /> */}
     </Box>
   );
 };

@@ -1,0 +1,12 @@
+.post-status-icon {
+    display: flex;
+    gap: 1rem;
+    cursor: pointer;
+}
+
+
+.status-btn-count{
+    font-size: 15px;
+    padding-bottom: 2px;
+}
+

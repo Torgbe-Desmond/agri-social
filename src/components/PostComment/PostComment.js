@@ -52,6 +52,24 @@ function PostComment() {
         .unwrap()
         .then(() => {
           if (post_id) {
+            const postEl = document.querySelector(`#post-${post_id}`);
+            // console.log("postEl", postEl);
+
+            if (!post_id || !postEl) return;
+
+            const hasImage = postEl.querySelector(
+              ".post__images .post_media img"
+            );
+
+            // const hasVideo = el.querySelector(`#post-${id} video`);
+
+            // postEl.classList.add("visible-post-next");
+
+            if (hasImage) {
+              console.log("has image");
+              hasImage.style.display = "flex";
+            }
+
             dispatch(getComments({ post_id }));
           }
         })
@@ -190,7 +208,7 @@ function PostComment() {
 
       <Post post={post} />
 
-      {togetherComments.length > 0 &&<ReplyIndicator />}
+      {togetherComments.length > 0 && <ReplyIndicator />}
 
       <CommentReplyList
         chatContainerRef={chatContainerRef}

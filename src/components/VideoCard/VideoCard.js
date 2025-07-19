@@ -181,8 +181,18 @@ function VideoCard({
     setFullScreen(!fullScreen);
   };
 
-  let videoProgress = (currentTime / duration) * 100;
+  const handleSeek = (newTime) => {
+    const videoElement = videoRef.current;
+    if (videoElement) {
+      videoElement.currentTime = newTime;
+      setCurrentTime(newTime); // update local state
+    }
+  };
 
+  const handleChange = (e) => {
+    const newTime = parseFloat(e.target.value);
+    handleSeek(newTime);
+  };
   return (
     <div className={`videoCard`}>
       {/* <VideoHeader
@@ -218,9 +228,21 @@ function VideoCard({
 
       <PostInfo content={content} />
 
-      <div className="video-progress-bar">
-        <div className="progress" style={{ width: `${videoProgress}%` }} />
-      </div>
+      <input
+        type="range"
+        min={0}
+        max={duration}
+        step={0.1}
+        value={currentTime}
+        onChange={handleChange}
+        style={{
+          width: "100%",
+          color: "#FFF",
+          position: "absolute",
+          bottom: 0,
+          zIndex:1
+        }}
+      />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import MarketPlace from "../../components/MarketPlace/MarketPlace";
 import UserProducts from "../../components/UserProducts/UserProducts";
 import { clearProducts } from "../../Features/ProductSlice";
 import { setScrolling } from "../../Features/StackSlice";
+import Group from "../../components/Group/Group";
 
 function Profile() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -73,6 +74,7 @@ function Profile() {
 
       <Box>{tabIndex === 0 && <PostHistory />}</Box>
       <Box>{tabIndex === 1 && <UserProducts />}</Box>
+      <Box>{tabIndex === 2 && <Group />}</Box>
     </Box>
   );
 }

@@ -7,10 +7,13 @@ import {
   Typography,
   Modal,
   Paper,
+  IconButton,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { createGroup } from "../../Features/MessageSlice";
+import ImageIcon from "@mui/icons-material/Image";
+import CloseIcon from "@mui/icons-material/Close";
 
 const modalStyle = {
   position: "absolute",
@@ -27,14 +30,32 @@ const modalStyle = {
 const CreateGroupModal = () => {
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
+  const [media, setMedia] = useState(null);
+  const [file, setFile] = useState(null);
   const dispatch = useDispatch();
+
+  const handleMediaUpload = (event, type) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setMedia(reader.result);
+      };
+      reader.readAsDataURL(file);
+      setFile(file);
+    }
+  };
+
+  const handleClearMedia = () => {
+    setMedia(null);
+  };
 
   const handleCreate = () => {
     if (!groupName.trim()) return;
 
     const formData = new FormData();
     formData.append("name", groupName.trim());
-    // formData.append("description", description.trim());
+    formData.append("description", description.trim());
     formData.append("sender_id", localStorage.getItem("cc_ft"));
     formData.append("is_group", "1");
 
@@ -69,8 +90,36 @@ const CreateGroupModal = () => {
             rows={3}
             fullWidth
           />
+          <input
+            accept="image/*"
+            style={{ display: "none" }}
+            id="image-upload"
+            type="file"
+            onChange={(e) => handleMediaUpload(e, "image")}
+          />
+          <label htmlFor="image-upload">
+            <IconButton component="span" color="primary">
+              <ImageIcon />
+            </IconButton>
+          </label>
         </Box>
 
+        <Box mt={2} position="relative" justifyContent="center" display="flex">
+          <IconButton
+            size="small"
+            color="inherit"
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              zIndex: 1,
+            }}
+            onClick={handleClearMedia}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+          <img src={media} style={{ width: "300px" }} alt="Preview" />
+        </Box>
         <Stack
           direction="row"
           spacing={2}

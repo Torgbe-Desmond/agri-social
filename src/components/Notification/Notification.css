@@ -3,7 +3,7 @@
     /* background: #fff; */
     font-family: sans-serif;
     box-sizing: border-box;
-    border-bottom: 1px solid var(--twitter-background);
+    /* border-bottom: 1px solid var(--twitter-background); */
 }
 
 .notification {
@@ -15,8 +15,16 @@
     position: relative;
 }
 
+.message {
+    color: #FFF;
+}
+
 .notification.unread {
-    background-color:#648572;
+    background-color: #95b6a2;
+    /* background: rgba(255, 255, 255, 0.2); */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .notification .time {
@@ -42,5 +50,5 @@
 }
 
 .notification__headerDescription p {
-    color: #000;
+    color: #FFF;
 }

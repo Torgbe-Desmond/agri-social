@@ -27,7 +27,9 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
   const dispatch = useDispatch();
   const { user_id } = useOutletContext();
   const { userDetails } = useSelector((state) => state.auth);
-  const { singlePostStatus } = useSelector((state) => state.post);
+  const { postStatus, likeStatus, savedStatus, postDeleteStatus } = useSelector(
+    (state) => state.post
+  );
   const location = useLocation();
 
   const handleLikePost = () => {
@@ -51,13 +53,13 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
     dispatch(unSavePost({ user_id: userDetails?.id, post_id: post?.post_id }));
   };
 
-  if (singlePostStatus === "loading") {
-    return (
-      <p className="circular__progress">
-        <CircularProgress />
-      </p>
-    );
-  }
+  // if (postStatus === "loading") {
+  //   return (
+  //     <p className="circular__progress">
+  //       <CircularProgress />
+  //     </p>
+  //   );
+  // }
 
   const actions = [
     {
@@ -73,6 +75,7 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
       icon: <FavoriteBorderIcon fontSize="small" />,
       count: post?.likes,
       action: () => handleLikePost(),
+      status: likeStatus,
     },
     {
       id: "bookmark",
@@ -80,6 +83,7 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
       icon: <BookmarkBorderIcon fontSize="small" />,
       count: post?.comments,
       action: () => handleUnsaved(),
+      status: savedStatus,
     },
     {
       id: "deletePost",

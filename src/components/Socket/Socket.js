@@ -15,6 +15,10 @@ const SocketContext = createContext(null);
 // Custom hook for easy access
 export const useSocket = () => useContext(SocketContext);
 
+const url = [
+  "https://agri-social-backend.onrender.com",
+  "http://localhost:8000",
+];
 // Create provider
 export const SocketProvider = ({ children }) => {
   const socketRef = useRef(null);
@@ -22,7 +26,7 @@ export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    socketRef.current = io("https://agri-social-backend.onrender.com", {
+    socketRef.current = io(url[0], {
       transports: ["websocket"],
       withCredentials: true,
     });

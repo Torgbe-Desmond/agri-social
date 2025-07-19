@@ -23,7 +23,9 @@ import GroupPost from "./GroupPost";
 const Post = forwardRef(({ post }, ref) => {
   const dispatch = useDispatch();
   const { userDetails } = useSelector((state) => state.auth);
-  const { singlePostStatus } = useSelector((state) => state.post);
+  const { singlePostStatus, likeStatus, savedStatus } = useSelector(
+    (state) => state.post
+  );
   const [successMessage, setSuccessMessage] = useState(null);
   const { imageInPostPrediction, imageInPostPredictionStatus } = useSelector(
     (state) => state.prediction
@@ -82,7 +84,7 @@ const Post = forwardRef(({ post }, ref) => {
       location: "post",
       to: `/post/${post?.post_id}`,
       icon: <ChatBubbleOutlineIcon fontSize="small" />,
-      count: post?.replies,
+      count: post?.replies || post?.comments,
     },
     {
       id: "like",
@@ -90,6 +92,7 @@ const Post = forwardRef(({ post }, ref) => {
       icon: <FavoriteBorderIcon fontSize="small" />,
       count: post?.likes,
       action: () => handleLikePost(),
+      status: likeStatus,
     },
     {
       id: "bookmark",
@@ -97,6 +100,7 @@ const Post = forwardRef(({ post }, ref) => {
       icon: <BookmarkBorderIcon fontSize="small" />,
       count: post?.saved,
       action: () => handleSavePost(),
+      status: savedStatus,
     },
   ];
 
@@ -120,7 +124,7 @@ const Post = forwardRef(({ post }, ref) => {
       {/* <RePosts /> */}
       <HeaderPost post={post} />
       <BodyPost post={post} />
-      <FooterPost actions={actions} />
+      <FooterPost actions={actions} post_id={post?.post_id} />
     </Box>
   );
 });

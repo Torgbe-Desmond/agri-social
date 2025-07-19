@@ -67,6 +67,7 @@ const notificationSlice = createSlice({
         // state.notificationStatus = "succeeded";
 
         const { notifications, numb_found } = action.payload;
+        console.log(notifications);
         state.hasMore = notifications.length > 0;
 
         if (state.hasMore) {
@@ -82,6 +83,7 @@ const notificationSlice = createSlice({
         state.notificationStatus = "succeeded";
       })
       .addCase(getNofitications.rejected, (state) => {
+        state.hasMore = false;
         state.notificationStatus = "failed";
       });
   },

@@ -19,11 +19,11 @@ import { useDispatch } from "react-redux";
 
 const MessagedUsersList = ({ users }) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleNavigateToChat = (user) => {
     dispatch(setConversaionId(user?.conversation_id));
-    navigate(`/chat/${user?.user_id}`);
+    navigate(`/chat/${user?.conversation_id}/c/${user.user_id}`);
   };
 
   return (
