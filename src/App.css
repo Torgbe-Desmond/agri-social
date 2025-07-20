@@ -86,8 +86,18 @@ body {
   margin-right: auto;
   /* padding: 0 10px; */
 
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
   /* margin-bottom: 56px !important; */
 }
+
+
+
+.roboto-app {}
 
 @media screen and (max-width: 1000px) {
 

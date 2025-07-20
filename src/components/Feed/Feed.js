@@ -161,7 +161,13 @@ function Feed() {
     <Box
       className="feed"
       ref={feedRef}
-      sx={{ height: "90vh", overflowY: "auto", padding: 1 }}
+      sx={{
+        height: "90vh",
+        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+        // justifyContent:"flex-end"
+      }}
     >
       {/* <TweetBox /> */}
       {postData?.map((post, index) => {

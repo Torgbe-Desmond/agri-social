@@ -15,6 +15,9 @@ import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useSocket } from "../Socket/Socket";
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import TimelineIcon from "@mui/icons-material/Timeline";
+import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
 
 function Sidebar() {
   const isMobile = useMediaQuery("(max-width:640px)");
@@ -56,10 +59,7 @@ function Sidebar() {
   }, [location]);
 
   return (
-    <Box
-     
-      className="sidebar"
-    >
+    <Box className="sidebar">
       {/* <Box className="logo">
         <img
           src={require("../../assets/icons8-farmer-64.png")}
@@ -133,6 +133,30 @@ function Sidebar() {
         active={currentPage === "streams"}
         text="Streams"
         to="/streams"
+      />
+      <SidebarOption
+        unShowIcons={unShowIcons}
+        isMobile={isMobile}
+        Icon={StorefrontIcon}
+        active={currentPage === "market-place"}
+        text="Market Place"
+        to="/market-place"
+      />
+      <SidebarOption
+        unShowIcons={unShowIcons}
+        isMobile={isMobile}
+        Icon={TimelineIcon}
+        active={currentPage === "post-history"}
+        text="Posts"
+        to="/post-history"
+      />
+      <SidebarOption
+        unShowIcons={unShowIcons}
+        isMobile={isMobile}
+        Icon={ProductionQuantityLimitsIcon}
+        active={currentPage === "products"}
+        text="Products"
+        to="/products"
       />
       {/* <SidebarOption isMobile={isMobile} Icon={MoreHorizIcon} text="More" /> */}
 

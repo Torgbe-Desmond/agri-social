@@ -65,6 +65,8 @@ function PostHistory() {
   };
 
   useEffect(() => {
+
+    // setScroll(1)
     const visible = itemRefs.current.find((el) => {
       if (!el) return false;
       const rect = el.getBoundingClientRect();
@@ -92,7 +94,6 @@ function PostHistory() {
         ?.replace("post-history-", "");
 
       const postEl = document.querySelector(`#post-history-${id}`);
-      console.log("postEl", postEl);
 
       if (!id || !postEl) return;
 
@@ -101,7 +102,7 @@ function PostHistory() {
 
       // const hasVideo = el.querySelector(`#post-${id} video`);
 
-      // postEl.classList.add("visible-post-next");
+      postEl.classList.add("visible-post-next");
 
       if (hasImage) {
         console.log("has image");
@@ -124,11 +125,13 @@ function PostHistory() {
       // If new post is different from currently playing
       if (visiblePostId && visiblePostId !== id) {
         // Pause the previously playing video
-        const oldVideo = document.querySelector(`#post-history-${visiblePostId} video`);
+        const oldVideo = document.querySelector(
+          `#post-history-${visiblePostId} video`
+        );
         if (oldVideo) oldVideo.pause();
       }
 
-      // visible.classList.add("visible-post");
+      visible.classList.add("visible-post");
 
       const newVideo = document.querySelector(`#post-history-${id} video`);
       if (newVideo) {

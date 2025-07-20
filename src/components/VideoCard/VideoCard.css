@@ -51,15 +51,26 @@
 
 .video-actions {
   position: absolute;
-  right: 0;
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
-  gap: 1rem;
-  flex-direction: column;
+  bottom: 0;
+  display: grid;
+  /* justify-content: flex-end;
+  align-items: flex-end; */
+  /* gap: 1rem; */
+  gap: 2rem;
+  flex-direction: row;
   bottom: 0;
   z-index: 100;
-  padding: 1rem;
+  padding: 1rem 1rem;
+  /* border: 1px solid red; */
+  width: 100%;
+
+
+  /* background: rgba(255, 255, 255, 0.2); */
+  background: transparent;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px 15px 0px 0px;
 }
 
 .ui-video-seek-slider {
@@ -70,11 +81,12 @@
 
 .actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 1rem;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   z-index: 1;
+  width: 100%;
 }
 
 

@@ -1,0 +1,8 @@
+.market {
+    flex: 1;
+    min-width: fit-content;
+    overflow-y: scroll;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}

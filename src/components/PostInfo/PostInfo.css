@@ -1,15 +1,11 @@
 .post-info {
-    position: absolute;
-    left: 0;
-    display: flex;
+
     justify-content: flex-end;
     align-items: flex-end;
     gap: 1rem;
     flex-direction: column;
-    bottom: 0;
     z-index: 100;
-    padding: 1rem;
-    max-width: 80%;
+    max-width: 100%;
     text-align: flex-end;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -52,29 +52,8 @@ function Profile() {
       >
         <h2>Profile</h2>
         <TwitterProfileUI />
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            display: "flex",
-            width: "100%",
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
-            gap: "50px",
-          }}
-        >
-          <Tabs value={tabIndex} onChange={handleTabChange} sx={{}}>
-            <Tab label="Posts" />
-            {/* <Tab label="Replies" /> */}
-            <Tab label="Products" />
-            <Tab label="Groups" />
-          </Tabs>
-        </Box>
       </Box>
-
-      <Box>{tabIndex === 0 && <PostHistory />}</Box>
-      <Box>{tabIndex === 1 && <UserProducts />}</Box>
-      <Box>{tabIndex === 2 && <Group />}</Box>
+      <Group />
     </Box>
   );
 }

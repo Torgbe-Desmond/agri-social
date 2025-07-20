@@ -17,6 +17,9 @@ import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import OnlinePredictionOutlinedIcon from "@mui/icons-material/OnlinePredictionOutlined";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import TimelineIcon from "@mui/icons-material/Timeline";
+import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
 
 import { useLocation } from "react-router-dom";
 
@@ -69,6 +72,11 @@ const BottomBar = ({ notifyCounts = 0 }) => {
             active={currentPage === "messages"}
           />
           <BottomBarOption
+            Icon={StorefrontIcon}
+            to="/market-place"
+            active={currentPage === "market-place"}
+          />
+          <BottomBarOption
             Icon={MoreHorizIcon}
             to="#"
             active={false}
@@ -96,6 +104,12 @@ const BottomBar = ({ notifyCounts = 0 }) => {
           }}
         >
           <BottomBarOption
+            Icon={ProductionQuantityLimitsIcon}
+            text="Products"
+            to="/products"
+            active={currentPage === "products"}
+          />
+          <BottomBarOption
             Icon={BookmarkBorderIcon}
             text="Bookmarks"
             to="/bookmarks"
@@ -113,12 +127,18 @@ const BottomBar = ({ notifyCounts = 0 }) => {
             to="/predict-disease"
             active={currentPage === "predict-disease"}
           />
-          {/* <BottomBarOption
+          <BottomBarOption
             Icon={VideocamOutlinedIcon}
             text="Streams"
             to="/streams"
             active={currentPage === "streams"}
-          /> */}
+          />
+          <BottomBarOption
+            Icon={TimelineIcon}
+            text="Posts"
+            to="/post-history"
+            active={currentPage === "post-history"}
+          />
         </Box>
       </SwipeableDrawer>
     </>

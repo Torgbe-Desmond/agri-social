@@ -195,12 +195,13 @@ function VideoCard({
   };
   return (
     <div className={`videoCard`}>
-      {/* <VideoHeader
+      <VideoHeader
         toggleMute={toggleMute}
         isMuted={isMuted}
         username={username}
+        user_image={user_image}
         handleToggleDialog={handleToggleDialog}
-      /> */}
+      />
 
       <AutoplayVideo
         videoRef={videoRef}
@@ -215,6 +216,7 @@ function VideoCard({
 
       <VideoActions
         saved={saved}
+        content={content}
         likes={likes}
         user_id={user_id}
         post_id={post_id}
@@ -223,12 +225,13 @@ function VideoCard({
         isMuted={isMuted}
         comments={comments}
         username={username}
+        currentTime={currentTime}
+        handleChange={handleChange}
+        duration={duration}
         handleToggleDialog={handleToggleDialog}
       />
 
-      <PostInfo content={content} />
-
-      <input
+      {/* <input
         type="range"
         min={0}
         max={duration}
@@ -242,7 +245,7 @@ function VideoCard({
           bottom: 0,
           zIndex:1
         }}
-      />
+      /> */}
     </div>
   );
 }

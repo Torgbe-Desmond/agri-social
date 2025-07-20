@@ -1,6 +1,13 @@
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
-import { Avatar, Box, SwipeableDrawer, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Slider,
+  styled,
+  SwipeableDrawer,
+  Typography,
+} from "@mui/material";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import ModeCommentOutlinedIcon from "@mui/icons-material/ModeCommentOutlined";
 import BottomBarOption from "../BottomBarOption/BottomBarOption";
@@ -20,6 +27,7 @@ import {
 import { useDispatch } from "react-redux";
 import { predictImageInPost } from "../../Features/PredictionSlice";
 import ComponentStack from "../HandleStack/HandleStack";
+import PostInfo from "../PostInfo/PostInfo";
 export default function VideoActions({
   toggleMute,
   likes,
@@ -29,8 +37,12 @@ export default function VideoActions({
   user_image,
   isMuted,
   saved,
+  content,
   user_id,
   handleToggleDialog,
+  currentTime,
+  handleChange,
+  duration,
 }) {
   const [openDrawer, setOpenDrawer] = useState(false);
 
@@ -61,6 +73,14 @@ export default function VideoActions({
     navigate(`/user/${user_id}`);
   };
 
+  const TinyText = styled(Typography)({
+    fontSize: "0.75rem",
+    opacity: 0.38,
+    fontWeight: 500,
+    letterSpacing: 0.2,
+    color:"#FFF"
+  });
+
   const handleSavePost = () => {
     const formData = new FormData();
     console.log(localStorage.getItem("cc_ft"));
@@ -87,36 +107,41 @@ export default function VideoActions({
     dispatch(predictImageInPost({ formData }));
   };
 
+  function formatDuration(value) {
+    const minute = Math.floor(value / 60);
+    const secondLeft = Math.floor(value);
+    return `${minute}:${secondLeft}`;
+  }
+
   const style = {
     fontSize: "32px",
     cursor: "pointer",
-    filter: "drop-shadow(2px 2px 4px rgba(9, 8, 8, 0.5))",  
+    filter: "drop-shadow(2px 2px 4px rgba(9, 8, 8, 0.5))",
   };
 
   return (
     <div className="video-actions">
-      <div className="actions">
-        <Avatar src={user_image || ""} sx={style} />
-        <Typography>{username}</Typography>
+      <PostInfo content={content} />
 
+      <div className="actions">
         <StatusIcons
           sx={style}
-          location={"video"}
-          icon={<ModeCommentOutlinedIcon fontSize="large" />}
+          location={"post"}
+          icon={<ModeCommentOutlinedIcon fontSize="small" />}
           action={toggleDrawer}
         />
 
         <StatusIcons
           sx={style}
-          location={"video"}
-          icon={<FavoriteBorderIcon fontSize="large" />}
+          location={"post"}
+          icon={<FavoriteBorderIcon fontSize="small" />}
           count={likes}
           action={handleLikePost}
         />
         <StatusIcons
           sx={style}
-          location={"video"}
-          icon={<BookmarkBorderIcon fontSize="large" />}
+          location={"post"}
+          icon={<BookmarkBorderIcon fontSize="small" />}
           count={saved}
           action={handleSavePost}
         />
@@ -124,19 +149,82 @@ export default function VideoActions({
         {isMuted ? (
           <StatusIcons
             sx={style}
-            location={"video"}
-            icon={<VolumeOffIcon fontSize="large" />}
+            location={"post"}
+            icon={<VolumeOffIcon fontSize="small" />}
             action={toggleMute}
           />
         ) : (
           <StatusIcons
             sx={style}
-            location={"video"}
-            icon={<VolumeUpIcon fontSize="large" />}  
+            location={"post"}
+            icon={<VolumeUpIcon fontSize="small" />}
             action={toggleMute}
           />
         )}
       </div>
+      {/* <input
+        type="range"
+        min={0}
+        max={duration}
+        step={0.1}
+        value={currentTime}
+        onChange={handleChange}
+        style={{
+          width: "100%",
+          color: "#FFF",
+          position: "absolute",
+          bottom: 0,
+          zIndex: 1,
+        }}
+      /> */}
+      <Slider
+        aria-label="time-indicator"
+        size="small"
+        value={currentTime}
+        min={0}
+        step={1}
+        max={duration}
+        onChange={handleChange}
+        sx={(t) => ({
+          color: "inherit",
+          height: 4,
+          "& .MuiSlider-thumb": {
+            width: 8,
+            height: 8,
+            transition: "0.3s cubic-bezier(.47,1.64,.41,.8)",
+            "&::before": {
+              boxShadow: "0 2px 12px 0 rgba(0,0,0,0.4)",
+            },
+            "&:hover, &.Mui-focusVisible": {
+              boxShadow: `0px 0px 0px 8px ${"rgb(0 0 0 / 16%)"}`,
+              ...t.applyStyles("dark", {
+                boxShadow: `0px 0px 0px 8px ${"rgb(255 255 255 / 16%)"}`,
+              }),
+            },
+            "&.Mui-active": {
+              width: 20,
+              height: 20,
+            },
+          },
+          "& .MuiSlider-rail": {
+            opacity: 0.28,
+          },
+          ...t.applyStyles("dark", {
+            color: "#fff",
+          }),
+        })}
+      />
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mt: -2,
+        }}
+      >
+        <TinyText>{formatDuration(currentTime)}</TinyText>
+        <TinyText>-{formatDuration(duration - currentTime)}</TinyText>
+      </Box>
     </div>
   );
 }

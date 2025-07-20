@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import "./Main.css";
+import "./Market.css";
 import { useOutletContext } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Tabs, Tab, Box, Typography, CircularProgress } from "@mui/material";
@@ -8,21 +8,21 @@ import MarketPlace from "../../components/MarketPlace/MarketPlace";
 import { clearProducts } from "../../Features/ProductSlice";
 import { setMainPathIndex } from "../../Features/StackSlice";
 
-function Main() {
+function Market() {
   const [tabIndex, setTabIndex] = useState(0);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (tabIndex === 0) {
-      dispatch(clearProducts());
-    }
-  }, [tabIndex]);
+  //   useEffect(() => {
+  //     if (tabIMarketPlacendex === 0) {
+  //       dispatch(clearProducts());
+  //     }
+  //   }, [tabIndex]);
 
   return (
-    <Box className="main">
-      <Feed />
+    <Box className="market">
+      <MarketPlace />
     </Box>
   );
 }
 
-export default Main;
+export default Market;

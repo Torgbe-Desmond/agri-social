@@ -8,7 +8,7 @@ function PostInfo({ content }) {
     cursor: "pointer",
     filter: "drop-shadow(2px 2px 4px rgba(9, 8, 8, 0.5))",
   };
-  return <Box className="post-info">{content}</Box>;
+  return content && <Box className="post-info">{content}</Box>;
 }
 
 export default PostInfo;

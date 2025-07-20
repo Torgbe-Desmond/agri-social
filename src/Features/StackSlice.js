@@ -5,9 +5,9 @@ const stackSlice = createSlice({
   initialState: {
     search: false,
     components: [],
-    mainPathIndex: 0,
     stackState: "",
     scrolling: false,
+    index: 0,
     message: "",
     onlineStatus: null,
   },
@@ -40,7 +40,7 @@ const stackSlice = createSlice({
       state.search = !state.search;
     },
     setMainPathIndex: (state, action) => {
-      state.mainPathIndex = action.payload;
+      state.index = action.payload;
     },
   },
 });

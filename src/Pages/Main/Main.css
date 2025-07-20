@@ -3,6 +3,8 @@
   min-width: fit-content;
   overflow-y: scroll;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -43,4 +45,65 @@
   font-size: 20px;
   padding: 15px 20px;
   font-weight: 800;
+}
+
+
+.custom-tabs-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+
+}
+
+.custom-tabs-header {
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+  padding: 10px 0;
+  color: #FFF;
+  height: 50px;
+  padding: 10px 0px;
+  /* background-color: #fff; */
+
+
+  /* background: rgba(255, 255, 255, 0.2); */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  /* border-radius: 15px; */
+}
+
+.custom-tab {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  color: #666;
+  transition: color 0.3s ease;
+  border: 1px solid red;
+
+}
+
+.custom-tab.active {
+  color: #1976d2;
+  /* Active tab color */
+}
+
+.custom-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #1976d2;
+  border-radius: 4px;
+}
+
+.custom-tabs-content {
+  /* padding: 20px; */
 }

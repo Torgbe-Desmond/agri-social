@@ -80,6 +80,7 @@ function MarketPlace() {
       status={loading}
       allowedSearch={true}
       reloadAction={reloadAction}
+      name={"Market Place"}
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
       children={

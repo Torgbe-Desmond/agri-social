@@ -30,13 +30,13 @@ function Header({
 
   useEffect(() => {
     const scrollContainer = document.querySelector(".resuable");
+
     if (!scrollContainer) return;
 
     const handleScroll = () => {
       const scrollTop = scrollContainer.scrollTop;
       setScroll((prev) => prev + 1);
       lastScrollTop.current = scrollTop;
-      console.log("ddddd");
     };
 
     scrollContainer.addEventListener("scroll", handleScroll);

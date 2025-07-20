@@ -1,15 +1,14 @@
 .videoHeader {
+  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: sticky;
-  bottom: 0;
-  /* background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px); */
-  z-index: 100;
-  /* border-bottom: 1px solid var(--twitter-background); */
-  border: 1px solid red;
+  top: 0;
+  background: transparent;
+  z-index: 900;
+  padding: 1rem 0rem 0rem 1rem;
+  gap: 1rem;
+
 }
 
 .videoHeader-title {
@@ -26,8 +25,4 @@
 .shadow-v {
   font-size: 24px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.videoHeader>* {
-  /* padding: 10px; */
 }

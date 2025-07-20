@@ -6,7 +6,9 @@
     bottom: 0;
     z-index: 99;
     width: 100%;
-    padding: 0px 0px
+    padding: 0px 0px;
+
+
 }
 
 .feed-title {
@@ -27,7 +29,15 @@
     bottom: 0;
     z-index: 99;
     width: 100%;
-    padding: 0px 10px
+    padding: 0px 10px;
+
+
+
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
 }
 
 .timestamp {
@@ -40,10 +50,11 @@
     width: 20px; */
     /* background: rgba(14, 14, 14, 0.967); */
 
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
+    /* background: rgba(255, 255, 255, 0.2); */
+    background: transparent;
+    /* backdrop-filter: blur(10px); */
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* border: 1px solid rgba(255, 255, 255, 0.3); */
     border-radius: 50%;
 
 }

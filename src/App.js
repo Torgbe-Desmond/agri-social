@@ -48,6 +48,8 @@ import Streams from "./components/Streams/Streams";
 import Conversations from "./components/Conversations/Conversations";
 import GroupConversation from "./components/GroupConversation/GroupConversation";
 import { clearOnLineStatus } from "./Features/StackSlice";
+import Posts from "./Pages/Posts/Posts";
+import Products from "./Pages/Products/Products";
 
 function App() {
   const isAuthenticated = localStorage.getItem("cc_ft") ? true : false;
@@ -91,6 +93,8 @@ function App() {
               <Route path="/" element={<Main />} />
               <Route path="/you" element={<Profile />} />
               <Route path="/bookmarks" element={<Bookmarks />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/post-history" element={<Posts />} />
               <Route path="/predictions" element={<Predictions />} />
               <Route path="/post/:post_id" element={<PostComment />} />
               <Route path="/replies/:comment_id" element={<CommentReplies />} />

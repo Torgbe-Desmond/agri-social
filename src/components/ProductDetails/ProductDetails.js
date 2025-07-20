@@ -60,7 +60,7 @@ function ProductDetails() {
   };
 
   return (
-    <Box className="messages">
+    <Box className="profile">
       <Box className="notifications__header">
         <h2>
           <ArrowBackIcon cursor="pointer" onClick={handleGoBack} /> Product
@@ -74,7 +74,6 @@ function ProductDetails() {
       ) : (
         <Box
           sx={{
-            borderBottom: "1px solid #ddd",
             overflow: "hidden",
             fontFamily: "sans-serif",
           }}
