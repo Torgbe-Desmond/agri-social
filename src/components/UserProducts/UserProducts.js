@@ -71,7 +71,7 @@ function UserProducts() {
         <Box sx={{ padding: 3 }} className="user__products">
           {products.map((product, index) => {
             const isLast = index === products.length - 1;
-            return <LocalProductCard {...product} />;
+            return <LocalProductCard {...product} key={index} />;
           })}
         </Box>
       }

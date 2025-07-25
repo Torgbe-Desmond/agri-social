@@ -1,7 +1,12 @@
 import { Box, Avatar } from "@mui/material";
 import ChatMessage from "./ChatMessage";
 
-const ChatMessageList = ({ messages, userDetails, systemPrefersDark, scrollRef }) => {
+const ChatMessageList = ({
+  messages,
+  userDetails,
+  systemPrefersDark,
+  scrollRef,
+}) => {
   return (
     <div className="chat__chat-container" style={{ overflowY: "auto" }}>
       {messages.map((msg, index) => (
@@ -19,4 +24,3 @@ const ChatMessageList = ({ messages, userDetails, systemPrefersDark, scrollRef }
 };
 
 export default ChatMessageList;
-

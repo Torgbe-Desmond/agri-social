@@ -36,7 +36,7 @@ export const SocketProvider = ({ children }) => {
       console.log("🟢 Socket connected:", socketRef.current.id);
       setSocket(socketRef.current); // Set to state so context updates
       socketRef.current.emit("user", {
-        user_id: localStorage.getItem("cc_ft"),
+        user_id: localStorage.getItem("reference_id"),
       });
     });
 

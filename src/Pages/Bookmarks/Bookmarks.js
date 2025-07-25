@@ -1,33 +1,32 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./Bookmarks.css";
 import { useDispatch, useSelector } from "react-redux";
 import Saved from "../../components/Saved/Saved";
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { getSavedHistory } from "../../Features/PostSlice";
 import Header from "../../components/Header/Header";
 import { setScrolling } from "../../Features/StackSlice";
 
-function Bookmarks() {
+const Bookmarks = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [visiblePostId, setVisiblePostId] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
   const dispatch = useDispatch();
   const feedRef = useRef(null);
   const itemRefs = useRef([]);
-  const { savedStatus, savedHistory } = useSelector((state) => state.post);
+  const { savedStatus, savedHistory, hasMoreSaved } = useSelector(
+    (state) => state.post
+  );
+  const observer = useRef();
 
   // Scrolling trigger
   const [scrolling, setScroll] = useState(0);
 
   // Get saved history
   useEffect(() => {
-    dispatch(setScrolling(true));
-    const userId = localStorage.getItem("cc_ft");
-    if (userId) {
-      dispatch(getSavedHistory({ user_id: userId }));
-    }
-    return () => dispatch(setScrolling(false));
-  }, [dispatch]);
+    dispatch(getSavedHistory({ offset: pageNumber, limit: 10 }));
+  }, [pageNumber, dispatch]);
 
   // Filter results
   useEffect(() => {
@@ -40,6 +39,19 @@ function Bookmarks() {
       : savedHistory;
     setFilteredData(filtered);
   }, [searchTerm, savedHistory]);
+
+  const lastPostRef = useCallback(
+    (node) => {
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMoreSaved) {
+          setPageNumber((prev) => prev + 1);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [hasMoreSaved]
+  );
 
   // Scroll effect to track visible video/image
   useEffect(() => {
@@ -70,13 +82,11 @@ function Bookmarks() {
 
     postIds.forEach((id) => {
       const currentImage = document.querySelector(`#post-bookmarks-${id} img`);
-      console.log("currentImage", currentImage);
       if (currentImage) {
         currentImage.style.display = "flex";
       }
     });
   }
-
 
   function onVideoReach(itemRefs) {
     const visibleItem = itemRefs.current.find((el) => {
@@ -104,12 +114,14 @@ function Bookmarks() {
       const prev = document.querySelector(
         `#post-bookmarks-${visiblePostId} video`
       );
+
       if (prev) prev.pause();
     }
 
     const currentVideo = document.querySelector(
       `#post-bookmarks-${postId} video`
     );
+
     if (currentVideo) {
       currentVideo.play().catch((err) => console.warn("Autoplay failed:", err));
     }
@@ -123,24 +135,34 @@ function Bookmarks() {
       name="Bookmarks"
       allowedSearch
       setSearchTerm={setSearchTerm}
-      status={savedStatus}
       setScroll={setScroll}
       ref={feedRef}
       children={
         <Box>
-          {filteredData.map((saved, index) => (
-            <div
-              key={saved.post_id || index}
-              ref={(el) => (itemRefs.current[index] = el)}
-              className="bookmark__item-wrapper"
-            >
-              <Saved save={saved} />
-            </div>
-          ))}
+          {filteredData.map((saved, index) => {
+            const isLast = index === savedHistory.length - 1;
+            return (
+              <div
+                key={saved.post_id || index}
+                ref={(el) => {
+                  itemRefs.current[index] = el;
+                  if (isLast) lastPostRef(el);
+                }}
+                className="bookmark__item-wrapper"
+              >
+                <Saved save={saved} />
+              </div>
+            );
+          })}
+          {savedStatus === "loading" && (
+            <p className="circular__progress">
+              <CircularProgress fontSize="large" />
+            </p>
+          )}
         </Box>
       }
     />
   );
-}
+};
 
 export default Bookmarks;

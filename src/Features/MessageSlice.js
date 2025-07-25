@@ -10,8 +10,11 @@ const initialState = {
   getConversationStatus: "idle",
   getdMessagesStatus: "idle",
   getGroupConversationStatus: "idle",
+  createConversationStatus: "",
+  conversingStatus: "idle",
   error: "",
   conversation_id: "",
+  message: "",
 };
 
 export const getConversation = createAsyncThunk(
@@ -29,9 +32,35 @@ export const getConversation = createAsyncThunk(
 
 export const getGroupConversation = createAsyncThunk(
   "conversation/getGroupConversation",
+  async (_, thunkAPI) => {
+    try {
+      const response = await ConversationService.getGroupConversation();
+      return response;
+    } catch (error) {
+      const message = error?.response?.data;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const createConversation = createAsyncThunk(
+  "conversation/createConversation",
   async ({ formData }, thunkAPI) => {
     try {
-      const response = await ConversationService.getGroupConversation(formData);
+      const response = await ConversationService.createConversation(formData);
+      return response;
+    } catch (error) {
+      const message = error?.response?.data;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const conversing = createAsyncThunk(
+  "conversation/conversing",
+  async ({ formData }, thunkAPI) => {
+    try {
+      const response = await ConversationService.conversing(formData);
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -55,9 +84,9 @@ export const createGroup = createAsyncThunk(
 
 export const getMessagedUsers = createAsyncThunk(
   "conversation/getMessagedUsers",
-  async ({ formData }, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
-      const response = await ConversationService.getMessagedUsers(formData);
+      const response = await ConversationService.getMessagedUsers();
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -112,8 +141,11 @@ const messageSlice = createSlice({
         // profilePicture: require("../../assets/icons8-farmer-64.png"),
       });
     },
-    setConversaionId: (state, action) => {
-      state.conversation_id = action.payload;
+    // setConversaionId: (state, action) => {
+    //   state.conversation_id = action.payload;
+    // },
+    clearConversationId: (state, action) => {
+      state.conversation_id = "";
     },
     clearMessages: (state) => {
       state.messages = [];
@@ -124,18 +156,17 @@ const messageSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // get conversation
-      // .addCase(getConversation.pending, (state) => {
-      //   state.getConversationStatus = "loading";
-      // })
-      // .addCase(getConversation.fulfilled, (state, action) => {
-      //   state.conversation_id = action.payload;
-      //   state.getConversationStatus = "succeeded";
-      // })
-      // .addCase(getConversation.rejected, (state, action) => {
-      //   state.error = action.error.message;
-      //   state.getConversationStatus = "failed";
-      // })
+      .addCase(createConversation.pending, (state) => {
+        state.createConversationStatus = "loading";
+      })
+      .addCase(createConversation.fulfilled, (state, action) => {
+        state.message = action.payload;
+        state.createConversationStatus = "succeeded";
+      })
+      .addCase(createConversation.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.createConversationStatus = "failed";
+      })
 
       .addCase(createGroup.pending, (state) => {
         state.createGroupStatus = "loading";
@@ -147,6 +178,18 @@ const messageSlice = createSlice({
       .addCase(createGroup.rejected, (state, action) => {
         state.error = action.error.message;
         state.createGroupStatus = "failed";
+      })
+
+      .addCase(conversing.pending, (state) => {
+        state.conversingStatus = "loading";
+      })
+      .addCase(conversing.fulfilled, (state, action) => {
+        state.conversation_id = action.payload.conversation_id;
+        state.conversingStatus = "succeeded";
+      })
+      .addCase(conversing.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.conversingStatus = "failed";
       })
 
       .addCase(getGroupConversation.pending, (state) => {
@@ -191,5 +234,6 @@ export const {
   clearMessages,
   clearGroups,
   setConversaionId,
+  clearConversationId,
 } = messageSlice.actions;
 export default messageSlice.reducer;

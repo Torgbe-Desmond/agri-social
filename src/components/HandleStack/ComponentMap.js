@@ -9,6 +9,7 @@ import SearchModal from "../SearchModal/SearchModal";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import CreateGroupModal from "../CreateGroupModal/CreateGroupModal";
 import SwipeableEdgeDrawer from "../SwipeableDrawer/SwipeableDrawer";
+import CreateConversationModal from "../CreateConversationModal/CreateConversationModal";
 
 export const componentMap = {
   CreatePost: (props) => <CreatePost {...props} />,
@@ -22,6 +23,7 @@ export const componentMap = {
   Error: (props) => <ErrorMessage {...props} />,
   CreateGroup: (props) => <CreateGroupModal {...props} />,
   SwipeDrawer: (props) => <SwipeableEdgeDrawer {...props} />,
+  CreateConversation: (props) => <CreateConversationModal {...props} />,
 };
 
 // "Server error: This result object does not return rows. It has been closed automatically."

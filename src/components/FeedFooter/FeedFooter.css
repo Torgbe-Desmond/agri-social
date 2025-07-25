@@ -7,8 +7,14 @@
     z-index: 99;
     width: 100%;
     padding: 0px 0px;
+}
 
+.hide-feed-footer-holder {
+    display: none;
+}
 
+.show-feed-footer-holder {
+    display: none;
 }
 
 .feed-title {
@@ -30,31 +36,20 @@
     z-index: 99;
     width: 100%;
     padding: 0px 10px;
-
-
-
     background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    border: 0px solid rgba(255, 255, 255, 0.3);
     border-radius: 15px;
 }
 
 .timestamp {
-    border-radius: 4px;
-    background: #ccc;
+    /* background: #ccc; */
     padding: 10px;
     color: #FFF;
     font-size: 14px;
-    /* height: 10px;
-    width: 20px; */
-    /* background: rgba(14, 14, 14, 0.967); */
-
-    /* background: rgba(255, 255, 255, 0.2); */
     background: transparent;
-    /* backdrop-filter: blur(10px); */
     -webkit-backdrop-filter: blur(10px);
-    /* border: 1px solid rgba(255, 255, 255, 0.3); */
     border-radius: 50%;
 
 }

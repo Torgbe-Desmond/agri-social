@@ -126,7 +126,6 @@ function PostComment() {
       const formData = new FormData();
       formData.append("content", comment);
       formData.append("post_owner", post?.user_id);
-      formData.append("user_id", userDetails?.id);
       dispatch(addComment({ post_id, formData }));
       setAddLocalComment((prev) => [...prev, messageData]);
       setComment("");
@@ -214,7 +213,6 @@ function PostComment() {
         chatContainerRef={chatContainerRef}
         commentReplies={togetherComments}
         scrollAnchorRef={scrollAnchorRef}
-        user_id={userDetails?.id}
       />
 
       <CommentChat

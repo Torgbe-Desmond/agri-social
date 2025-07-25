@@ -2,6 +2,7 @@ import { Box, IconButton, TextField } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
+import "./CommentChat.css";
 
 const CommentChat = ({
   message,
@@ -14,6 +15,12 @@ const CommentChat = ({
   onEmojiSelect,
   openEmojiPicker,
 }) => {
+  const textFieldStyles = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "40px",
+      height: "50px",
+    },
+  };
   return (
     <Box
       sx={{
@@ -31,6 +38,7 @@ const CommentChat = ({
       bgcolor="#FFF"
     >
       <TextField
+        sx={textFieldStyles}
         fullWidth
         placeholder="Write a comment..."
         value={message}

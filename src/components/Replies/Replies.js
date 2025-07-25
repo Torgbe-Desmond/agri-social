@@ -13,14 +13,14 @@ import HeaderPost from "../Post/HeaderPost";
 import BodyPost from "../Post/BodyPost";
 import FooterPost from "../Post/FooterPost";
 
-function Replies({ reply, user_id }) {
+function Replies({ reply }) {
   const dispatch = useDispatch();
   const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
   const navigate = useNavigate();
+  const reference_id = localStorage.getItem("reference_id");
 
   const handleLikeComment = () => {
     const formData = new FormData();
-    formData.append("user_id", user_id);
     formData.append("comment_id", reply?.id);
     formData.append("post_owner", reply.user_id);
     dispatch(likeComment({ comment_id: reply?.id, formData }));
@@ -36,7 +36,7 @@ function Replies({ reply, user_id }) {
     {
       id: "comment",
       location: "post",
-      to: `/replies/${reply?.id}`,
+      to: `/${reference_id}/replies/${reply?.id}`,
       icon: <ChatBubbleOutlineIcon fontSize="small" />,
       count: reply?.comments,
     },

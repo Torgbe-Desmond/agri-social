@@ -24,7 +24,7 @@ function FeedFooter({
   };
 
   return (
-    <div className="feed-footer-holder">
+    <div className="feed-footer-holder hide-feed-footer-holder">
       <div className="feed-footer-container">
         <div className="timestamp">
           {Math.floor(currentTime)}:{Math.floor(duration)}
@@ -57,7 +57,7 @@ function FeedFooter({
         max={duration}
         onChange={handleChange}
         sx={(t) => ({
-          color: "inherit",
+          color: "#FFF",
           height: 4,
           "& .MuiSlider-thumb": {
             width: 8,

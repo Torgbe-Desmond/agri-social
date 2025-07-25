@@ -14,38 +14,46 @@ function Feed() {
   const { postData, hasMore, postStatus, offset } = useSelector(
     (state) => state.post
   );
-  const [pageNumber, setPageNumber] = useState(1);
   const dispatch = useDispatch();
   const socket = useSocket();
   const observer = useRef();
-
   const feedRef = useRef(null);
   const lastScrollTop = useRef(0);
   const [scrolling, setScroll] = useState(0);
-
   const itemRefs = useRef([]);
   const [visiblePostId, setVisiblePostId] = useState(null);
+  const isFetchingRef = useRef(false);
 
   useEffect(() => {
-    dispatch(getPosts({ user_id, offset, limit: 10 }));
-  }, [pageNumber, dispatch, user_id]);
+    dispatch(getPosts({ offset, limit: 10 }))
+      .then(() => {
+        isFetchingRef.current = false;
+      })
+      .catch(() => {
+        isFetchingRef.current = false;
+      });
+  }, [offset, dispatch]);
 
   useEffect(() => {
     return () => {
-      // dispatch(clearPostData());
       dispatch(setScrolling(false));
     };
   }, [dispatch]);
 
+  console.log("Fetching page", offset);
+
   const lastPostRef = useCallback(
     (node) => {
       if (observer.current) observer.current.disconnect();
+
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          // setPageNumber((prev) => prev + 1);
+        const entry = entries[0];
+        if (entry.isIntersecting && hasMore && !isFetchingRef.current) {
+          isFetchingRef.current = true;
           dispatch(setOffset());
         }
       });
+
       if (node) observer.current.observe(node);
     },
     [hasMore]
@@ -67,95 +75,80 @@ function Feed() {
   }, [dispatch]);
 
   // Detect visible post
+  // Scroll effect to track visible video/image
   useEffect(() => {
-    const visible = itemRefs.current.find((el) => {
-      if (!el) return false;
-      const rect = el.getBoundingClientRect();
-      return (
-        rect.top >= parseInt(window.innerHeight / 10) &&
-        rect.bottom <= window.innerHeight
-      );
+    itemRefs.current.forEach((el) => {
+      el?.classList.remove("visible-post", "visible-post-next");
     });
+    onVideoReach(itemRefs);
+    onImageReach(itemRefs);
+  }, [scrolling, postData]);
 
+  function onImageReach(itemRefs) {
     const visibleItems = itemRefs.current.filter((el) => {
       if (!el) return false;
-
       const rect = el.getBoundingClientRect();
       return (
         rect.top >= window.innerHeight / 10 && rect.bottom <= window.innerHeight
       );
     });
 
-    visibleItems.unshift();
+    const postIds = visibleItems
+      .map((el) =>
+        el.querySelector(".post")?.getAttribute("id")?.replace("post-", "")
+      )
+      .filter(Boolean);
 
-    visibleItems.forEach((el) => {
-      const id = el
-        ?.querySelector(".post")
-        ?.getAttribute("id")
-        ?.replace("post-", "");
-
-      const postEl = document.querySelector(`#post-${id}`);
-      // console.log("postEl", postEl);
-
-      if (!id || !postEl) return;
-
-      const hasImage = postEl.querySelector(".post__images .post_media img");
-
-      // const hasVideo = el.querySelector(`#post-${id} video`);
-
-      // postEl.classList.add("visible-post-next");
-
-      if (hasImage) {
-        console.log("has image");
-        hasImage.style.display = "flex";
+    postIds.forEach((id) => {
+      const currentImage = document.querySelector(`#post-${id} img`);
+      if (currentImage) {
+        currentImage.style.display = "flex";
       }
     });
+  }
 
-    // itemRefs.current.forEach((el) => el?.classList.remove("visible-post"));
+  function onVideoReach(itemRefs) {
+    const visibleItem = itemRefs.current.find((el) => {
+      if (!el) return false;
+      const rect = el.getBoundingClientRect();
+      return (
+        rect.top >= window.innerHeight / 10 && rect.bottom <= window.innerHeight
+      );
+    });
 
-    const videoIds = postData
-      // .filter((p) => p.has_video)
-      .map((p) => p.post_id);
+    if (!visibleItem) return;
 
-    const id = visible
-      ?.querySelector(".post")
-      ?.getAttribute("id")
-      ?.replace("post-", "");
+    const postId = visibleItem.querySelector(".post")?.id?.replace("post-", "");
+    if (!postId) return;
 
-    if (videoIds.includes(id)) {
-      // If new post is different from currently playing
-      if (visiblePostId && visiblePostId !== id) {
-        // Pause the previously playing video
-        const oldVideo = document.querySelector(`#post-${visiblePostId} video`);
-        if (oldVideo) oldVideo.pause();
-      }
+    const isVideoPost = postData.find(
+      (p) => p.post_id === postId && p.has_video
+    );
+    if (!isVideoPost) return;
 
-      // visible.classList.add("visible-post");
+    // Pause previously playing video
+    if (visiblePostId && visiblePostId !== postId) {
+      const prev = document.querySelector(`#post-${visiblePostId} video`);
+      // const prevFooter = document.querySelector(
+      //   `#post-${visiblePostId} .hide-feed-footer-holder`
+      // );
+      // prevFooter.classList.remove("feed-footer-holder");
 
-      const newVideo = document.querySelector(`#post-${id} video`);
-      if (newVideo) {
-        newVideo.play().catch((err) => {
-          console.warn("Autoplay failed:", err);
-        });
-      }
-
-      const newImage = document.querySelector(`#post-${id} img`);
-      if (newImage) {
-        newImage.style.display = "flex";
-      }
-
-      setVisiblePostId(id); // Update the currently playing video ID
-    } else {
-      // If visible post is not a video, pause previously playing video
-      if (visiblePostId) {
-        const prevVideo = document.querySelector(
-          `#post-${visiblePostId} video`
-        );
-        if (prevVideo) prevVideo.pause();
-        setVisiblePostId(null);
-      }
+      if (prev) prev.pause();
     }
-  }, [scrolling, postData]);
+
+    const currentVideo = document.querySelector(`#post-${postId} video`);
+
+    // const currentFooter = document.querySelector(
+    //   `#post-${postId} .hide-feed-footer-holder `
+    // );
+    if (currentVideo) {
+      // currentFooter.classList.add("feed-footer-holder");
+      currentVideo.play().catch((err) => console.warn("Autoplay failed:", err));
+    }
+
+    setVisiblePostId(postId);
+  }
 
   return (
     <Box

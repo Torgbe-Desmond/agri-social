@@ -130,9 +130,9 @@ export const getVerificationToken = createAsyncThunk(
 
 export const getUser = createAsyncThunk(
   "auth/getUser",
-  async ({ user_id }, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
-      const response = await AuthService.getUser(user_id);
+      const response = await AuthService.getUser();
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -145,7 +145,7 @@ export const _getUser = createAsyncThunk(
   "auth/_getUser",
   async ({ user_id }, thunkAPI) => {
     try {
-      const response = await AuthService.getUser(user_id);
+      const response = await AuthService.getAnotherUser(user_id);
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -156,9 +156,9 @@ export const _getUser = createAsyncThunk(
 
 export const updateUserImage = createAsyncThunk(
   "auth/updateUserImage",
-  async ({ user_id, formData }, thunkAPI) => {
+  async ({ formData }, thunkAPI) => {
     try {
-      const response = await AuthService.updateUserImage(user_id, formData);
+      const response = await AuthService.updateUserImage(formData);
       return response;
     } catch (error) {
       console.log(error);
@@ -170,10 +170,9 @@ export const updateUserImage = createAsyncThunk(
 
 export const updateUserInformation = createAsyncThunk(
   "auth/updateUserInformation",
-  async ({ user_id, formData }, thunkAPI) => {
+  async ({ formData }, thunkAPI) => {
     try {
       const response = await AuthService.updateUserInformation(
-        user_id,
         formData
       );
       return response;
@@ -186,9 +185,9 @@ export const updateUserInformation = createAsyncThunk(
 
 export const peopleToFollow = createAsyncThunk(
   "auth/peopleToFollow",
-  async ({ user_id, offset, limit }, thunkAPI) => {
+  async ({ offset, limit }, thunkAPI) => {
     try {
-      const response = await AuthService.peopleToFollow(user_id, offset, limit);
+      const response = await AuthService.peopleToFollow(offset, limit);
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -199,9 +198,9 @@ export const peopleToFollow = createAsyncThunk(
 
 export const isFollowing = createAsyncThunk(
   "auth/isFollowing",
-  async ({ user_id, localUser }, thunkAPI) => {
+  async ({ localUser }, thunkAPI) => {
     try {
-      const response = await AuthService.isFollowing(user_id, localUser);
+      const response = await AuthService.isFollowing(localUser);
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -259,10 +258,23 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.status = "succeeded";
-        localStorage.setItem("cc_ft", action.payload?.id);
+        state.userDetails = action.payload
+        //  "access_token": token,
+        //     "token_type": "bearer",
+        //     "user": {
+        //         "id":str(user.id),
+        //         "username": user.username,
+        //         "email": user.email,
+        //         "user_image": user.user_image,
+        //         "reference_id":str(user.reference_id)
+        //     }
+        localStorage.setItem("reference_id",action.payload.user.reference_id)
+        localStorage.setItem("access_token", action.payload?.access_token);
       })
       .addCase(login.rejected, (state, action) => {
         state.status = "failed";
+        console.log(action.payload);
+
         state.errorMessage = action.payload;
       })
 

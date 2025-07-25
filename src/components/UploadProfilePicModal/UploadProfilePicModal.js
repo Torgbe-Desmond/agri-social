@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { updateUserImage } from "../../Features/AuthSlice";
 
-const UpdateProfilePicModal = ({ user_id, user_image }) => {
+const UpdateProfilePicModal = ({  user_image }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const { userImageStatus } = useSelector((state) => state.auth);
@@ -31,7 +31,7 @@ const UpdateProfilePicModal = ({ user_id, user_image }) => {
     if (!selectedImage) return;
     const formData = new FormData();
     formData.append("file", selectedImage);
-    dispatch(updateUserImage({ user_id, formData }));
+    dispatch(updateUserImage({ formData }));
   };
 
   const handleClose = () => {

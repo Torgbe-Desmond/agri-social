@@ -7,6 +7,7 @@ import UserFeed from "../../components/UserFeed/UserFeed";
 import { _getUser } from "../../Features/AuthSlice";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { clearConversationId, conversing } from "../../Features/MessageSlice";
 
 function User() {
   const { _user_id } = useParams();
@@ -14,11 +15,26 @@ function User() {
   const [pageNumber, setPageNumber] = useState(1);
   const observer = useRef();
   const dispatch = useDispatch();
-  const { _userDetails, _userDetailsStatus } = useSelector(
+  const { _userDetails, _userDetailsStatus, userDetails } = useSelector(
     (state) => state.auth
   );
   const { systemPrefersDark } = useOutletContext();
   const navigate = useNavigate();
+  const { conversation_id } = useSelector((state) => state.message);
+
+  const areConversingAlready = () => {};
+
+  useEffect(() => {
+    dispatch(_getUser({ user_id: _user_id }));
+    return () => dispatch(clearConversationId());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const member_ids = [userDetails?.id, _userDetails?.id];
+    const formData = new FormData();
+    member_ids.forEach((member) => formData.append("member_ids", member));
+    dispatch(conversing({ formData }));
+  }, [dispatch, userDetails, _userDetails]);
 
   //   const lastPostRef = useCallback(
   //     (node) => {
@@ -37,56 +53,17 @@ function User() {
     navigate(-1);
   };
 
-  useEffect(() => {
-    dispatch(_getUser({ user_id: _user_id }));
-  }, [dispatch]);
-
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
 
   return (
-    <div className="profile">
-      <Box
-        sx={{ bgcolor: systemPrefersDark && "background.paper" }}
-        className="profile__header"
-      >
-        <h2>
-          {" "}
-          <ArrowBackIcon cursor="pointer" onClick={handleGoBack} />
-          User
-        </h2>
-
-        <UserInfo
-          _userDetails={_userDetails}
-          _userDetailsStatus={_userDetailsStatus}
-        />
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            display: "flex",
-            width: "100%",
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
-            gap: "50px",
-          }}
-        >
-          <Tabs value={tabIndex} onChange={handleTabChange}>
-            <Tab label="Posts" />
-            <Tab label="Getto" />
-          </Tabs>
-        </Box>
-      </Box>
-
-      <Box
-      // sx={{
-      //   height: "calc(100vh - 250px)", // adjust based on your header height
-      //   overflowY: "auto",
-      // }}
-      >
-        {tabIndex === 0 && <UserFeed user_id={_userDetails?.id} />}
-      </Box>
+    <div className="posts">
+      <UserFeed
+        _userDetails={_userDetails}
+        _conversation_id={conversation_id}
+        _userDetailsStatus={_userDetailsStatus}
+      />
     </div>
   );
 }

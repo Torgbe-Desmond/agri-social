@@ -7,7 +7,10 @@ import { Socket } from "socket.io-client";
 const ChatHeader = ({ userImage, onlineStatus }) => {
   const navigate = useNavigate();
   return (
-    <Box className="chat__header">
+    <Box
+      sx={{ borderBottom: 1, borderColor: "divider" }}
+      className="chat__header"
+    >
       <h2>
         <ArrowBackIcon cursor="pointer" onClick={() => navigate(-1)} />
         <Avatar
@@ -15,8 +18,6 @@ const ChatHeader = ({ userImage, onlineStatus }) => {
           sx={{
             width: 45,
             height: 45,
-            borderBottom: 1,
-            borderColor: "divider",
           }}
         />
       </h2>

@@ -5,6 +5,7 @@
   cursor: pointer;
   padding: 10px;
   height: 50px;
+  /* border: 1px solid red; */
 }
 
 .sidebarOption_center {
@@ -25,9 +26,9 @@
 .sidebarOption>h2 {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   font-weight: 800;
-  gap:10px;
+  gap: 10px;
   font-size: 20px;
   margin-right: 20px;
 }

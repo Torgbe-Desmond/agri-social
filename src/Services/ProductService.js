@@ -42,9 +42,9 @@ async function fetchProduct(product_id) {
   }
 }
 
-async function fetchUserProducts(user_id) {
+async function fetchUserProducts() {
   try {
-    const response = await axiosInstance.get(`/user-products/${user_id}`);
+    const response = await axiosInstance.get(`/user-products`);
     return response.data;
   } catch (error) {
     console.log(error);

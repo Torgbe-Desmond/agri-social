@@ -1,6 +1,7 @@
 import React from "react";
 import FeedVideoCard from "../FeedVideoCard/FeedVideoCard";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import FeedImageCard from "../FeedImageCard/FeedImageCard";
 
 function BodyPost({ post }) {
   const renderTags = (tags) => {
@@ -30,30 +31,21 @@ function BodyPost({ post }) {
       {/* Media Section */}
       <div className="post__images">
         <div className="post_media">
-          {post?.images && (
-            <img
-              style={{
-                display: "none", // This assumes it gets toggled later
-                width: "100%",
-                objectFit: "contain",
-                borderRadius: 12,
-              }}
-              src={post.images}
-              alt="Post visual"
-            />
-          )}
+          {post?.images && <FeedImageCard images={post.images.split(",")} />}
 
           {post?.videos && (
-            <div
-              style={{
+            <Box
+              sx={{
                 position: "relative",
                 width: "100%",
                 overflow: "hidden",
-                borderRadius: 12,
+                borderRadius: 4,
+                border: 1,
+                borderColor: "divider",
               }}
             >
               <FeedVideoCard url={post.videos} />
-            </div>
+            </Box>
           )}
         </div>
       </div>

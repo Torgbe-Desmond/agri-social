@@ -56,7 +56,6 @@ const CreateGroupModal = () => {
     const formData = new FormData();
     formData.append("name", groupName.trim());
     formData.append("description", description.trim());
-    formData.append("sender_id", localStorage.getItem("cc_ft"));
     formData.append("is_group", "1");
 
     dispatch(createGroup({ formData }));

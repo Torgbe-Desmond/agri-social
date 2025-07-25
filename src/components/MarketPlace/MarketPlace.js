@@ -101,6 +101,7 @@ function MarketPlace() {
                     height: "auto",
                     boxSizing: "border-box",
                   }}
+                  key={index}
                   ref={isLast ? lastProductRef : null}
                   item
                   xs={12}

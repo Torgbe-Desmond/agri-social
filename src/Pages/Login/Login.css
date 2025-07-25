@@ -1,26 +1,26 @@
 .login-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 999;
-    color: #9ea3c1
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  color: #9ea3c1;
+  height: 100vh;
 }
 
+.css-1ky6zaq-MuiFormControl-root-MuiTextField-root,
+.css-1pjy560-MuiFormControl-root-MuiTextField-root {
+  border-radius: 40px !important;
+}
 
-/* .login-form{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: center;
-    width:350px;
-    box-sizing: border-box;
-    padding: 10px;
-} */
+.login-form {
+  align-items: center;
+  justify-content: center;
+  width: 400px;
+  box-sizing: border-box;
+  padding: 10px;
+}
 
 .login__input {
   display: flex;
@@ -37,13 +37,13 @@
 .login__input>input {
   border: none;
   /* background-color: var(--twitter-background); */
-  
+
 }
 
 
 #particles-in-login canvas {
-    z-index: -1;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-  }
+  z-index: -1;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}

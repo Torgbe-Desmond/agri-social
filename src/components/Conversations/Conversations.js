@@ -8,6 +8,8 @@ import { Tabs, Tab, Box, Typography, CircularProgress } from "@mui/material";
 import Messages from "../Messages/Messages";
 import GroupMessages from "../Messages/GroupMessages";
 import { setScrolling } from "../../Features/StackSlice";
+import Header from "../Header/Header";
+import { CustomTabs } from "../CustomTab/CustomTabs";
 // import PostHistory from "../../components/PostHistory/PostHistory";
 // import TwitterProfileUI from "../../components/TopProfile/TopProfile";
 // import MarketPlace from "../../components/MarketPlace/MarketPlace";
@@ -20,6 +22,7 @@ function Conversations() {
   const observer = useRef();
   const dispatch = useDispatch();
   const { user_id, darkMode, systemPrefersDark } = useOutletContext();
+  const [scrolling, setScroll] = useState(0);
 
   // alert(systemPrefersDark)
 
@@ -45,34 +48,22 @@ function Conversations() {
     return () => dispatch(setScrolling(false));
   }, []);
 
+  const tabData = [
+    {
+      label: "Messages",
+      content: <Messages />,
+    },
+    {
+      label: "Group Messages",
+      content: <GroupMessages />,
+    },
+  ];
+
+  <CustomTabs tabs={tabData} />;
+
   return (
     <Box className="profile">
-      <Box
-        sx={{ bgcolor: systemPrefersDark && "background.paper" }}
-        className={`profile__header`}
-      >
-        <h2>Chats</h2>
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            display: "flex",
-            width: "100%",
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
-            gap: "50px",
-          }}
-        >
-          <Tabs value={tabIndex} onChange={handleTabChange} sx={{}}>
-            <Tab label="Messages" />
-            {/* <Tab label="Replies" /> */}
-            <Tab label="Group Messages" />
-          </Tabs>
-        </Box>
-      </Box>
-
-      <Box>{tabIndex === 0 && <Messages />}</Box>
-      <Box>{tabIndex === 1 && <GroupMessages />}</Box>
+      <Header setScroll={setScroll} children={<CustomTabs tabs={tabData} />} />
     </Box>
   );
 }

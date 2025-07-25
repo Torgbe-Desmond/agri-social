@@ -11,6 +11,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { deletePost } from "../../Features/PostSlice";
+import { createConversation } from "../../Features/MessageSlice";
 
 const style = {
   position: "absolute",
@@ -24,15 +25,19 @@ const style = {
   p: 3,
 };
 
-const DeletePostModal = ({ post_id }) => {
-  const { postStatus, postData, selectedPostId, postDeleteStatus } =
-    useSelector((state) => state.post);
+const CreateConversationModal = ({ conversee }) => {
   const dispatch = useDispatch();
+  const { userDetails } = useSelector((state) => state.auth);
+  const { createConversationStatus } = useSelector((state) => state.message);
 
-  const handlePostDelete = () => {
-    dispatch(deletePost({ post_id }))
+  const handleCreateConversation = () => {
+    const formData = new FormData();
+    const member_ids = [conversee?.id, userDetails?.id];
+    member_ids.forEach((member) => formData.append("member_ids", member));
+    dispatch(createConversation({ formData }))
       .unwrap()
       .then((data) => {
+        alert(data.message);
         dispatch(popComponent());
       });
   };
@@ -42,12 +47,12 @@ const DeletePostModal = ({ post_id }) => {
       <Box sx={style}>
         {/* Title */}
         <Typography variant="h6" gutterBottom>
-          Delete
+          Create Conversation
         </Typography>
         <Divider sx={{ mb: 2 }} />
 
         <Typography sx={{ mb: 2 }}>
-          Are you sure you want to delete this post ?
+          Create group with {conversee.username} ?
         </Typography>
         {/* Action Buttons */}
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
@@ -61,15 +66,15 @@ const DeletePostModal = ({ post_id }) => {
           >
             Cancel
           </Button>
-          {postDeleteStatus === "loading" ? (
+          {createConversationStatus === "loading" ? (
             <CircularProgress />
           ) : (
             <Button
               className="sidebar__tweet__contained"
-              onClick={() => handlePostDelete()}
+              onClick={() => handleCreateConversation()}
               variant="outlined"
             >
-              Delete
+              Create
             </Button>
           )}
         </Box>
@@ -78,4 +83,4 @@ const DeletePostModal = ({ post_id }) => {
   );
 };
 
-export default DeletePostModal;
+export default CreateConversationModal;

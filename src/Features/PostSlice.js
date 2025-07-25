@@ -6,33 +6,53 @@ import { PredictionService } from "../Services/PredictionService";
 import { SavedService } from "../Services/savePost";
 
 const initialState = {
+  // === Post Data ===
   postData: [],
-  offset: 1,
-  streamData: [],
-  streamStatus: "idle",
-  numb_found: null,
   post: null,
-  hasMore: true,
-  hasMoreStreams: true,
-  scrollTo: "",
-  postHistory: [],
-  userPostHistory: [],
-  selectedPostId: "",
-  savedHistory: [],
   postCount: 0,
-  userPostCount: 0,
-  stream_numb_found: 0,
-  comments: [],
-  userPostHistoryStatus: "idle",
-  createPostStatus: "idle",
-  commentStatus: "idle",
-  postHistoryStatus: "idle",
-  singlePostStatus: "idle",
+  selectedPostId: "",
+  scrollTo: "",
+  offset: 1,
+  hasMore: true,
   postStatus: "idle",
-  likeStatus: "idle",
-  savedStatus: "idle",
+  createPostStatus: "idle",
+  singlePostStatus: "idle",
   postDeleteStatus: "idle",
+
+  // === Stream Data ===
+  streamData: [],
+  hasMoreStreams: true,
+  stream_numb_found: 0,
+  streamStatus: "idle",
+
+  // === Post History ===
+  postHistory: [],
+  postHistoryStatus: "idle",
+  postHistoryOffset: 1,
+  post_history_count: 0,
+
+  // === User Post History ===
+  userPostHistory: [],
+  userPostHistoryStatus: "idle",
+  hasMoreUserPostHistory: true,
+  hasMoreUserPost: true,
+  userPostCount: 0,
+
+  // === Saved Posts ===
+  savedHistory: [],
+  savedStatus: "idle",
+  hasMoreSaved: true,
   unSavePostStatus: "idle",
+
+  // === Comments ===
+  comments: [],
+  commentStatus: "idle",
+
+  // === Likes ===
+  likeStatus: "idle",
+
+  // === Search Result Count ===
+  numb_found: null,
 };
 
 export const createPost = createAsyncThunk(
@@ -50,9 +70,9 @@ export const createPost = createAsyncThunk(
 
 export const getPosts = createAsyncThunk(
   "post/getPosts",
-  async ({ user_id, offset, limit }, thunkAPI) => {
+  async ({ offset, limit }, thunkAPI) => {
     try {
-      const response = await PostService.getPosts(user_id, offset, limit);
+      const response = await PostService.getPosts(offset, limit);
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -63,9 +83,9 @@ export const getPosts = createAsyncThunk(
 
 export const getStreams = createAsyncThunk(
   "post/getStreams",
-  async ({ user_id, offset, limit }, thunkAPI) => {
+  async ({ offset, limit }, thunkAPI) => {
     try {
-      const response = await PostService.getStreams(user_id, offset, limit);
+      const response = await PostService.getStreams(offset, limit);
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -89,9 +109,9 @@ export const getPost = createAsyncThunk(
 
 export const getPostHistory = createAsyncThunk(
   "post/getPostHistory",
-  async ({ user_id }, thunkAPI) => {
+  async ({ offset, limit }, thunkAPI) => {
     try {
-      const response = await PostService.getPostHistory(user_id);
+      const response = await PostService.getPostHistory(offset, limit);
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -102,9 +122,13 @@ export const getPostHistory = createAsyncThunk(
 
 export const getUserPostHistory = createAsyncThunk(
   "post/getUserPostHistory",
-  async ({ user_id }, thunkAPI) => {
+  async ({ user_id, offset, limit }, thunkAPI) => {
     try {
-      const response = await PostService.getPostHistory(user_id);
+      const response = await PostService.getUserPostHistory(
+        user_id,
+        offset,
+        limit
+      );
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -180,9 +204,9 @@ export const savePost = createAsyncThunk(
 
 export const unSavePost = createAsyncThunk(
   "post/unSavePost",
-  async ({ post_id, user_id }, thunkAPI) => {
+  async ({ post_id }, thunkAPI) => {
     try {
-      const response = await SavedService.unSavePostHistory(post_id, user_id);
+      const response = await SavedService.unSavePostHistory(post_id);
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -193,9 +217,9 @@ export const unSavePost = createAsyncThunk(
 
 export const getSavedHistory = createAsyncThunk(
   "post/getSavedHistory",
-  async ({ user_id }, thunkAPI) => {
+  async ({ offset, limit }, thunkAPI) => {
     try {
-      const response = await SavedService.savedPostHistory(user_id);
+      const response = await SavedService.savedPostHistory(offset, limit);
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -235,6 +259,9 @@ const postSlice = createSlice({
     },
     setOffset: (state) => {
       state.offset = state.offset + 1;
+    },
+    setPostHistoryOffset: (state) => {
+      state.postHistoryOffset = state.postHistoryOffset + 1;
     },
     updateStreamLike: (state, action) => {
       const { post_id, liked } = action.payload;
@@ -343,9 +370,19 @@ const postSlice = createSlice({
         state.postHistoryStatus = "loading";
       })
       .addCase(getPostHistory.fulfilled, (state, action) => {
-        state.postHistory = [...action.payload];
+        const { posts, numb_found } = action.payload;
+        state.hasMoreUserPost = posts.length > 0;
+
+        if (state.hasMoreUserPost) {
+          const existingIds = new Set(
+            state.postHistory.map((post) => post.post_id)
+          );
+          const newPosts = posts.filter(
+            (post) => !existingIds.has(post.post_id)
+          );
+          state.postHistory = [...state.postHistory, ...newPosts];
+        }
         state.postHistoryStatus = "succeeded";
-        state.postCount = state.postHistory.length;
       })
       .addCase(getPostHistory.rejected, (state, action) => {
         state.postHistoryStatus = "failed";
@@ -355,9 +392,20 @@ const postSlice = createSlice({
         state.userPostHistoryStatus = "loading";
       })
       .addCase(getUserPostHistory.fulfilled, (state, action) => {
-        state.userPostHistory = [...action.payload];
-        state.userPostCount = state.postCount = state.userPostHistory.length;
+        const { posts, numb_found } = action.payload;
 
+        console.log("ddddd", posts);
+
+        state.hasMoreUserPostHistory = posts.length > 0;
+        if (state.hasMoreUserPostHistory) {
+          const existingIds = new Set(
+            state.userPostHistory.map((post) => post.post_id)
+          );
+          const newPosts = posts.filter(
+            (post) => !existingIds.has(post.post_id)
+          );
+          state.userPostHistory = [...state.userPostHistory, ...newPosts];
+        }
         state.userPostHistoryStatus = "succeeded";
       })
       .addCase(getUserPostHistory.rejected, (state, action) => {
@@ -383,12 +431,14 @@ const postSlice = createSlice({
         state.commentStatus = "loading";
       })
       .addCase(getComments.fulfilled, (state, action) => {
-        state.comments = [...action.payload];
+        const { comments, numb_found } = action.payload;
+        state.comments = [...state.comments, ...comments];
         state.commentStatus = "succeeded";
       })
       .addCase(getComments.rejected, (state, action) => {
         state.commentStatus = "failed";
       })
+
       .addCase(addComment.pending, (state, action) => {
         state.commentStatus = "loading";
       })
@@ -409,7 +459,7 @@ const postSlice = createSlice({
       })
       .addCase(likePost.fulfilled, (state, action) => {
         const { post_id, liked } = action.payload;
-        console.log(action.payload)
+        console.log(action.payload);
         state.postData = state.postData?.map((p) => {
           if (p.post_id === post_id) {
             return {
@@ -451,7 +501,18 @@ const postSlice = createSlice({
         state.savedStatus = "loading";
       })
       .addCase(getSavedHistory.fulfilled, (state, action) => {
-        state.savedHistory = [...action.payload];
+        const { posts, numb_found } = action.payload;
+        state.hasMoreSaved = posts.length > 0;
+
+        if (state.hasMoreSaved) {
+          const existingIds = new Set(
+            state.savedHistory.map((post) => post.post_id)
+          );
+          const newPosts = posts.filter(
+            (post) => !existingIds.has(post.post_id)
+          );
+          state.savedHistory = [...state.savedHistory, ...newPosts];
+        }
         state.savedStatus = "succeeded";
       })
       .addCase(getSavedHistory.rejected, (state, action) => {
@@ -486,6 +547,7 @@ export const {
   updateStreamSaved,
   updateStreamComment,
   clearStreams,
+  setPostHistoryOffset,
   setOffset,
 } = postSlice.actions;
 export default postSlice.reducer;

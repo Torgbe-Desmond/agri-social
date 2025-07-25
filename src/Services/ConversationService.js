@@ -26,13 +26,9 @@ async function getMessages(conversation_id) {
   }
 }
 
-async function getMessagedUsers(formData) {
+async function getMessagedUsers() {
   try {
-    const response = await axiosInstance.post(`/get-messaged-users`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await axiosInstance.post(`/get-messaged-users`);
     return response.data;
   } catch (error) {
     throw error;
@@ -40,13 +36,9 @@ async function getMessagedUsers(formData) {
 }
 
 // Function to add a message
-async function getConversation(formData) {
+async function getConversation() {
   try {
-    const response = await axiosInstance.post(`/get-conversation`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await axiosInstance.post(`/get-conversation`);
     return response.data;
   } catch (error) {
     throw error;
@@ -58,6 +50,36 @@ async function getGroupConversation(formData) {
   try {
     const response = await axiosInstance.post(
       `/get-group-conversations`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function conversing(formData) {
+  try {
+    const response = await axiosInstance.post(`/conversing`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function createConversation(formData) {
+  try {
+    const response = await axiosInstance.post(
+      `/create-conversation`,
       formData,
       {
         headers: {
@@ -89,25 +111,13 @@ async function createGroup(formData) {
   }
 }
 
-// Function to add a message
-async function createC(formData, post_id) {
-  try {
-    const response = await axiosInstance.get(`/get-conversation`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-}
-
 export const ConversationService = {
   sendMessage,
   getMessages,
   getConversation,
   getMessagedUsers,
   getGroupConversation,
-  createGroup
+  createGroup,
+  conversing,
+  createConversation,
 };

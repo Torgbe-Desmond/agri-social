@@ -31,9 +31,9 @@ export const fetchProduct = createAsyncThunk(
 
 export const fetchUserProducts = createAsyncThunk(
   "products/fetchUserPrducts",
-  async ({ user_id }, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
-      const response = await ProductService.fetchUserProducts(user_id);
+      const response = await ProductService.fetchUserProducts();
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -148,7 +148,8 @@ const productSlice = createSlice({
         state.loading = "loading";
       })
       .addCase(fetchUserProducts.fulfilled, (state, action) => {
-        state.products = [...new Set([...action.payload])];
+        const { products, numb_found} = action.payload
+        state.products = [...new Set([...state.products,...products])];
         state.loading = "succeeded";
       })
       .addCase(fetchUserProducts.rejected, (state, action) => {

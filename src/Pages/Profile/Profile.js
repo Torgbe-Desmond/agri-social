@@ -12,6 +12,8 @@ import UserProducts from "../../components/UserProducts/UserProducts";
 import { clearProducts } from "../../Features/ProductSlice";
 import { setScrolling } from "../../Features/StackSlice";
 import Group from "../../components/Group/Group";
+import Header from "../../components/Header/Header";
+import { CustomTabs } from "../../components/CustomTab/CustomTabs";
 
 function Profile() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -19,6 +21,7 @@ function Profile() {
   const observer = useRef();
   const dispatch = useDispatch();
   const { user_id, darkMode, systemPrefersDark } = useOutletContext();
+  const [scrolling, setScroll] = useState(0);
 
   // useEffect(() => {
   //   dispatch(setScrolling(true));
@@ -44,16 +47,26 @@ function Profile() {
     setTabIndex(newValue);
   };
 
+  const tabData = [
+    {
+      label: "Post",
+      content: <PostHistory />,
+    },
+    {
+      label: "Groups",
+      content: <Group />,
+    },
+  ];
+
+  <CustomTabs tabs={tabData} />;
+
   return (
     <Box className="profile">
-      <Box
-        sx={{ bgcolor: systemPrefersDark && "background.paper" }}
-        className={`profile__header`}
-      >
-        <h2>Profile</h2>
-        <TwitterProfileUI />
-      </Box>
-      <Group />
+      <Header
+        setScroll={setScroll}
+        userDetailComponent={<TwitterProfileUI />}
+        children={<CustomTabs tabs={tabData} />}
+      />
     </Box>
   );
 }

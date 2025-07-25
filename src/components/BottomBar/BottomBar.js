@@ -26,8 +26,9 @@ import { useLocation } from "react-router-dom";
 const BottomBar = ({ notifyCounts = 0 }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const location = useLocation();
-  const currentPage = location.pathname.split("/")[1];
+  const currentPage = location.pathname.split("/")[2];
   const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
+  const reference_id = localStorage.getItem("access_token");
 
   const toggleDrawer = (value) => () => setOpenDrawer(value);
 
@@ -54,26 +55,30 @@ const BottomBar = ({ notifyCounts = 0 }) => {
             transition: "background-color 0.3s ease",
           }}
         >
-          <BottomBarOption Icon={HomeIcon} to="/" active={currentPage === ""} />
+          <BottomBarOption
+            Icon={HomeIcon}
+            to="/"
+            active={currentPage ? currentPage : ""}
+          />
           <BottomBarOption
             Icon={PermIdentityIcon}
-            to="/you"
-            active={currentPage === "you"}
+            to={`/${reference_id}`}
+            active={currentPage === "home"}
           />
           <BottomBarOption
             Icon={NotificationsNoneIcon}
-            to="/notifications"
+            to={`/${reference_id}/notifications`}
             count={notifyCounts}
             active={currentPage === "notifications"}
           />
           <BottomBarOption
             Icon={MailOutlineIcon}
-            to="/messages"
+            to={`/${reference_id}/messages`}
             active={currentPage === "messages"}
           />
           <BottomBarOption
             Icon={StorefrontIcon}
-            to="/market-place"
+            to={`/${reference_id}/market-place`}
             active={currentPage === "market-place"}
           />
           <BottomBarOption
@@ -106,39 +111,39 @@ const BottomBar = ({ notifyCounts = 0 }) => {
           <BottomBarOption
             Icon={ProductionQuantityLimitsIcon}
             text="Products"
-            to="/products"
+            to={`/${reference_id}/products`}
             active={currentPage === "products"}
           />
           <BottomBarOption
             Icon={BookmarkBorderIcon}
             text="Bookmarks"
-            to="/bookmarks"
+            to={`/${reference_id}/bookmarks`}
             active={currentPage === "bookmarks"}
           />
           <BottomBarOption
             Icon={OnlinePredictionOutlinedIcon}
             text="Predictions"
-            to="/predictions"
+            to={`/${reference_id}/predictions`}
             active={currentPage === "predictions"}
           />
           <BottomBarOption
             Icon={SmartToyOutlinedIcon}
             text="FarmBot"
-            to="/predict-disease"
+            to={`/${reference_id}/predict-disease`}
             active={currentPage === "predict-disease"}
           />
           <BottomBarOption
             Icon={VideocamOutlinedIcon}
             text="Streams"
-            to="/streams"
+            to={`/${reference_id}/streams`}
             active={currentPage === "streams"}
           />
-          <BottomBarOption
+          {/* <BottomBarOption
             Icon={TimelineIcon}
             text="Posts"
-            to="/post-history"
+            to={`/${reference_id}/post-history`}
             active={currentPage === "post-history"}
-          />
+          /> */}
         </Box>
       </SwipeableDrawer>
     </>

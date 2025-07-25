@@ -42,15 +42,11 @@ function Messages() {
   };
 
   useEffect(() => {
-    const formData = new FormData();
-    formData.append("user_id", localStorage.getItem("cc_ft"));
-    dispatch(getMessagedUsers({ formData }));
+    dispatch(getMessagedUsers());
   }, []);
 
   const reloadAction = () => {
-    const formData = new FormData();
-    formData.append("user_id", localStorage.getItem("cc_ft"));
-    dispatch(getMessagedUsers({ formData }));
+    dispatch(getMessagedUsers());
   };
 
   useEffect(() => {
@@ -77,7 +73,6 @@ function Messages() {
       // ]}
       status={getMessagedUsersStatus}
       allowedSearch={true}
-      name={"Messages"}
       reloadAction={reloadAction}
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}

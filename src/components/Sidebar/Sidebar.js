@@ -27,13 +27,19 @@ function Sidebar() {
   const dispatch = useDispatch();
   const socket = useSocket();
   const [notifyCounts, setNotifyCount] = useState(0);
-  const { userDetails } = useSelector((state) => state.auth);
+  const reference_id = localStorage.getItem("reference_id");
 
   // if (isMobile) return null;
 
   const handleOpenPostModal = () => {
     const stack = new ComponentStack(dispatch);
     stack.handleStack("CreatePost", {});
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("reference_id");
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -54,8 +60,12 @@ function Sidebar() {
   }, [socket]);
 
   useEffect(() => {
-    const page = location.pathname.split("/")[1];
-    setCurrentPage(page);
+    const page = location.pathname.split("/")[2];
+    if (!page) {
+      setCurrentPage("");
+    } else {
+      setCurrentPage(page);
+    }
   }, [location]);
 
   return (
@@ -75,7 +85,7 @@ function Sidebar() {
         active={currentPage === ""}
         Icon={HomeIcon}
         text="Home"
-        to="/"
+        to={`/${reference_id}`}
       />
       <SidebarOption
         unShowIcons={unShowIcons}
@@ -83,7 +93,7 @@ function Sidebar() {
         Icon={PermIdentityIcon}
         text="Profile"
         active={currentPage === "you"}
-        to="/you"
+        to={`/${reference_id}/you`}
       />
       <SidebarOption
         unShowIcons={unShowIcons}
@@ -91,7 +101,7 @@ function Sidebar() {
         Icon={NotificationsNoneIcon}
         text="Notifications"
         active={currentPage === "notifications"}
-        to="/notifications"
+        to={`/${reference_id}/notifications`}
         count={notifyCounts}
       />
       <SidebarOption
@@ -100,7 +110,7 @@ function Sidebar() {
         Icon={OnlinePredictionOutlinedIcon}
         text="Predictions"
         active={currentPage === "predictions"}
-        to="/predictions"
+        to={`/${reference_id}/predictions`}
       />
       <SidebarOption
         unShowIcons={unShowIcons}
@@ -108,7 +118,7 @@ function Sidebar() {
         Icon={SmartToyOutlinedIcon}
         text="Farm Model"
         active={currentPage === "predict-disease"}
-        to="/predict-disease"
+        to={`/${reference_id}/predict-disease`}
       />
       <SidebarOption
         unShowIcons={unShowIcons}
@@ -116,7 +126,7 @@ function Sidebar() {
         Icon={MailOutlineIcon}
         text="Messages"
         active={currentPage === "messages"}
-        to="/messages"
+        to={`/${reference_id}/messages`}
       />
       <SidebarOption
         unShowIcons={unShowIcons}
@@ -124,7 +134,7 @@ function Sidebar() {
         Icon={BookmarkBorderIcon}
         active={currentPage === "bookmarks"}
         text="Bookmarks"
-        to="/bookmarks"
+        to={`/${reference_id}/bookmarks`}
       />
       <SidebarOption
         unShowIcons={unShowIcons}
@@ -132,7 +142,7 @@ function Sidebar() {
         Icon={VideocamOutlinedIcon}
         active={currentPage === "streams"}
         text="Streams"
-        to="/streams"
+        to={`/${reference_id}/streams`}
       />
       <SidebarOption
         unShowIcons={unShowIcons}
@@ -140,23 +150,23 @@ function Sidebar() {
         Icon={StorefrontIcon}
         active={currentPage === "market-place"}
         text="Market Place"
-        to="/market-place"
+        to={`/${reference_id}/market-place`}
       />
-      <SidebarOption
+      {/* <SidebarOption
         unShowIcons={unShowIcons}
         isMobile={isMobile}
         Icon={TimelineIcon}
         active={currentPage === "post-history"}
         text="Posts"
-        to="/post-history"
-      />
+        to={`/${reference_id}/post-history`}
+      /> */}
       <SidebarOption
         unShowIcons={unShowIcons}
         isMobile={isMobile}
         Icon={ProductionQuantityLimitsIcon}
         active={currentPage === "products"}
         text="Products"
-        to="/products"
+        to={`/${reference_id}/products`}
       />
       {/* <SidebarOption isMobile={isMobile} Icon={MoreHorizIcon} text="More" /> */}
 
@@ -168,6 +178,14 @@ function Sidebar() {
         fullWidth
       >
         Post
+      </Button>
+      <Button
+        onClick={handleLogout}
+        variant="outlined"
+        className="sidebar__tweet"
+        fullWidth
+      >
+        Logout
       </Button>
     </Box>
   );

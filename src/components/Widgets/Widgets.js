@@ -38,6 +38,7 @@ function Widgets() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { searchedUserDetails } = useSelector((state) => state.search);
+  const reference_id = localStorage.getItem("reference_id");
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -62,7 +63,7 @@ function Widgets() {
   };
 
   const handleNavigateToProfile = (user_id) => {
-    navigate(`/user/${user_id}`);
+    navigate(`/${reference_id}/user/${user_id}`);
     setSearchTerm("");
   };
 
@@ -71,9 +72,7 @@ function Widgets() {
   );
 
   return (
-    <Box
-      className="widgets"
-    >
+    <Box className="widgets">
       <Box
         sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
         className="widgets__input"

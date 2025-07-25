@@ -16,7 +16,7 @@
 }
 
 .message {
-    color: #FFF;
+    /* color: #FFF; */
 }
 
 .notification.unread {
@@ -29,26 +29,26 @@
 
 .notification .time {
     font-size: 0.8rem;
-    color: #FFF;
+    /* color: #FFF; */
     position: absolute;
     right: 10px;
     top: 10px;
 }
 
 .notification__avatar {
-    padding: 10px;
+    display: flex;
+    padding: 10px 0px;
 }
 
 .notification__headerDescription {
     margin-top: 5px;
     font-size: 15px;
-    border: 1px solid #ccc;
     border-radius: 8px;
-    color: #FFF;
+    /* color: #FFF; */
     cursor: pointer;
     padding: 1rem;
 }
 
 .notification__headerDescription p {
-    color: #FFF;
+    /* color: #FFF; */
 }

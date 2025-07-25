@@ -57,7 +57,6 @@ function Predictions() {
       const scrollTop = scrollContainer.scrollTop;
       setScroll((prev) => prev + 1);
       lastScrollTop.current = scrollTop;
-      console.log("ddddd");
     };
 
     scrollContainer.addEventListener("scroll", handleScroll);

@@ -21,18 +21,6 @@ function PostStatusIcons({
     }
     if (action) {
       action()
-        .then(() => {
-          if (status !== "loading" || status !== "rejected") {
-            const postEl = document.querySelector(`#post-${id} button`);
-            postEl.setAttribute("disabled", true);
-          }
-        })
-        .finally(() => {
-          if ((status = "succeeded")) {
-            const postEl = document.querySelector(`#post-${id} button`);
-            postEl.setAttribute("disabled", false);
-          }
-        });
     }
   };
 

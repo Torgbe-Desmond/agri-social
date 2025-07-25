@@ -32,6 +32,7 @@ const Post = forwardRef(({ post }, ref) => {
   );
   // const location = useLocation();
   const navigate = useNavigate();
+  const reference_id = localStorage.getItem("reference_id")
 
   useEffect(() => {
     let responseText = `The image in the post by ${
@@ -82,7 +83,7 @@ const Post = forwardRef(({ post }, ref) => {
     {
       id: "comment",
       location: "post",
-      to: `/post/${post?.post_id}`,
+      to: `/${reference_id}/post/${post?.post_id}`,
       icon: <ChatBubbleOutlineIcon fontSize="small" />,
       count: post?.replies || post?.comments,
     },

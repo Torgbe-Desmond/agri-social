@@ -18,6 +18,10 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
+    const token = localStorage.getItem("access_token"); // or whatever key you use
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -35,8 +39,8 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     if (error) {
-      console.log(error);
-
+      console.log(error.response.status === 401);
+      
       throw error;
     }
   }

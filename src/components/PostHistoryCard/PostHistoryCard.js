@@ -34,14 +34,12 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
 
   const handleLikePost = () => {
     const formData = new FormData();
-    formData.append("user_id", userDetails?.id);
-    dispatch(likePost({ post_id: post?.post_id, formData }));
+    dispatch(likePost({ post_id: post?.post_id }));
   };
 
   const handleSavePost = () => {
     const formData = new FormData();
-    formData.append("user_id", userDetails?.id);
-    dispatch(savePost({ post_id: post?.post_id, formData }));
+    dispatch(savePost({ post_id: post?.post_id }));
   };
 
   const handlePostDelete = () => {
@@ -50,7 +48,7 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
   };
 
   const handleUnsaved = () => {
-    dispatch(unSavePost({ user_id: userDetails?.id, post_id: post?.post_id }));
+    dispatch(unSavePost({ post_id: post?.post_id }));
   };
 
   // if (postStatus === "loading") {

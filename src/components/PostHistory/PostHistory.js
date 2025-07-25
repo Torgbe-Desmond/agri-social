@@ -1,154 +1,125 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./PostHistory.css";
 import { useDispatch, useSelector } from "react-redux";
-import { getPostHistory } from "../../Features/PostSlice";
+import { getPostHistory, setPostHistoryOffset } from "../../Features/PostSlice";
 import { useOutletContext } from "react-router-dom";
-import { Box, CircularProgress, TextField } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import PostHistoryCard from "../PostHistoryCard/PostHistoryCard";
-import SearchIcon from "@mui/icons-material/Search";
 import Header from "../Header/Header";
-import { setScrolling } from "../../Features/StackSlice";
-// import './PostHistory.css'
 
 function PostHistory() {
   const { user_id } = useOutletContext();
   const dispatch = useDispatch();
-  const postRef = useRef();
-  const { postHistory, postHistoryStatus } = useSelector((state) => state.post);
+  const feedRef = useRef();
+  const itemRefs = useRef([]);
+  const observer = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  const feedRef = useRef(null);
-  const lastScrollTop = useRef(0);
-  const [scrolling, setScroll] = useState(0);
-
-  const itemRefs = useRef([]);
   const [visiblePostId, setVisiblePostId] = useState(null);
+  const [scrolling, setScroll] = useState(0);
+  const isFetchingRef = useRef(false);
 
+  const { postHistory, postHistoryStatus, hasMoreUserPost, postHistoryOffset } =
+    useSelector((state) => state.post);
+
+  // Fetch post history
   useEffect(() => {
-    dispatch(getPostHistory({ user_id }));
-  }, [dispatch, user_id]);
+    dispatch(getPostHistory({ offset: postHistoryOffset, limit: 10 }))
+      .then(() => {
+        isFetchingRef.current = false;
+      })
+      .catch(() => {
+        isFetchingRef.current = false;
+      });
+  }, [dispatch, postHistoryOffset]);
 
-  // useEffect(() => {
-  //   const node = feedRef.current;
-  //   if (!node) return;
+  console.log("postHistoryOffset", postHistoryOffset);
 
-  //   const handleScroll = () => {
-  //     const scrollTop = node.scrollTop;
-  //     dispatch(setScrolling(scrollTop > lastScrollTop.current));
-  //     lastScrollTop.current = scrollTop;
-  //     setScroll((prev) => prev + 1);
-  //     console.log("eeee");
-  //   };
+  // Infinite scroll trigger
+  const lastPostRef = useCallback(
+    (node) => {
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMoreUserPost && !isFetchingRef) {
+          isFetchingRef.current = true;
+          dispatch(setPostHistoryOffset());
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [hasMoreUserPost]
+  );
 
-  //   node.addEventListener("scroll", handleScroll);
-  //   return () => node.removeEventListener("scroll", handleScroll);
-  // }, [dispatch]);
-
+  // Search filter
   useEffect(() => {
-    let searchedData;
-    searchedData = searchTerm
-      ? postHistory?.filter(
-          (st) =>
-            st.username
-              ?.toLocaleLowerCase()
-              ?.includes(searchTerm.toLocaleLowerCase()) ||
-            st.content
-              ?.toLocaleLowerCase()
-              ?.includes(searchTerm.toLocaleLowerCase())
+    const filtered = searchTerm
+      ? postHistory.filter(
+          (post) =>
+            post.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            post.content?.toLowerCase().includes(searchTerm.toLowerCase())
         )
       : postHistory;
-    setFilteredData(searchedData);
+
+    setFilteredData(filtered);
   }, [searchTerm, postHistory]);
 
   const reloadAction = () => {
     dispatch(getPostHistory({ user_id }));
   };
 
+  // Handle visibility and autoplay on scroll
   useEffect(() => {
-
-    // setScroll(1)
-    const visible = itemRefs.current.find((el) => {
-      if (!el) return false;
-      const rect = el.getBoundingClientRect();
-      return (
-        rect.top >= parseInt(window.innerHeight / 10) &&
-        rect.bottom <= window.innerHeight
-      );
-    });
-
     const visibleItems = itemRefs.current.filter((el) => {
       if (!el) return false;
-
       const rect = el.getBoundingClientRect();
       return (
         rect.top >= window.innerHeight / 10 && rect.bottom <= window.innerHeight
       );
     });
 
-    visibleItems.unshift();
-
+    // Show images
     visibleItems.forEach((el) => {
-      const id = el
+      const postId = el
         ?.querySelector(".post_history")
-        ?.getAttribute("id")
-        ?.replace("post-history-", "");
+        ?.id?.replace("post-history-", "");
 
-      const postEl = document.querySelector(`#post-history-${id}`);
+      if (!postId) return;
 
-      if (!id || !postEl) return;
-
-      const hasImage = postEl.querySelector(".post__images .post_media img");
-      console.log("hasImage", hasImage);
-
-      // const hasVideo = el.querySelector(`#post-${id} video`);
-
-      postEl.classList.add("visible-post-next");
-
-      if (hasImage) {
-        console.log("has image");
-        hasImage.style.display = "flex";
-      }
+      const imageEl = document.querySelector(`#post-history-${postId} img`);
+      if (imageEl) imageEl.style.display = "flex";
     });
 
-    // itemRefs.current.forEach((el) => el?.classList.remove("visible-post"));
-
-    const videoIds = postHistory
-      // .filter((p) => p.has_video)
-      .map((p) => p.post_id);
-
-    const id = visible
+    // Autoplay video
+    const firstVisible = visibleItems[0];
+    const postId = firstVisible
       ?.querySelector(".post_history")
-      ?.getAttribute("id")
-      ?.replace("post-history-", "");
+      ?.id?.replace("post-history-", "");
 
-    if (videoIds.includes(id)) {
-      // If new post is different from currently playing
-      if (visiblePostId && visiblePostId !== id) {
-        // Pause the previously playing video
-        const oldVideo = document.querySelector(
+    if (!postId) return;
+
+    const hasVideo = postHistory.find(
+      (p) => p.post_id === postId && p.has_video
+    );
+
+    if (hasVideo) {
+      if (visiblePostId && visiblePostId !== postId) {
+        const prevVideo = document.querySelector(
           `#post-history-${visiblePostId} video`
         );
-        if (oldVideo) oldVideo.pause();
+        if (prevVideo) prevVideo.pause();
       }
 
-      visible.classList.add("visible-post");
-
-      const newVideo = document.querySelector(`#post-history-${id} video`);
-      if (newVideo) {
-        newVideo.play().catch((err) => {
-          console.warn("Autoplay failed:", err);
-        });
+      const currentVideo = document.querySelector(
+        `#post-history-${postId} video`
+      );
+      if (currentVideo) {
+        currentVideo
+          .play()
+          .catch((err) => console.warn("Autoplay failed:", err));
       }
 
-      const newImage = document.querySelector(`#post-history-${id} img`);
-      console.log("newImage", newImage);
-      if (newImage) {
-        newImage.style.display = "flex";
-      }
-
-      setVisiblePostId(id); // Update the currently playing video ID
+      setVisiblePostId(postId);
     } else {
-      // If visible post is not a video, pause previously playing video
       if (visiblePostId) {
         const prevVideo = document.querySelector(
           `#post-history-${visiblePostId} video`
@@ -159,43 +130,42 @@ function PostHistory() {
     }
   }, [scrolling, postHistory]);
 
-  if (postHistoryStatus === "loading") {
-    return (
-      <p className="circular__progress">
-        <CircularProgress />
-      </p>
-    );
-  }
-
   return (
     <Header
-      status={postHistoryStatus}
-      allowedSearch={true}
-      name={"Posts"}
-      setScroll={setScroll}
-      reloadAction={reloadAction}
+      name="Posts"
+      allowedSearch
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
+      setScroll={setScroll}
+      reloadAction={reloadAction}
       feedRef={feedRef}
-      children={
-        <Box sx={{ height: "100%", overflowY: "auto" }}>
-          {filteredData?.length === 0 ? (
-            <p style={{ padding: "1rem", color: "#555" }}>No posts yet.</p>
-          ) : (
-            filteredData.map((post, index) => (
+    >
+      <Box>
+        {filteredData.length === 0 ? (
+          <p style={{ padding: "1rem", color: "#555" }}>No posts yet.</p>
+        ) : (
+          filteredData.map((post, index) => {
+            const isLast = index === postHistory.length - 1;
+            return (
               <div
+                key={post.post_id || index}
                 ref={(el) => {
                   itemRefs.current[index] = el;
+                  if (isLast) lastPostRef(el);
                 }}
-                key={index}
               >
                 <PostHistoryCard post={post} />
               </div>
-            ))
-          )}
-        </Box>
-      }
-    />
+            );
+          })
+        )}
+        {postHistoryStatus === "loading" && (
+          <p className="circular__progress">
+            <CircularProgress />
+          </p>
+        )}
+      </Box>
+    </Header>
   );
 }
 

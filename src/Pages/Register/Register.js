@@ -82,7 +82,13 @@ const Register = () => {
     formData.append("email", userInfo.email);
     formData.append("password", userInfo.password);
 
-    dispatch(register({ formData }));
+    dispatch(register({ formData }))
+      .unwrap()
+      .then(() => {
+        navigate(`/`);
+        window.location.reload();
+      })
+      .catch(() => {});
   };
 
   useEffect(() => {
@@ -110,59 +116,96 @@ const Register = () => {
   return (
     <div className="register-container">
       <Container maxWidth="sm">
-        <Typography variant="h4" align="center">
-          <ShareOutlinedIcon sx={{ fontSize: 50 }} />
-          <FileCopyOutlinedIcon sx={{ fontSize: 50 }} />
-        </Typography>
         <Box mt={2} p={4}>
-          <form onSubmit={handleSubmit}>
-            <TextField
-              sx={darkMode}
-              placeholder="Username"
-              name="username"
-              value={userInfo.username}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              disabled={registerStatus === "loading"}
-            />
-            <TextField
-              sx={darkMode}
-              placeholder="Email"
-              name="email"
-              value={userInfo.email}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              disabled={registerStatus === "loading"}
-            />
-            <TextField
-              sx={darkMode}
-              placeholder="Password"
-              name="password"
-              type="password"
-              value={userInfo.password}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              disabled={registerStatus === "loading"}
-            />
-            <TextField
-              sx={darkMode}
-              placeholder="Confirm Password"
-              name="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              error={passwordError}
-              disabled={registerStatus === "loading"}
-              helperText={passwordError ? "Passwords don't match" : ""}
-            />
+          <form className="register-form" onSubmit={handleSubmit}>
+            <Box>
+              <TextField
+                sx={{
+                  bgcolor: "background.paper",
+                  border: "1px solid #ccc",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "40px",
+                  },
+                }}
+                placeholder="Username"
+                name="username"
+                autoComplete="off"
+                value={userInfo.username}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                disabled={registerStatus === "loading"}
+              />
+            </Box>
+
+            <Box>
+              <TextField
+                sx={{
+                  bgcolor: "background.paper",
+                  border: "1px solid #ccc",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "40px",
+                  },
+                }}
+                placeholder="Email"
+                name="email"
+                autoComplete="off"
+                value={userInfo.email}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                disabled={registerStatus === "loading"}
+              />
+            </Box>
+
+            <Box>
+              <TextField
+                sx={{
+                  bgcolor: "background.paper",
+                  border: "1px solid #ccc",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "40px",
+                  },
+                }}
+                placeholder="Password"
+                name="password"
+                type="password"
+                autoComplete="off"
+                value={userInfo.password}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                disabled={registerStatus === "loading"}
+              />
+            </Box>
+
+            <Box>
+              <TextField
+                sx={{
+                  bgcolor: "background.paper",
+                  border: "1px solid #ccc",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "40px",
+                  },
+                }}
+                placeholder="Confirm Password"
+                name="confirmPassword"
+                type="password"
+                autoComplete="off"
+                value={confirmPassword}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                error={passwordError}
+                disabled={registerStatus === "loading"}
+                helperText={passwordError ? "Passwords don't match" : ""}
+              />
+            </Box>
+
             <Button
               type="submit"
-              variant="contained"
+              className="tweetBox__tweetButton "
+              variant="outlined"
               color={passwordError ? "error" : "primary"}
               fullWidth
               disabled={registerStatus === "loading"}

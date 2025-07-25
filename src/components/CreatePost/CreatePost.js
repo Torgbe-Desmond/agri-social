@@ -54,7 +54,6 @@ const CreatePost = () => {
     const formData = new FormData();
 
     formData.append("content", content);
-    formData.append("user_id", userDetails?.id);
     if (selectedTags) {
       formData.append("tags", selectedTags.join(","));
     }

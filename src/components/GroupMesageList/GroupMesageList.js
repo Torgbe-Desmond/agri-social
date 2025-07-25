@@ -17,15 +17,28 @@ import { useNavigate } from "react-router-dom";
 
 const GroupMessageList = ({ groups }) => {
   const navigate = useNavigate();
+  const reference_id = localStorage.getItem("reference_id");
 
   return (
-    <Card sx={{ maxWidth: "100%", margin: "auto", p: 2, cursor: "pointer" ,borderRadius:"0px" }}>
+    <Card
+      sx={{
+        maxWidth: "100%",
+        margin: "auto",
+        p: 2,
+        cursor: "pointer",
+        borderRadius: "0px",
+      }}
+    >
       <List>
-        {groups.length > 0 ?
+        {groups.length > 0 ? (
           groups.map((group) => (
             <React.Fragment key={group?.conversation_id}>
               <ListItem
-                onClick={() => navigate(`/group-chat/${group.conversation_id}`)}
+                onClick={() =>
+                  navigate(
+                    `/${reference_id}/group-chat/${group.conversation_id}`
+                  )
+                }
                 alignItems="flex-start"
               >
                 {/* <ListItemAvatar>
@@ -55,7 +68,10 @@ const GroupMessageList = ({ groups }) => {
               </ListItem>
               <Divider variant="inset" component="li" />
             </React.Fragment>
-          )):<p>No messages yet</p>}
+          ))
+        ) : (
+          <p>No messages yet</p>
+        )}
       </List>
     </Card>
   );

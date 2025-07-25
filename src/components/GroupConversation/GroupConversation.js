@@ -69,7 +69,7 @@ function GroupConversation() {
     if (!files || !message) return;
 
     const userMessage = {
-      sender_id: userDetails?.id,
+      sender_id: "active",
       conversation_id: conversation_id & conversation_id,
       image: files,
       profilePicture: userDetails?.user_image || "/user-avatar.png",
@@ -81,7 +81,6 @@ function GroupConversation() {
     const formData = new FormData();
     const member_ids = [recipient_id, userDetails?.id];
     formData.append("member_ids", member_ids);
-    formData.append("sender_id", userDetails?.id);
     formData.append("content", message);
 
     if (conversation_id) {
@@ -208,7 +207,7 @@ function GroupConversation() {
             />
 
             {/* User: show image only */}
-            {msg.sender_id === userDetails?.id &&
+            {msg.sender_id === "active" &&
               msg.image &&
               msg.image.map((img) => {
                 <img
@@ -224,7 +223,7 @@ function GroupConversation() {
               })}
             {/* User: show image only */}
 
-            {msg.sender_id === userDetails?.id && msg.content && (
+            {msg.sender_id === "active" && msg.content && (
               <Box
                 sx={{
                   background: systemPrefersDark ? "#daf4ff" : "#daf4ff",
@@ -239,7 +238,7 @@ function GroupConversation() {
             )}
 
             {/* Bot: show text only */}
-            {msg.sender_id !== userDetails?.id && (
+            {msg.sender_id !== "active" && (
               <Box
                 sx={{
                   background: systemPrefersDark ? "#e8fef1" : "#e8fef1",

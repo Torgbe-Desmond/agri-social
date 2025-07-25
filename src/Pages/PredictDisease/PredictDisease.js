@@ -61,7 +61,6 @@ function PredictDisease() {
     setChatMessages((prev) => [...prev, userMessage]);
 
     const formData = new FormData();
-    formData.append("user_id", userDetails?.id);
     formData.append("file", selectedFile);
     dispatch(predictImage({ formData }));
 

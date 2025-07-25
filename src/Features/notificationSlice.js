@@ -4,18 +4,33 @@ import { notificationService } from "../Services/notificationService";
 const initialState = {
   notifications: [],
   notificationStatus: "idle",
+  readNotifcationStatus: "idle",
+  notificationOffset: 1,
   hasMore: true,
+  message: "",
 };
 
 export const getNofitications = createAsyncThunk(
   "notification/getNofitications",
-  async ({ user_id, offset, limit }, thunkAPI) => {
+  async ({ offset, limit }, thunkAPI) => {
     try {
       const response = await notificationService.getNofitications(
-        user_id,
         offset,
         limit
       );
+      return response;
+    } catch (error) {
+      const message = error?.response?.data;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const readNotification = createAsyncThunk(
+  "notification/readNotification",
+  async ({ formData }, thunkAPI) => {
+    try {
+      const response = await notificationService.readNofitications(formData);
       return response;
     } catch (error) {
       const message = error?.response?.data;
@@ -46,6 +61,9 @@ const notificationSlice = createSlice({
     clearHasMore: (state) => {
       state.hasMore = true;
     },
+    setNotificationOffset: (state) => {
+      state.notificationOffset = state.notificationOffset + 1;
+    },
   },
 
   extraReducers: (builder) => {
@@ -54,20 +72,7 @@ const notificationSlice = createSlice({
         state.notificationStatus = "loading";
       })
       .addCase(getNofitications.fulfilled, (state, action) => {
-        // const { notifications, numb_found } = action.payload;
-
-        // // First update `hasMore`
-        // state.hasMore = notifications.length > 0 && notifications.length >= 10;
-
-        // // Then append based on actual result
-        // if (notifications.length > 0) {
-        //   state.notifications = [...state.notifications, ...notifications];
-        // }
-
-        // state.notificationStatus = "succeeded";
-
         const { notifications, numb_found } = action.payload;
-        console.log(notifications);
         state.hasMore = notifications.length > 0;
 
         if (state.hasMore) {
@@ -85,10 +90,36 @@ const notificationSlice = createSlice({
       .addCase(getNofitications.rejected, (state) => {
         state.hasMore = false;
         state.notificationStatus = "failed";
+      })
+
+      .addCase(readNotification.pending, (state) => {
+        state.readNotifcationStatus = "loading";
+      })
+      .addCase(readNotification.fulfilled, (state, action) => {
+        const { updated } = action.payload;
+        state.notifications = state.notifications.map((n) => {
+          if (updated?.includes(n.id)) {
+            return {
+              ...n,
+              is_read: 1,
+            };
+          }
+          return n;
+        });
+        state.readNotifcationStatus = "succeeded";
+      })
+      .addCase(readNotification.rejected, (state, action) => {
+        state.hasMore = false;
+        state.readNotifcationStatus = "failed";
+        state.message = action.payload;
       });
   },
 });
 
-export const { updateReadNofitications, clearNotificationData, clearHasMore } =
-  notificationSlice.actions;
+export const {
+  updateReadNofitications,
+  clearNotificationData,
+  clearHasMore,
+  setNotificationOffset,
+} = notificationSlice.actions;
 export default notificationSlice.reducer;

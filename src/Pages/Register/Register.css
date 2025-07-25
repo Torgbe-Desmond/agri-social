@@ -1,17 +1,27 @@
 .register-container {
-    display: flex;
+    display: grid;
     align-items: center;
     justify-content: center;
-    position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
     z-index: 999;
-    color: #9ea3c1
-
+    color: #9ea3c1;
+    height: 100vh;
 }
 
+.css-1ky6zaq-MuiFormControl-root-MuiTextField-root,
+.css-1pjy560-MuiFormControl-root-MuiTextField-root {
+    border-radius: 40px !important;
+}
+
+
+.register-form {
+    align-items: center;
+    justify-content: center;
+    width: 400px;
+    box-sizing: border-box;
+    padding: 10px;
+}
 
 /* 
 

@@ -113,7 +113,6 @@ function CommentReplies() {
 
       const formData = new FormData();
       formData.append("content", comment);
-      formData.append("user_id", userDetails?.id);
       formData.append("post_owner", singleComment?.user_id);
       formData.append("id", singleComment?.id);
       formData.append("post_id", singleComment?.post_id);
@@ -200,7 +199,6 @@ function CommentReplies() {
         chatContainerRef={chatContainerRef}
         commentReplies={togetherComments}
         scrollAnchorRef={scrollAnchorRef}
-        user_id={userDetails?.id}
       />
 
       <CommentChat

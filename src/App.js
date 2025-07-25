@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -50,18 +51,30 @@ import GroupConversation from "./components/GroupConversation/GroupConversation"
 import { clearOnLineStatus } from "./Features/StackSlice";
 import Posts from "./Pages/Posts/Posts";
 import Products from "./Pages/Products/Products";
+import { useError } from "./components/Errors/Errors";
+import SuccessMessage from "./components/SuccessMessage/SuccessMessage";
 
 function App() {
-  const isAuthenticated = localStorage.getItem("cc_ft") ? true : false;
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("access_token")
+  );
+  const { message, setMessage } = useError();
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    setIsAuthenticated(!!token);
+  }, [localStorage.getItem("access_token")]);
+
   const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
   const isMobile = useMediaQuery("(max-width:640px)");
-  const { components, scrolling, onlineStatus, message } = useSelector(
+  const { components, scrolling, onlineStatus } = useSelector(
     (state) => state.stack
   );
   const [errorMessage, setErrorMessage] = useState(null);
   const dispatch = useDispatch();
 
   const handleSnackbarClose = () => {
+    setMessage(null);
     dispatch(clearOnLineStatus());
     setErrorMessage(null);
   };
@@ -74,7 +87,7 @@ function App() {
           (isMobile ? scrolling && <BottomBar /> : <Sidebar />)}
 
         <Routes>
-          {!isAuthenticated && <Route path="/login" element={<Login />} />}
+          {!isAuthenticated && <Route path="/" element={<Login />} />}
           {!isAuthenticated && (
             <Route path="/register" element={<Register />} />
           )}
@@ -90,33 +103,60 @@ function App() {
                 />
               }
             >
-              <Route path="/" element={<Main />} />
-              <Route path="/you" element={<Profile />} />
-              <Route path="/bookmarks" element={<Bookmarks />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/post-history" element={<Posts />} />
-              <Route path="/predictions" element={<Predictions />} />
-              <Route path="/post/:post_id" element={<PostComment />} />
-              <Route path="/replies/:comment_id" element={<CommentReplies />} />
-              <Route path="/predict-disease" element={<PredictDisease />} />
-              <Route path="/user/:_user_id" element={<User />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/messages" element={<Conversations />} />
-              <Route path="/market-place" element={<MarketPlace />} />
-              <Route path="/product/:product_id" element={<ProductDetails />} />
-              <Route path="/create-product" element={<CreateProduct />} />
+              <Route path="/:reference_id" element={<Main />} />
+              <Route path="/:reference_id/you" element={<Profile />} />
+              <Route path="/:reference_id/bookmarks" element={<Bookmarks />} />
+              <Route path="/:reference_id/products" element={<Products />} />
+              <Route path="/:reference_id/post-history" element={<Posts />} />
               <Route
-                path="/chat/:conversation_id/c/:recipient_id"
+                path="/:reference_id/predictions"
+                element={<Predictions />}
+              />
+              <Route
+                path="/:reference_id/post/:post_id"
+                element={<PostComment />}
+              />
+              <Route
+                path="/:reference_id/replies/:comment_id"
+                element={<CommentReplies />}
+              />
+              <Route
+                path="/:reference_id/predict-disease"
+                element={<PredictDisease />}
+              />
+              <Route path="/:reference_id/user/:_user_id" element={<User />} />
+              <Route
+                path="/:reference_id/notifications"
+                element={<Notifications />}
+              />
+              <Route
+                path="/:reference_id/messages"
+                element={<Conversations />}
+              />
+              <Route
+                path="/:reference_id/market-place"
+                element={<MarketPlace />}
+              />
+              <Route
+                path="/:reference_id/product/:product_id"
+                element={<ProductDetails />}
+              />
+              <Route
+                path="/:reference_id/create-product"
+                element={<CreateProduct />}
+              />
+              <Route
+                path="/:reference_id/chat/:conversation_id/c/:recipient_id"
                 element={<Chat />}
               />
               <Route
-                path="/group-chat/:conversation_id"
+                path="/:reference_id/group-chat/:conversation_id"
                 element={<GroupConversation />}
               />
-              <Route path="/streams" element={<Streams />} />
+              <Route path="/:reference_id/streams" element={<Streams />} />
             </Route>
           ) : (
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           )}
         </Routes>
 
@@ -129,17 +169,17 @@ function App() {
       </Router>
 
       <Snackbar
-        open={Boolean(errorMessage)}
+        open={Boolean(message)}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
       >
         <Alert onClose={handleSnackbarClose} severity="error">
-          {errorMessage}
+          {message}
         </Alert>
       </Snackbar>
 
-      <Snackbar
-        open={Boolean(message)}
+      {/* <Snackbar
+        open={Boolean(SuccessMessage)}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
       >
@@ -147,9 +187,9 @@ function App() {
           onClose={handleSnackbarClose}
           severity={onlineStatus === true ? `success` : "error"}
         >
-          {message}
+          {SuccessMessage}
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
     </div>
   );
 }

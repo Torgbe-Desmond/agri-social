@@ -20,10 +20,12 @@ import { useDispatch } from "react-redux";
 const MessagedUsersList = ({ users }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const reference_id = localStorage.getItem("reference_id");
 
   const handleNavigateToChat = (user) => {
-    dispatch(setConversaionId(user?.conversation_id));
-    navigate(`/chat/${user?.conversation_id}/c/${user.user_id}`);
+    navigate(
+      `/${reference_id}/chat/${user?.conversation_id}/c/${user.reference_id}`
+    );
   };
 
   return (
@@ -38,8 +40,8 @@ const MessagedUsersList = ({ users }) => {
     >
       <List>
         {users &&
-          users.map((user) => (
-            <React.Fragment key={user.user_id}>
+          users.map((user, index) => (
+            <React.Fragment key={index}>
               <ListItem
                 onClick={() => handleNavigateToChat(user)}
                 alignItems="flex-start"

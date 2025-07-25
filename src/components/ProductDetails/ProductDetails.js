@@ -68,7 +68,6 @@ function ProductDetails() {
       </Box>
       {loading === "loading" ? (
         <div className="product_progress">
-          {" "}
           <CircularProgress />
         </div>
       ) : (

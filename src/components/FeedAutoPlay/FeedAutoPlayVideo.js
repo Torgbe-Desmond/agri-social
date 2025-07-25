@@ -30,13 +30,13 @@ const FeedAutoplayVideo = ({
 
         {!isVideoPlaying && !isVideoBuffering ? (
           <div className="play-button-overlay">
-            <PlayArrowIcon fontSize="small" style={{ color: "white" }} />
+            <PlayArrowIcon fontSize="medium" style={{ color: "white" }} />
           </div>
         ) : null}
 
         {isVideoLoading ? (
           <div className="video-loading">
-            <CircularProgress fontSize="small" color="inherit" />
+            <CircularProgress fontSize="medium" color="inherit" />
           </div>
         ) : null}
 

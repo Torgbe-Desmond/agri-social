@@ -3,9 +3,6 @@ import axios from "axios";
 
 // Function to create a post
 async function predictImage(formData) {
-  for (let pair of formData.entries()) {
-    console.log(pair[0], pair[1]);
-  }
   try {
     const response = await axiosInstance.post(`/prediction`, formData, {
       headers: {
@@ -80,9 +77,9 @@ async function deletePrediction(prediction_id) {
 }
 
 // Function to get a post
-async function getPredictions(user_id) {
+async function getPredictions() {
   try {
-    const response = await axiosInstance.get(`/prediction-history/${user_id}`);
+    const response = await axiosInstance.get(`/prediction-history`);
     return response.data;
   } catch (error) {
     throw error;

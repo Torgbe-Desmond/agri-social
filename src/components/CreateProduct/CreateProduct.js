@@ -80,7 +80,6 @@ const CreateProduct = ({ open, onSubmit }) => {
     productData.append("price", formData?.price);
     productData.append("oldPrice", formData?.oldPrice);
     productData.append("unit", formData?.unit);
-    productData.append("user_id", userDetails?.id);
     for (let i = 0; i < formData.images.length; i++) {
       productData.append("files", formData?.images[i]);
     }

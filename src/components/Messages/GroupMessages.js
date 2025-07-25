@@ -42,17 +42,13 @@ function GroupMessages() {
   };
 
   useEffect(() => {
-    const formData = new FormData();
-    formData.append("user_id", localStorage.getItem("cc_ft"));
-    dispatch(getGroupConversation({ formData }));
+    dispatch(getGroupConversation());
 
     return () => dispatch(clearGroups());
   }, []);
 
   const reloadAction = () => {
-    const formData = new FormData();
-    formData.append("user_id", localStorage.getItem("cc_ft"));
-    dispatch(getGroupConversation({ formData }));
+    dispatch(getGroupConversation());
   };
 
   useEffect(() => {
@@ -77,7 +73,6 @@ function GroupMessages() {
       ]}
       status={getGroupConversationStatus}
       allowedSearch={true}
-      name={"Group Messages"}
       reloadAction={reloadAction}
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}

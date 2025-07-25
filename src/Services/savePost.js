@@ -20,9 +20,14 @@ async function savePost(post_id, formData) {
 }
 
 // Function to get saved post history
-async function savedPostHistory(user_id) {
+async function savedPostHistory(offset = 1, limit = 10) {
   try {
-    const response = await axiosInstance.get(`/saved-history/${user_id}`);
+    const response = await axiosInstance.get(`/saved-history`, {
+      params: {
+        offset,
+        limit,
+      },
+    });
     return response.data;
   } catch (error) {
     console.log(error);
@@ -31,11 +36,9 @@ async function savedPostHistory(user_id) {
 }
 
 // Function to get unsaved post history
-async function unSavePostHistory(post_id, user_id) {
+async function unSavePostHistory(post_id) {
   try {
-    const response = await axiosInstance.delete(
-      `/delete-saved/${user_id}/one/${post_id}`
-    );
+    const response = await axiosInstance.delete(`/delete-saved/${post_id}`);
     return response.data;
   } catch (error) {
     console.log(error);

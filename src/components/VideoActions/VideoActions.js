@@ -78,7 +78,7 @@ export default function VideoActions({
     opacity: 0.38,
     fontWeight: 500,
     letterSpacing: 0.2,
-    color:"#FFF"
+    color: "#FFF",
   });
 
   const handleSavePost = () => {

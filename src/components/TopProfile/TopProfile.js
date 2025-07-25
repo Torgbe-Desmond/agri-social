@@ -45,6 +45,8 @@ const TwitterProfileUI = () => {
         boxSizing: "border-box",
         display: "flex",
         justifyContent: "flex-start",
+        pt:1,
+        pb:1
       }}
     >
       <Box sx={{ position: "relative", px: 2, pb: 0 }}>

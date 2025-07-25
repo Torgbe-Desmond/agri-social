@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useOutletContext } from "react-router-dom";
 import {
+  clearMessages,
   getConversation,
   getdMessages,
   sendMessage,
@@ -32,13 +33,14 @@ function Chat() {
   const dispatch = useDispatch();
   const { darkMode, systemPrefersDark } = useOutletContext();
   const { conversation_id, recipient_id } = useParams();
-  console.log(conversation_id, recipient_id);
+
+  useEffect(() => {
+    return () => dispatch(clearMessages());
+  }, []);
 
   useEffect(() => {
     setChatMessages(messages);
   }, [messages]);
-
- 
 
   useEffect(() => {
     if (conversation_id) {
@@ -56,9 +58,8 @@ function Chat() {
     if (!files || !message) return;
 
     const formData = new FormData();
-    const member_ids = [recipient_id, userDetails?.id];
+    const member_ids = [recipient_id, userDetails?.refernce_id];
     formData.append("member_ids", member_ids);
-    formData.append("sender_id", userDetails?.id);
     formData.append("content", message);
     if (conversation_id) formData.append("conversation_id", conversation_id);
     dispatch(sendMessage({ formData }));

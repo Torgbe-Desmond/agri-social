@@ -20,6 +20,7 @@ function Header({
   setSearchTerm,
   allowedSearch,
   children,
+  userDetailComponent,
   reloadAction,
   feedRef,
   setScroll,
@@ -61,6 +62,7 @@ function Header({
             </Box>
           ))}
         </Typography>
+        {userDetailComponent && userDetailComponent}
         {allowedSearch && (
           <Box
             sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
@@ -88,9 +90,9 @@ function Header({
       </Box>
 
       {status === "loading" ? (
-        <p className="circular__progress">
+        <Box className="circular__progress">
           <CircularProgress size={20} />
-        </p>
+        </Box>
       ) : (
         <Box
           className="scrolling-component"
@@ -101,9 +103,9 @@ function Header({
       )}
 
       {reloadAction && status === "failed" && (
-        <p className="circular__progress">
+        <Box className="circular__progress">
           <Button onClick={reloadAction}>Reload</Button>
-        </p>
+        </Box>
       )}
     </Box>
   );

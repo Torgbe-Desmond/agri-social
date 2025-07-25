@@ -2,9 +2,6 @@ import axiosInstance from "./AxiosInstance";
 
 // Function to create a post
 async function createPost(formData) {
-  for (let pair of formData.entries()) {
-    console.log(pair[0], pair[1]);
-  }
   try {
     const response = await axiosInstance.post(`/create-post`, formData, {
       headers: {
@@ -17,13 +14,13 @@ async function createPost(formData) {
   }
 }
 
-async function getPosts(user_id, offset = 1, limit = 10) {
+async function getPosts(offset = 1, limit = 10) {
   try {
-    const response = await axiosInstance.get(`/get-posts/${user_id}`, {
+    const response = await axiosInstance.get(`/get-posts`, {
       params: {
         offset,
-        limit
-      }
+        limit,
+      },
     });
     return response.data;
   } catch (error) {
@@ -32,14 +29,13 @@ async function getPosts(user_id, offset = 1, limit = 10) {
   }
 }
 
-
-async function getStreams(user_id, offset = 1, limit = 10) {
+async function getStreams(offset = 1, limit = 10) {
   try {
-    const response = await axiosInstance.get(`/get-streams/${user_id}`, {
+    const response = await axiosInstance.get(`/get-streams`, {
       params: {
         offset,
-        limit
-      }
+        limit,
+      },
     });
     return response.data;
   } catch (error) {
@@ -54,16 +50,34 @@ async function getPost(post_id) {
     const response = await axiosInstance.get(`/get-single-post/${post_id}`);
     return response.data;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     throw error;
   }
 }
 
-
 // Function to get post history
-async function getPostHistory(user_id) {
+async function getPostHistory(offset = 1, limit = 10) {
   try {
-    const response = await axiosInstance.get(`/post-history/${user_id}`);
+    const response = await axiosInstance.get(`/post-history`, {
+      params: {
+        offset,
+        limit,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getUserPostHistory(user_id, offset = 1, limit = 10) {
+  try {
+    const response = await axiosInstance.get(`/user-post-history/${user_id}`, {
+      params: {
+        offset,
+        limit,
+      },
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -72,14 +86,14 @@ async function getPostHistory(user_id) {
 
 // Function to get delete post
 async function deletePost(post_id) {
-    try {
-      const response = await axiosInstance.delete(`/delete-post/${post_id}`);
-      return response.data;
-    } catch (error) {
-      console.log(error)
-      throw error;
-    }
+  try {
+    const response = await axiosInstance.delete(`/delete-post/${post_id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
+}
 
 export const PostService = {
   createPost,
@@ -88,4 +102,5 @@ export const PostService = {
   getPost,
   deletePost,
   getStreams,
+  getUserPostHistory,
 };

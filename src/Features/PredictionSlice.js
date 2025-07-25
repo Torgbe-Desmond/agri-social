@@ -41,9 +41,9 @@ export const predictImageInPost = createAsyncThunk(
 
 export const getPredictions = createAsyncThunk(
   "prediction/getPredictions",
-  async ({ user_id }, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
-      const response = await PredictionService.getPredictions(user_id);
+      const response = await PredictionService.getPredictions();
       return response;
     } catch (error) {
       const message = error?.response?.data;

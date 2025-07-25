@@ -44,19 +44,12 @@ async function logout() {
 }
 
 // Function to send logout link
-async function updateUserInformation(user_id, formData) {
-  Object.keys(formData).forEach((key) => {
-    console.log(key, formData[key]);
+async function updateUserInformation(formData) {
+  const response = await axiosInstance.put(`/update-user`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
-  const response = await axiosInstance.put(
-    `/update-user/${user_id}`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
   return response.data;
 }
 
@@ -96,15 +89,20 @@ async function updatePassword(newPassword) {
 }
 
 // Function to get all users
-async function getUser(user_id) {
-  const response = await axiosInstance.get(`/user/${user_id}`);
+async function getUser() {
+  const response = await axiosInstance.get(`/user`);
+  return response.data;
+}
+
+async function getAnotherUser(user_id) {
+  const response = await axiosInstance.get(`/another-user/${user_id}`);
   return response.data;
 }
 
 // Function to update user imagge
-async function updateUserImage(user_id, formData) {
+async function updateUserImage(formData) {
   const response = await axiosInstance.put(
-    `/update-user-profile/${user_id}`,
+    `/update-user-profile-image`,
     formData,
     {
       headers: {
@@ -117,23 +115,19 @@ async function updateUserImage(user_id, formData) {
 
 // Function to check if following
 async function isFollowing(user_id, current_user_id) {
-  const response = await axiosInstance.get(
-    `/following/${user_id}/one/${current_user_id}`
-  );
+  const response = await axiosInstance.get(`/following/${user_id}`);
   return response.data;
 }
 
 // Function to follow
-async function follow(user_id, localUser) {
-  const response = await axiosInstance.post(
-    `/follow/${user_id}/one/${localUser}`
-  );
+async function follow(user_id) {
+  const response = await axiosInstance.post(`/follow/${user_id}`);
   return response.data;
 }
 
 // Function to follow people
-async function peopleToFollow(user_id, offset, limit) {
-  const response = await axiosInstance.get(`/new-followers/${user_id}`, {
+async function peopleToFollow(offset, limit) {
+  const response = await axiosInstance.get(`/new-followers`, {
     params: {
       offset,
       limit,
@@ -156,5 +150,6 @@ export const AuthService = {
   updateUserImage,
   isFollowing,
   follow,
+  getAnotherUser,
   peopleToFollow,
 };

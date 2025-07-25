@@ -76,7 +76,7 @@ const ProfileModal = ({ user, systemPrefersDark, darkMode }) => {
     if (userData.city) formData.append("city", userData.city);
     if (userData.interests) formData.append("interests", userData.interests);
 
-    dispatch(updateUserInformation({ user_id: user?.id, formData }));
+    dispatch(updateUserInformation({formData }));
     dispatch(popComponent());
   };
 
@@ -87,7 +87,6 @@ const ProfileModal = ({ user, systemPrefersDark, darkMode }) => {
   const updateProfileImage = () => {
     const stack = new ComponentStack(dispatch);
     stack.handleStack("ProfileImage", {
-      user_id: user?.id,
       user_image: user?.user_image,
     });
   };

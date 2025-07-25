@@ -85,7 +85,6 @@ function SwipeableEdgeDrawer(props) {
     commentStatus,
   } = useSelector((state) => state.comment);
 
-  console.log("here i am ",post_id)
 
   useEffect(() => {
     if (post_id) {
@@ -132,7 +131,6 @@ function SwipeableEdgeDrawer(props) {
       const formData = new FormData();
       formData.append("content", comment);
       formData.append("post_owner", user_id);
-      formData.append("user_id", localStorage.getItem("cc_ft"));
       dispatch(addComment({ post_id, formData }));
       setAddLocalComment((prev) => [...prev, messageData]);
       setComment("");

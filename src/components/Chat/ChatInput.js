@@ -8,12 +8,19 @@ const ChatInput = ({
   handleAddFile,
   systemPrefersDark,
 }) => {
+  const textFieldStyles = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "40px",
+      height: "50px",
+    },
+  };
   return (
     <Box
       sx={{
         p: 1,
         bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
         borderColor: "divider",
+        borderTop:0.5
       }}
       display="flex"
       position="sticky"
@@ -25,6 +32,7 @@ const ChatInput = ({
       bgcolor="#FFF"
     >
       <TextField
+        sx={textFieldStyles}
         fullWidth
         placeholder="Write a chat..."
         value={message}

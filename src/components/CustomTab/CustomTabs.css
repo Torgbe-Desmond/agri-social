@@ -1,0 +1,31 @@
+.custom-tabs {
+    overflow: hidden;
+}
+
+.tab-header {
+    display: flex;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 0px 16px;
+    cursor: pointer;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+/* .tab-button:hover {
+    background-color: #e0e0e0;
+    color: #088a6a;
+} */
+
+.tab-button.active {
+    border-bottom: 2px solid #088a6a;
+}
+
+.tab-content {
+    padding: 0px 0px 0px 0px;
+    /* background-color: white; */
+}

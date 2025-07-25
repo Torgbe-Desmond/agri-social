@@ -6,16 +6,19 @@ import * as serviceWorker from "./serviceWorker";
 import { Provider } from "react-redux";
 import { store } from "./Features/Store";
 import { ThemeProviderWrapper } from "./components/ThemeContent/ThemeContext";
+import { ErrorProvider } from "./components/Errors/Errors";
 import { SocketProvider } from "./components/Socket/Socket";
 
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProviderWrapper>
-    <Provider store={store}>
-      <SocketProvider>
-        <App />
-      </SocketProvider>
-    </Provider>
+      <Provider store={store}>
+        <SocketProvider>
+          <ErrorProvider>
+            <App />
+          </ErrorProvider>
+        </SocketProvider>
+      </Provider>
     </ThemeProviderWrapper>
   </React.StrictMode>,
   document.getElementById("root")
