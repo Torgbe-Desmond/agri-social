@@ -33,8 +33,6 @@ function PostHistory() {
       });
   }, [dispatch, postHistoryOffset]);
 
-  console.log("postHistoryOffset", postHistoryOffset);
-
   // Infinite scroll trigger
   const lastPostRef = useCallback(
     (node) => {
@@ -132,7 +130,6 @@ function PostHistory() {
 
   return (
     <Header
-      name="Posts"
       allowedSearch
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}

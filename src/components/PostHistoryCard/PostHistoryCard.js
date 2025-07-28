@@ -7,9 +7,11 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import StatusIcons from "../StatusIcons/StatusIcons";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  clearActionId,
   deletePost,
   likePost,
   savePost,
+  setActionId,
   unSavePost,
 } from "../../Features/PostSlice";
 import { useLocation, useOutletContext } from "react-router-dom";
@@ -17,6 +19,7 @@ import { Box, CircularProgress } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ComponentStack from "../HandleStack/HandleStack";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import FeedVideoCard from "../FeedVideoCard/FeedVideoCard";
 import "./PostHistoryCard.css";
 import BodyPost from "../Post/BodyPost";
@@ -31,10 +34,20 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
     (state) => state.post
   );
   const location = useLocation();
+  const reference_id = localStorage.getItem("reference_id");
 
   const handleLikePost = () => {
     const formData = new FormData();
-    dispatch(likePost({ post_id: post?.post_id }));
+    formData.append("post_owner", post?.user_id);
+    dispatch(setActionId(`like-${post?.post_id}`));
+    dispatch(likePost({ post_id: post?.post_id }))
+      .unwrap()
+      .then(() => {
+        dispatch(clearActionId());
+      })
+      .finally(() => {
+        dispatch(clearActionId());
+      });
   };
 
   const handleSavePost = () => {
@@ -48,29 +61,33 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
   };
 
   const handleUnsaved = () => {
-    dispatch(unSavePost({ post_id: post?.post_id }));
+    dispatch(setActionId(`bookmark-${post?.post_id}`));
+    dispatch(unSavePost({ post_id: post?.post_id }))
+      .unwrap()
+      .then(() => {
+        dispatch(clearActionId());
+      })
+      .finally(() => {
+        dispatch(clearActionId());
+      });
   };
-
-  // if (postStatus === "loading") {
-  //   return (
-  //     <p className="circular__progress">
-  //       <CircularProgress />
-  //     </p>
-  //   );
-  // }
 
   const actions = [
     {
       id: "comment",
       location: "post",
-      to: `/post/${post?.post_id}`,
+      to: `${reference_id}/post/${post?.post_id}`,
       icon: <ChatBubbleOutlineIcon fontSize="small" />,
       count: post?.comments,
     },
     {
       id: "like",
       location: "post",
-      icon: <FavoriteBorderIcon fontSize="small" />,
+      icon: post.liked ? (
+        <FavoriteIcon fontSize="small" />
+      ) : (
+        <ChatBubbleOutlineIcon fontSize="small" />
+      ),
       count: post?.likes,
       action: () => handleLikePost(),
       status: likeStatus,
@@ -96,7 +113,7 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
       className="post_history"
       id={`post-history-${post?.post_id}`}
       ref={ref}
-      sx={{ borderBottom: 1, borderColor: "divider" }}
+      sx={{ border: 1, borderColor: "divider" }}
     >
       <HeaderPost post={post} />
       <BodyPost post={post} />

@@ -14,9 +14,9 @@ import "./PostComment.css";
 import Post from "../Post/Post";
 import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
 import CommentChat from "../Comment/commentChat";
-import CommentReplyList from "../CommentReplies/CommentReplyList";
-import ReplyIndicator from "../CommentReplies/ReplyIndicator";
-import Comment_Header from "../CommentReplies/Comment_Header";
+import CommentReplyList from "../Comment/CommentReplyList";
+import ReplyIndicator from "../Comment/ReplyIndicator";
+import Comment_Header from "../Comment/Comment_Header";
 
 function PostComment() {
   const { post_id } = useParams();
@@ -53,23 +53,16 @@ function PostComment() {
         .then(() => {
           if (post_id) {
             const postEl = document.querySelector(`#post-${post_id}`);
-            // console.log("postEl", postEl);
-
             if (!post_id || !postEl) return;
 
             const hasImage = postEl.querySelector(
               ".post__images .post_media img"
             );
 
-            // const hasVideo = el.querySelector(`#post-${id} video`);
-
-            // postEl.classList.add("visible-post-next");
-
             if (hasImage) {
               console.log("has image");
               hasImage.style.display = "flex";
             }
-
             dispatch(getComments({ post_id }));
           }
         })

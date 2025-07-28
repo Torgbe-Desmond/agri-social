@@ -26,8 +26,6 @@ function Replies({ reply }) {
     dispatch(likeComment({ comment_id: reply?.id, formData }));
   };
 
-  console.log("reply", reply);
-
   const handleNavigateToProfile = () => {
     navigate(`/user/${reply?.user_id}`);
   };
@@ -38,7 +36,7 @@ function Replies({ reply }) {
       location: "post",
       to: `/${reference_id}/replies/${reply?.id}`,
       icon: <ChatBubbleOutlineIcon fontSize="small" />,
-      count: reply?.comments,
+      count: reply?.comments || reply?.replies,
     },
     {
       id: "like",

@@ -7,6 +7,7 @@ import BottomBar from "../components/BottomBar/BottomBar";
 import Sidebar from "../components/Sidebar/Sidebar";
 import "../App.css";
 import { Box } from "@mui/material";
+import TopHeader from "../components/TopHeader/TopHeader";
 
 function PrivateRoute({
   darkMode,
@@ -49,10 +50,11 @@ function PrivateRoute({
         }}
         className="private-route"
       >
+        <TopHeader systemPrefersDark={systemPrefersDark} />
         <Outlet context={sharedProps} />
       </Box>
     );
-  } 
+  }
 
   return component;
 }

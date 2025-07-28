@@ -18,11 +18,8 @@ import Header from "../../components/Header/Header";
 
 function Notifications() {
   const [tabIndex, setTabIndex] = useState(0);
-  const [pageNumber, setPageNumber] = useState(1);
   const observer = useRef();
   const dispatch = useDispatch();
-  const { user_id, darkMode, systemPrefersDark } = useOutletContext();
-  const { userDetails } = useSelector((state) => state.auth);
   const { notifications, hasMore, notificationStatus, notificationOffset } =
     useSelector((state) => state.notification);
   const socket = useSocket();

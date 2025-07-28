@@ -1,12 +1,22 @@
 .post-status-icon {
     display: flex;
     gap: 1rem;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
+    border-radius: 40px;
+    /* width: 100px; */
+
+
+    /* background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 15px; */
+
 }
 
 
-.status-btn-count{
+.status-btn-count {
     font-size: 15px;
-    padding-bottom: 2px;
+    padding-bottom: 5px;
 }
-

@@ -53,6 +53,9 @@ const initialState = {
 
   // === Search Result Count ===
   numb_found: null,
+
+  // === action id ===
+  action_id: "",
 };
 
 export const createPost = createAsyncThunk(
@@ -176,6 +179,7 @@ export const getComments = createAsyncThunk(
   }
 );
 
+
 export const addComment = createAsyncThunk(
   "comment/addComment",
   async ({ post_id, formData }, thunkAPI) => {
@@ -263,6 +267,13 @@ const postSlice = createSlice({
     setPostHistoryOffset: (state) => {
       state.postHistoryOffset = state.postHistoryOffset + 1;
     },
+    clearActionId: (state) => {
+      state.action_id = "";
+    },
+    setActionId: (state, action) => {
+      console.log(action.payload);
+      state.action_id = action.payload;
+    },
     updateStreamLike: (state, action) => {
       const { post_id, liked } = action.payload;
       state.streamData = state.streamData?.map((p) => {
@@ -270,6 +281,22 @@ const postSlice = createSlice({
           return {
             ...p,
             likes: liked ? (p.likes || 0) + 1 : p.likes - 1,
+          };
+        }
+        return p;
+      });
+    },
+    updatePostLike: (state, action) => {
+      const { post_id, liked } = action.payload;
+
+      state.postData = state.postData?.map((p) => {
+        if (p.post_id === post_id) {
+          const currentLikes = Number(p.likes) || 0;
+          console.log("currentLikes", currentLikes);
+
+          return {
+            ...p,
+            likes: liked ? currentLikes + 1 : Math.max(currentLikes - 1, 0),
           };
         }
         return p;
@@ -394,8 +421,6 @@ const postSlice = createSlice({
       .addCase(getUserPostHistory.fulfilled, (state, action) => {
         const { posts, numb_found } = action.payload;
 
-        console.log("ddddd", posts);
-
         state.hasMoreUserPostHistory = posts.length > 0;
         if (state.hasMoreUserPostHistory) {
           const existingIds = new Set(
@@ -439,6 +464,8 @@ const postSlice = createSlice({
         state.commentStatus = "failed";
       })
 
+
+
       .addCase(addComment.pending, (state, action) => {
         state.commentStatus = "loading";
       })
@@ -459,12 +486,13 @@ const postSlice = createSlice({
       })
       .addCase(likePost.fulfilled, (state, action) => {
         const { post_id, liked } = action.payload;
-        console.log(action.payload);
         state.postData = state.postData?.map((p) => {
           if (p.post_id === post_id) {
+            const currentLikes = Number(p.likes) || 0;
+
             return {
               ...p,
-              likes: liked ? (p.likes || 0) + 1 : p.likes - 1,
+              likes: liked ? currentLikes + 1 : Math.max(currentLikes - 1, 0),
             };
           }
           return p;
@@ -548,6 +576,9 @@ export const {
   updateStreamComment,
   clearStreams,
   setPostHistoryOffset,
+  updatePostLike,
   setOffset,
+  setActionId,
+  clearActionId,
 } = postSlice.actions;
 export default postSlice.reducer;

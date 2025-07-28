@@ -37,6 +37,7 @@ export const SocketProvider = ({ children }) => {
       setSocket(socketRef.current); // Set to state so context updates
       socketRef.current.emit("user", {
         user_id: localStorage.getItem("reference_id"),
+        room:"post_footer_notifications"
       });
     });
 

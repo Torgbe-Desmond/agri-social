@@ -22,6 +22,7 @@ import {
   clearComments,
   clearCommentScrollTo,
   getComment,
+  getReplies,
   likeComment,
 } from "../../Features/CommentSlice";
 import { popComponent } from "../../Features/StackSlice";
@@ -30,14 +31,15 @@ import "./CommentReplies.css";
 import SendIcon from "@mui/icons-material/Send";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Post from "../Post/Post";
-import Comment from "../Comment/Comment";
+import Comment from "./Comment";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import Comment_Header from "./Comment_Header";
 import ReplyIndicator from "./ReplyIndicator";
 import CommentReplyList from "./CommentReplyList";
-import CommentChat from "../Comment/commentChat";
+import CommentChat from "./commentChat";
+import CommentComponent from "./Comment";
 
 function CommentReplies() {
   const { comment_id } = useParams();
@@ -74,8 +76,11 @@ function CommentReplies() {
 
   useEffect(() => {
     if (comment_id) {
-      dispatch(getComment({ comment_id }));
-      dispatch(getComments({ post_id: comment_id }));
+      dispatch(getComment({ comment_id }))
+        .unwrap()
+        .then(() => {
+          dispatch(getReplies({ comment_id }));
+        });
     }
     return () => {
       dispatch(clearComments());
@@ -183,6 +188,8 @@ function CommentReplies() {
     };
   }, [togetherComments, scrollTo]);
 
+  console.log("togetherComments", togetherComments);
+
   return (
     <Box className="comment__replies">
       <Comment_Header
@@ -191,7 +198,7 @@ function CommentReplies() {
         handleGoBack={handleGoBack}
       />
 
-      <Post post={singleComment} />
+      <CommentComponent comment={singleComment} />
 
       <ReplyIndicator />
 

@@ -9,9 +9,9 @@ const initialState = {
 
 export const searchUser = createAsyncThunk(
   "search/searchUser",
-  async ({ username }, thunkAPI) => {
+  async ({ username, offset, limit }, thunkAPI) => {
     try {
-      const response = await SearchService.searchUser(username);
+      const response = await SearchService.searchUser(username, offset, limit);
       return response;
     } catch (error) {
       const message = error?.response?.data;

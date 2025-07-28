@@ -15,26 +15,12 @@ function User() {
   const [pageNumber, setPageNumber] = useState(1);
   const observer = useRef();
   const dispatch = useDispatch();
-  const { _userDetails, _userDetailsStatus, userDetails } = useSelector(
-    (state) => state.auth
-  );
+
   const { systemPrefersDark } = useOutletContext();
   const navigate = useNavigate();
   const { conversation_id } = useSelector((state) => state.message);
 
   const areConversingAlready = () => {};
-
-  useEffect(() => {
-    dispatch(_getUser({ user_id: _user_id }));
-    return () => dispatch(clearConversationId());
-  }, [dispatch]);
-
-  useEffect(() => {
-    const member_ids = [userDetails?.id, _userDetails?.id];
-    const formData = new FormData();
-    member_ids.forEach((member) => formData.append("member_ids", member));
-    dispatch(conversing({ formData }));
-  }, [dispatch, userDetails, _userDetails]);
 
   //   const lastPostRef = useCallback(
   //     (node) => {
@@ -49,21 +35,9 @@ function User() {
   //     [hasMore]
   //   );
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setTabIndex(newValue);
-  };
-
   return (
     <div className="posts">
-      <UserFeed
-        _userDetails={_userDetails}
-        _conversation_id={conversation_id}
-        _userDetailsStatus={_userDetailsStatus}
-      />
+      <UserFeed _conversation_id={conversation_id} />
     </div>
   );
 }

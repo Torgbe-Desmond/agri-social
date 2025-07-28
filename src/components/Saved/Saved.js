@@ -7,7 +7,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import StatusIcons from "../StatusIcons/StatusIcons";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useDispatch, useSelector } from "react-redux";
 import { likePost, savePost, unSavePost } from "../../Features/PostSlice";
 
@@ -22,6 +22,7 @@ import FooterPost from "../Post/FooterPost";
 function Saved({ save }) {
   const dispatch = useDispatch();
   const { userDetails } = useSelector((state) => state.auth);
+  const reference_id = localStorage.getItem("reference_id");
 
   const handleLikePost = () => {
     const formData = new FormData();
@@ -43,14 +44,18 @@ function Saved({ save }) {
     {
       id: "comment",
       location: "post",
-      to: `/post/${save?.post_id}`,
+      to: `${reference_id}/post/${save?.post_id}`,
       icon: <ChatBubbleOutlineIcon fontSize="small" />,
       count: save?.comments,
     },
     {
       id: "like",
       location: "post",
-      icon: <FavoriteBorderIcon fontSize="small" />,
+      icon: save?.liked ? (
+        <FavoriteIcon fontSize="small" />
+      ) : (
+        <ChatBubbleOutlineIcon fontSize="small" />
+      ),
       count: save?.likes,
       action: () => handleLikePost(),
     },

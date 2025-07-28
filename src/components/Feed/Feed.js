@@ -11,7 +11,7 @@ import TweetBox from "../TweetBox/TweetBox";
 
 function Feed() {
   const { user_id } = useOutletContext();
-  const { postData, hasMore, postStatus, offset } = useSelector(
+  const { postData, hasMore, postStatus, offset, aciton_id } = useSelector(
     (state) => state.post
   );
   const dispatch = useDispatch();
@@ -82,7 +82,33 @@ function Feed() {
     });
     onVideoReach(itemRefs);
     onImageReach(itemRefs);
+    onActionsRead(itemRefs);
   }, [scrolling, postData]);
+
+  function onActionsRead(itemRefs) {}
+
+  function onImageReach(itemRefs) {
+    const visibleItems = itemRefs.current.filter((el) => {
+      if (!el) return false;
+      const rect = el.getBoundingClientRect();
+      return (
+        rect.top >= window.innerHeight / 10 && rect.bottom <= window.innerHeight
+      );
+    });
+
+    const postIds = visibleItems
+      .map((el) =>
+        el.querySelector(".post")?.getAttribute("id")?.replace("post-", "")
+      )
+      .filter(Boolean);
+
+    postIds.forEach((id) => {
+      const currentImage = document.querySelector(`#post-${id} img`);
+      if (currentImage) {
+        currentImage.style.display = "flex";
+      }
+    });
+  }
 
   function onImageReach(itemRefs) {
     const visibleItems = itemRefs.current.filter((el) => {

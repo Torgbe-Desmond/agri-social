@@ -46,6 +46,15 @@ async function geComments(post_id) {
   }
 }
 
+async function getReplies(comment_id) {
+  try {
+    const response = await axiosInstance.get(`/get-replies/${comment_id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 // Function tp get comment
 async function geComment(comment_id) {
   try {
@@ -92,4 +101,5 @@ export const CommentService = {
   getCommentParent,
   addCommentLike,
   addReplyComment,
+  getReplies,
 };

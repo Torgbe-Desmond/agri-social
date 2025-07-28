@@ -125,7 +125,6 @@ const Bookmarks = () => {
     if (currentVideo) {
       currentVideo.play().catch((err) => console.warn("Autoplay failed:", err));
     }
-
     setVisiblePostId(postId);
   }
 

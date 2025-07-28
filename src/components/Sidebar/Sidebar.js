@@ -31,11 +31,6 @@ function Sidebar() {
 
   // if (isMobile) return null;
 
-  const handleOpenPostModal = () => {
-    const stack = new ComponentStack(dispatch);
-    stack.handleStack("CreatePost", {});
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("reference_id");
@@ -69,7 +64,15 @@ function Sidebar() {
   }, [location]);
 
   return (
-    <Box className="sidebar">
+    <Box
+      sx={
+        {
+          // borderRadius: "15px",
+          // boxShadow:2
+        }
+      }
+      className="sidebar"
+    >
       {/* <Box className="logo">
         <img
           src={require("../../assets/icons8-farmer-64.png")}
@@ -171,14 +174,7 @@ function Sidebar() {
       {/* <SidebarOption isMobile={isMobile} Icon={MoreHorizIcon} text="More" /> */}
 
       {/* Button -> Tweet */}
-      <Button
-        onClick={handleOpenPostModal}
-        variant="outlined"
-        className="sidebar__tweet"
-        fullWidth
-      >
-        Post
-      </Button>
+
       <Button
         onClick={handleLogout}
         variant="outlined"

@@ -7,12 +7,19 @@ import React, {
 } from "react";
 import "./Post.css";
 import { useDispatch, useSelector } from "react-redux";
-import { deletePost, likePost, savePost } from "../../Features/PostSlice";
+import {
+  clearActionId,
+  deletePost,
+  likePost,
+  savePost,
+  setActionId,
+} from "../../Features/PostSlice";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { predictImageInPost } from "../../Features/PredictionSlice";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import HeaderPost from "../Post/HeaderPost";
 import BodyPost from "./BodyPost";
@@ -32,7 +39,7 @@ const Post = forwardRef(({ post }, ref) => {
   );
   // const location = useLocation();
   const navigate = useNavigate();
-  const reference_id = localStorage.getItem("reference_id")
+  const reference_id = localStorage.getItem("reference_id");
 
   useEffect(() => {
     let responseText = `The image in the post by ${
@@ -54,9 +61,16 @@ const Post = forwardRef(({ post }, ref) => {
 
   const handleLikePost = () => {
     const formData = new FormData();
-    formData.append("user_id", userDetails?.id);
     formData.append("post_owner", post?.user_id);
-    dispatch(likePost({ post_id: post?.post_id, formData }));
+    dispatch(setActionId(`like-${post?.post_id}`));
+    dispatch(likePost({ post_id: post?.post_id, formData }))
+      .unwrap()
+      .then(() => {
+        // dispatch(clearActionId());
+      })
+      .finally(() => {
+        // dispatch(clearActionId());
+      });
   };
 
   const handleNavigateToProfile = () => {
@@ -66,7 +80,15 @@ const Post = forwardRef(({ post }, ref) => {
   const handleSavePost = () => {
     const formData = new FormData();
     formData.append("user_id", userDetails?.id);
-    dispatch(savePost({ post_id: post?.post_id, formData }));
+    dispatch(setActionId(`bookmark-${post?.post_id}`));
+    dispatch(savePost({ post_id: post?.post_id, formData }))
+      .unwrap()
+      .then(() => {
+        dispatch(clearActionId());
+      })
+      .finally(() => {
+        dispatch(clearActionId());
+      });
   };
 
   const handlePostDelete = () => {
@@ -90,7 +112,11 @@ const Post = forwardRef(({ post }, ref) => {
     {
       id: "like",
       location: "post",
-      icon: <FavoriteBorderIcon fontSize="small" />,
+      icon: post?.liked ? (
+        <FavoriteIcon fontSize="small" />
+      ) : (
+        <FavoriteBorderIcon fontSize="small" />
+      ),
       count: post?.likes,
       action: () => handleLikePost(),
       status: likeStatus,
@@ -101,7 +127,6 @@ const Post = forwardRef(({ post }, ref) => {
       icon: <BookmarkBorderIcon fontSize="small" />,
       count: post?.saved,
       action: () => handleSavePost(),
-      status: savedStatus,
     },
   ];
 

@@ -30,19 +30,7 @@ function Profile() {
 
   // alert(systemPrefersDark)
 
-  //   const lastPostRef = useCallback(
-  //     (node) => {
-  //       if (observer.current) observer.current.disconnect();
-  //       observer.current = new IntersectionObserver((entries) => {
-  //         if (entries[0].isIntersecting && hasMore) {
-  //           setPageNumber((prev) => prev + 1);
-  //         }
-  //       });
-  //       if (node) observer.current.observe(node);
-  //     },
-  //     [hasMore]
-  //   );
-
+   
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };

@@ -26,7 +26,7 @@ const CreatePost = () => {
   const [mediaType, setMediaType] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
   const dispatch = useDispatch();
-  const postStatus = useSelector((state) => state.post.postStatus);
+  const postStatus = useSelector((state) => state.post.createPostStatus);
   const predefinedTags = [];
   const { userDetails } = useSelector((state) => state.auth);
 
@@ -61,7 +61,11 @@ const CreatePost = () => {
       formData.append("file", file);
     }
 
-    dispatch(createPost({ formData }));
+    dispatch(createPost({ formData }))
+      .unwrap()
+      .then(() => {
+        dispatch(popComponent());
+      });
 
     setContent("");
     setMedia(null);
@@ -236,7 +240,7 @@ const CreatePost = () => {
             disabled={(!content && !media) || postStatus === "loading"}
           >
             {postStatus === "loading" ? (
-              <CircularProgress />
+              <CircularProgress fontSize="small" />
             ) : (
               <span>Post</span>
             )}

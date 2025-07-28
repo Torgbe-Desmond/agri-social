@@ -1,26 +1,21 @@
 import React, { useEffect, useState } from "react";
 import "./PostStatusIcons.css";
-import { useNavigate } from "react-router-dom";
-import { Box, CircularProgress, IconButton } from "@mui/material";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { Box, Button, CircularProgress, IconButton } from "@mui/material";
+import { useSelector } from "react-redux";
 
-function PostStatusIcons({
-  icon,
-  count,
-  to,
-  action,
-  location,
-  status,
-  post_id,
-}) {
+function PostStatusIcons({ id, icon, count, to, action, location, status }) {
   const navigate = useNavigate();
-  const [id, setId] = useState();
+  const { aciton_id } = useSelector((state) => state.post);
+  const { systemPrefersDark } = useOutletContext();
+  console.log(aciton_id);
 
-  const handleClick = (id, status) => {
+  const handleClick = () => {
     if (to) {
       navigate(to);
     }
     if (action) {
-      action()
+      action();
     }
   };
 
@@ -31,18 +26,19 @@ function PostStatusIcons({
 
   return (
     <Box className="post-status-icon">
-      <IconButton
-        onClick={() => handleClick(post_id, status)}
+      <Button
+        onClick={() => handleClick()}
+        variant="outlined"
+        color="primary"
+        startIcon={icon}
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 1,
+          textTransform: "none",
+          borderRadius: 20,
+          borderColor: "divider",
         }}
       >
-        <div className="status-btn-icon">{icon}</div>
-        <div className="status-btn-count">{count}</div>
-      </IconButton>
+        {count}
+      </Button>
     </Box>
   );
 }

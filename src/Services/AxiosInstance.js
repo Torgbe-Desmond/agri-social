@@ -38,9 +38,10 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
+    console.log(error);
     if (error) {
       console.log(error.response.status === 401);
-      
+
       throw error;
     }
   }

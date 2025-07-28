@@ -25,7 +25,7 @@ import Profile from "./Pages/Profile/Profile";
 import Bookmarks from "./Pages/Bookmarks/Bookmarks";
 import Predictions from "./Pages/Predictions/Predictions";
 import PostComment from "./components/PostComment/PostComment";
-import CommentReplies from "./components/CommentReplies/CommentReplies";
+import CommentReplies from "./components/Comment/CommentReplies";
 import PredictDisease from "./Pages/PredictDisease/PredictDisease";
 import User from "./Pages/User/User";
 import Notifications from "./Pages/Notifications/Notifications";
@@ -53,6 +53,7 @@ import Posts from "./Pages/Posts/Posts";
 import Products from "./Pages/Products/Products";
 import { useError } from "./components/Errors/Errors";
 import SuccessMessage from "./components/SuccessMessage/SuccessMessage";
+import TopHeader from "./components/TopHeader/TopHeader";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -85,7 +86,6 @@ function App() {
         {/* Authenticated layout */}
         {isAuthenticated &&
           (isMobile ? scrolling && <BottomBar /> : <Sidebar />)}
-
         <Routes>
           {!isAuthenticated && <Route path="/" element={<Login />} />}
           {!isAuthenticated && (

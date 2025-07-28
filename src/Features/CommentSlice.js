@@ -25,6 +25,19 @@ export const getComments = createAsyncThunk(
   }
 );
 
+export const getReplies = createAsyncThunk(
+  "comment/getReplies",
+  async ({ comment_id }, thunkAPI) => {
+    try {
+      const response = await CommentService.getReplies(comment_id);
+      return response;
+    } catch (error) {
+      const message = error?.response?.data;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const getComment = createAsyncThunk(
   "comment/getComment",
   async ({ comment_id }, thunkAPI) => {
@@ -117,7 +130,8 @@ const commentSlice = createSlice({
         state.commentStatus = "loading";
       })
       .addCase(getComments.fulfilled, (state, action) => {
-        state.comments = [...action.payload];
+        const { comments, numb_found } = action.payload;
+        state.comments = [...comments];
         state.commentStatus = "succeeded";
       })
       .addCase(getComments.rejected, (state, action) => {
@@ -142,6 +156,18 @@ const commentSlice = createSlice({
       .addCase(getCommentParent.fulfilled, (state, action) => {
         state.comments = [...action.payload];
         state.commentStatus = "succeeded";
+      })
+
+      .addCase(getReplies.pending, (state) => {
+        state.commentStatus = "loading";
+      })
+      .addCase(getReplies.fulfilled, (state, action) => {
+        const { comments, numb_found } = action.payload;
+        state.comments = [...state.comments, ...comments];
+        state.commentStatus = "succeeded";
+      })
+      .addCase(getReplies.rejected, (state, action) => {
+        state.commentStatus = "failed";
       })
 
       .addCase(addReplyComment.pending, (state, action) => {
