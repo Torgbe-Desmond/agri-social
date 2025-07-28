@@ -48,8 +48,8 @@ function Header({
     <Box ref={feedRef} className="resuable">
       <Box
         sx={{
-          borderBottom: 1,
-          borderColor: "divider",
+          // borderBottom: 1,
+          // borderColor: "divider",
           bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
         }}
         className="resuable__header"

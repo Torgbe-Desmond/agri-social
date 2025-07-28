@@ -179,7 +179,6 @@ export const getComments = createAsyncThunk(
   }
 );
 
-
 export const addComment = createAsyncThunk(
   "comment/addComment",
   async ({ post_id, formData }, thunkAPI) => {
@@ -262,6 +261,8 @@ const postSlice = createSlice({
       state.unSavePostStatus = "idle";
     },
     setOffset: (state) => {
+      if (localStorage.getItem("postOffset")) {
+      }
       state.offset = state.offset + 1;
     },
     setPostHistoryOffset: (state) => {
@@ -464,8 +465,6 @@ const postSlice = createSlice({
         state.commentStatus = "failed";
       })
 
-
-
       .addCase(addComment.pending, (state, action) => {
         state.commentStatus = "loading";
       })
@@ -489,14 +488,25 @@ const postSlice = createSlice({
         state.postData = state.postData?.map((p) => {
           if (p.post_id === post_id) {
             const currentLikes = Number(p.likes) || 0;
-
             return {
               ...p,
               likes: liked ? currentLikes + 1 : Math.max(currentLikes - 1, 0),
+              liked: liked,
             };
           }
           return p;
         });
+
+        if (state.post) {
+          state.post = {
+            ...state.post,
+            likes: liked
+              ? (Number(state.post.likes) || 0) + 1
+              : Math.max((Number(state.post.likes) || 0) - 1, 0),
+            liked: liked,
+          };
+        }
+
         state.likeStatus = "succeeded";
       })
       .addCase(likePost.rejected, (state, action) => {
@@ -511,9 +521,11 @@ const postSlice = createSlice({
         const { post_id, saved } = action.payload;
         state.postData = state.postData?.map((p) => {
           if (p.post_id === post_id) {
+            const currentSaved = Number(p.saves) || 0;
             return {
               ...p,
-              saved: saved ? (p.saved || 0) + 1 : p.saved - 1,
+              saves: saved ? currentSaved + 1 : Math.max(currentSaved - 1, 0),
+              saved: saved,
             };
           }
           return p;

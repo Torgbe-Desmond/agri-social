@@ -19,12 +19,13 @@ import { Box, CircularProgress } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ComponentStack from "../HandleStack/HandleStack";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import FeedVideoCard from "../FeedVideoCard/FeedVideoCard";
 import "./PostHistoryCard.css";
 import BodyPost from "../Post/BodyPost";
 import FooterPost from "../Post/FooterPost";
 import HeaderPost from "../Post/HeaderPost";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 
 const PostHistoryCard = forwardRef(({ post }, ref) => {
   const dispatch = useDispatch();
@@ -83,10 +84,10 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
     {
       id: "like",
       location: "post",
-      icon: post.liked ? (
+      icon: post?.liked ? (
         <FavoriteIcon fontSize="small" />
       ) : (
-        <ChatBubbleOutlineIcon fontSize="small" />
+        <FavoriteBorderIcon fontSize="small" />
       ),
       count: post?.likes,
       action: () => handleLikePost(),
@@ -95,8 +96,12 @@ const PostHistoryCard = forwardRef(({ post }, ref) => {
     {
       id: "bookmark",
       location: "post",
-      icon: <BookmarkBorderIcon fontSize="small" />,
-      count: post?.comments,
+      icon: post.saved ? (
+        <BookmarkIcon fontSize="small" />
+      ) : (
+        <BookmarkBorderIcon fontSize="small" />
+      ),
+      count: post?.saves,
       action: () => handleUnsaved(),
       status: savedStatus,
     },

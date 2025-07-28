@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import HeaderPost from "../Post/HeaderPost";
 import BodyPost from "../Post/BodyPost";
 import FooterPost from "../Post/FooterPost";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 function Replies({ reply }) {
   const dispatch = useDispatch();
@@ -41,7 +42,11 @@ function Replies({ reply }) {
     {
       id: "like",
       location: "post",
-      icon: <FavoriteBorderIcon fontSize="small" />,
+      icon: reply?.liked ? (
+        <FavoriteIcon fontSize="small" />
+      ) : (
+        <FavoriteBorderIcon fontSize="small" />
+      ),
       count: reply?.likes,
       action: () => handleLikeComment(),
     },

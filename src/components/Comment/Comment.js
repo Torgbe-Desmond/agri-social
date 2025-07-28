@@ -17,6 +17,7 @@ import Comment_Header from "./Comment_Header";
 import CommentBody from "./commentBody";
 import { likeComment } from "../../Features/CommentSlice";
 import CommentHeader from "./CommentHeader";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 const Comment = forwardRef(({ comment }, ref) => {
   const dispatch = useDispatch();
@@ -80,7 +81,11 @@ const Comment = forwardRef(({ comment }, ref) => {
     {
       id: "like",
       location: "comment",
-      icon: <FavoriteBorderIcon fontSize="small" />,
+      icon: comment?.liked ? (
+        <FavoriteIcon fontSize="small" />
+      ) : (
+        <FavoriteBorderIcon fontSize="small" />
+      ),
       count: comment?.likes,
       action: () => handleLikeComment(),
     },

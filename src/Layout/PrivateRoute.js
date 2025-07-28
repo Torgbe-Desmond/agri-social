@@ -22,10 +22,6 @@ function PrivateRoute({
   const user_id = localStorage.getItem("access_token");
   const reference_id = localStorage.getItem("reference_id");
 
-  // useEffect(() => {
-  //   navigate(`/${reference_id}`);
-  // }, []);
-
   // Fetch user on mount
   useEffect(() => {
     if (user_id) {
@@ -50,7 +46,6 @@ function PrivateRoute({
         }}
         className="private-route"
       >
-        <TopHeader systemPrefersDark={systemPrefersDark} />
         <Outlet context={sharedProps} />
       </Box>
     );

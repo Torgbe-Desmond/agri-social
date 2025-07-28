@@ -7,10 +7,10 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import StatusIcons from "../StatusIcons/StatusIcons";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useDispatch, useSelector } from "react-redux";
 import { likePost, savePost, unSavePost } from "../../Features/PostSlice";
-
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Box } from "@mui/material";
 import FeedVideoCard from "../FeedVideoCard/FeedVideoCard";
@@ -44,7 +44,7 @@ function Saved({ save }) {
     {
       id: "comment",
       location: "post",
-      to: `${reference_id}/post/${save?.post_id}`,
+      to: `/${reference_id}/post/${save?.post_id}`,
       icon: <ChatBubbleOutlineIcon fontSize="small" />,
       count: save?.comments,
     },
@@ -62,8 +62,12 @@ function Saved({ save }) {
     {
       id: "bookmark",
       location: "post",
-      icon: <BookmarkBorderIcon fontSize="small" />,
-      count: save?.saved,
+      icon: save.saved ? (
+        <BookmarkIcon fontSize="small" />
+      ) : (
+        <BookmarkBorderIcon fontSize="small" />
+      ),
+      count: save?.saves,
       action: () => handleUnsaved(),
     },
   ];

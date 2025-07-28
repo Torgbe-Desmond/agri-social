@@ -59,7 +59,6 @@ function Notifications() {
   useEffect(() => {
     const handleScroll = () => {
       setScroll((prev) => prev + 1);
-      console.log("Container is scrolling...");
     };
 
     const el = scrollRef.current;
@@ -176,16 +175,6 @@ function Notifications() {
 
   console.log(grouped);
 
-  // const array = [];
-  // array.push(grouped);
-
-  // console.log("array", array);
-
-  // // Example: render how many users liked each post
-  // Object.entries(grouped).forEach((s) => {
-  //   console.log(s);
-  // });
-
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
@@ -194,7 +183,6 @@ function Notifications() {
     <Header
       feedRef={scrollRef}
       setScroll={setScroll}
-      // status={notificationStatus}
       name={"Notifications"}
       children={
         <Box className="notifications">

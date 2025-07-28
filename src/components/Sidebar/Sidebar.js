@@ -64,24 +64,7 @@ function Sidebar() {
   }, [location]);
 
   return (
-    <Box
-      sx={
-        {
-          // borderRadius: "15px",
-          // boxShadow:2
-        }
-      }
-      className="sidebar"
-    >
-      {/* <Box className="logo">
-        <img
-          src={require("../../assets/icons8-farmer-64.png")}
-          alt="logo"
-          width="35px"
-          height="35px"
-        />
-      </Box> */}
-
+    <Box className="sidebar">
       <SidebarOption
         unShowIcons={unShowIcons}
         isMobile={isMobile}

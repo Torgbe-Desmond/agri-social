@@ -106,22 +106,38 @@ function PostComment() {
 
   const handleAddComment = () => {
     if (comment.trim()) {
-      const messageData = {
-        created_at: new Date().toISOString(),
-        content: comment.trim(),
-        username: userDetails?.username,
-        userId: userDetails?.id,
-        user_image: userDetails?.user_image,
-        likes: [],
-        replies: [],
-      };
+      // "id": str(row.id),
+      //       "post_id": str(row.post_id),
+      //       "user_id": str(row.user_id),
+      //       "likes": row.likes,
+      //       "username": row.username,
+      //       "content": row.content,
+      //       "replies": row.replies,
+      //       "created_at": row.created_at,
+      //       "user_image": row.user_image,
+      //       "liked":row.liked,
+      //       "parent_id": str(row.parent_id) if row.parent_id else None,
 
       const formData = new FormData();
       formData.append("content", comment);
       formData.append("post_owner", post?.user_id);
-      dispatch(addComment({ post_id, formData }));
-      setAddLocalComment((prev) => [...prev, messageData]);
-      setComment("");
+      dispatch(addComment({ post_id, formData }))
+        .unwrap()
+        .then((payload) => {
+          const { id, post_id, user_id, content, created_at } = payload;
+          const newCommentMessage = {
+            id,
+            post_id,
+            user_id,
+            content,
+            created_at,
+            likes: 0,
+            user_image: userDetails?.user_image,
+            username: userDetails?.username,
+          };
+          setAddLocalComment((prev) => [...prev, newCommentMessage]);
+          setComment("");
+        });
     }
   };
 

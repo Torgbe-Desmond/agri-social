@@ -9,6 +9,7 @@ import {
   ListItem,
   ListItemText,
   useTheme,
+  IconButton,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
@@ -22,15 +23,14 @@ import {
   selectedItem,
 } from "../../Features/SearchSlice";
 import { popComponent } from "../../Features/StackSlice";
+import CloseIcon from "@mui/icons-material/Close";
 
-function TopHeader() {
+function TopHeader({ systemPrefersDark }) {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { searchedUserDetails } = useSelector((state) => state.search);
   const reference_id = localStorage.getItem("reference_id");
-
-  console.log("searchedUserDetails", searchedUserDetails);
 
   useEffect(() => {
     if (!searchTerm) return;
@@ -81,7 +81,7 @@ function TopHeader() {
       <AppBar
         position="static"
         sx={{
-          backgroundColor: "inherit",
+          bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
           color: "#000",
           boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
           px: 2,
@@ -96,21 +96,15 @@ function TopHeader() {
               alt="logo"
               width={35}
             />
-            {/* <span style={{ fontWeight: 600, fontSize: "1.2rem" }}>slothit</span> */}
           </Box>
 
           {/* Search Bar */}
           <Box
             display="flex"
             alignItems="center"
-            // sx={{
-            //   // flexGrow: 1,
-            //   // px: 1,
-            //   // backgroundColor: "#f1f1f1",
-            // }}
             sx={{
               p: 1,
-              // bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
+              bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
               border: 1,
               borderColor: "divider",
               maxWidth: "100%",
@@ -123,7 +117,6 @@ function TopHeader() {
             pt={1}
             bgcolor="#FFF"
           >
-            <SearchIcon sx={{ color: "#888", mr: 1 }} />
             <TextField
               fullWidth
               sx={textFieldStyles}
@@ -133,12 +126,18 @@ function TopHeader() {
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
                 disableUnderline: true,
+                endAdornment: (
+                  <IconButton
+                    onClick={() => {
+                      setSearchTerm("");
+                      dispatch(clearSearch());
+                    }}
+                  >
+                    <CloseIcon sx={{ color: "#888" }} />
+                  </IconButton>
+                ),
+                startAdornment: <SearchIcon sx={{ color: "#888", mr: 1 }} />,
               }}
-              // sx={{
-              //   "& input": {
-              //     fontSize: "0.95rem",
-              //   },
-              // }}
             />
           </Box>
 
@@ -163,7 +162,7 @@ function TopHeader() {
           sx={{
             position: "absolute",
             top: "60px",
-            left: "50%",
+            left: "51.5%",
             transform: "translateX(-50%)",
             width: "100%",
             maxWidth: 500,

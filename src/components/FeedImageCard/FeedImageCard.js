@@ -19,7 +19,7 @@ export default function FeedImageCard({ images }) {
       sx={{ width: "100%", height: "auto" }}
       variant="quilted"
       cols={length > 1 ? 2 : 1}
-      rowHeight={180}
+      rowHeight={400}
     >
       {images.map((item, index) => (
         <ImageListItem

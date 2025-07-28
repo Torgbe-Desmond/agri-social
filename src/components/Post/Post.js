@@ -26,6 +26,7 @@ import BodyPost from "./BodyPost";
 import FooterPost from "./FooterPost";
 import RePosts from "./RePosts";
 import GroupPost from "./GroupPost";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 
 const Post = forwardRef(({ post }, ref) => {
   const dispatch = useDispatch();
@@ -124,8 +125,12 @@ const Post = forwardRef(({ post }, ref) => {
     {
       id: "bookmark",
       location: "post",
-      icon: <BookmarkBorderIcon fontSize="small" />,
-      count: post?.saved,
+      icon: post?.saved ? (
+        <BookmarkIcon fontSize="small" />
+      ) : (
+        <BookmarkBorderIcon fontSize="small" />
+      ),
+      count: post?.saves,
       action: () => handleSavePost(),
     },
   ];
