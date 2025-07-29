@@ -6,6 +6,10 @@ import { setPostScrollTo } from "../../Features/PostSlice";
 import { setCommentScrollTo } from "../../Features/CommentSlice";
 import { useDispatch } from "react-redux";
 import FeedVideoCard from "../FeedVideoCard/FeedVideoCard";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import NotificationFooter from "./NotificationFooter";
+import { deleteNotification } from "../../Features/notificationSlice";
+import ComponentStack from "../HandleStack/HandleStack";
 
 function Notification({ notification }) {
   const navigate = useNavigate();
@@ -57,6 +61,19 @@ function Notification({ notification }) {
     }
     return "just now";
   };
+  const handleDeleteNotification = () => {
+    const stack = new ComponentStack(dispatch);
+    stack.handleStack("DeleteNotification", {
+      notification_id: notification?.id,
+    });
+  };
+
+  const actions = [
+    {
+      icon: <DeleteOutlineIcon fontSize="small" />,
+      action: () => handleDeleteNotification(),
+    },
+  ];
 
   return (
     <Box
@@ -88,7 +105,6 @@ function Notification({ notification }) {
                   }}
                 />
               </Tooltip>
-              {/* <strong>{user?.username || "Someone"}</strong> */}
             </Box>
           ))}
         </Box>
@@ -139,6 +155,7 @@ function Notification({ notification }) {
         </Box>
         <span className="time">{timeAgo(notification?.created_at)}</span>
       </Box>
+      <NotificationFooter actions={actions} />
     </Box>
   );
 }

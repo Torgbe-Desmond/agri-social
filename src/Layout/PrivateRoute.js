@@ -39,11 +39,11 @@ function PrivateRoute({
   if (isAuthenticated) {
     component = (
       <Box
-        sx={{
-          borderLeft: 1,
-          borderRight: 1,
-          borderColor: "divider",
-        }}
+        // sx={{
+        //   borderLeft: 1,
+        //   borderRight: 1,
+        //   borderColor: "divider",
+        // }}
         className="private-route"
       >
         <Outlet context={sharedProps} />

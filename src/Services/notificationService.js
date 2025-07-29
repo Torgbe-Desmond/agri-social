@@ -30,7 +30,14 @@ async function readNofitications(formData) {
   }
 }
 
+
+const deleteNotification = async (formData) => {
+  const response = await axiosInstance.post("/delete-notification", formData);
+  return response.data;
+};
+
 export const notificationService = {
   getNofitications,
   readNofitications,
+  deleteNotification
 };

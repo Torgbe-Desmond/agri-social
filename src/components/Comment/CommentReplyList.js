@@ -7,7 +7,7 @@ const CommentReplyList = ({
   scrollAnchorRef,
 }) => {
   return (
-    <Box sx={{ gap: 1 }} ref={chatContainerRef}>
+    <Box sx={{ mt: 1, gap: 1, display: "grid" }} ref={chatContainerRef}>
       {commentReplies?.map((reply, index) => (
         <Replies key={index} reply={reply} />
       ))}
@@ -15,5 +15,5 @@ const CommentReplyList = ({
     </Box>
   );
 };
-  
+
 export default CommentReplyList;

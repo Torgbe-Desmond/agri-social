@@ -150,7 +150,7 @@ const Post = forwardRef(({ post }, ref) => {
   if (post) {
     component = (
       <Box
-        sx={{ borderBottom: 1, borderColor: "divider" }}
+        sx={{ border: 1, borderColor: "divider", borderRadius: "20px" }}
         className="post"
         id={`post-${post?.post_id}`}
         ref={ref}
@@ -164,7 +164,13 @@ const Post = forwardRef(({ post }, ref) => {
   } else {
     component = (
       <Box
-        sx={{ border: 1, borderColor: "divider", borderRadius: "30px", p: 2 ,m:2 }}
+        sx={{
+          border: 1,
+          borderColor: "divider",
+          borderRadius: "30px",
+          p: 2,
+          m: 2,
+        }}
       >
         Post does not exist
       </Box>

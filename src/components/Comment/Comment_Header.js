@@ -7,8 +7,6 @@ function Comment_Header({ systemPrefersDark, handleGoBack, name }) {
     <Box
       sx={{
         background: systemPrefersDark && "background.paper",
-        borderBottom: 1,
-        borderColor: "divider",
       }}
       className="post__comment__header"
     >

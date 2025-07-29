@@ -61,7 +61,7 @@ function Replies({ reply }) {
 
   return (
     <Box
-      sx={{ borderBottom: 1, borderColor: "divider" }}
+      sx={{ border: 1, borderColor: "divider" , borderRadius:"20px"}}
       id={`post-${reply?.id}`}
       className="post"
     >

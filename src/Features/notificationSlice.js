@@ -5,6 +5,7 @@ const initialState = {
   notifications: [],
   notificationStatus: "idle",
   readNotifcationStatus: "idle",
+  deleteNotificationStatus:"idle",
   notificationOffset: 1,
   hasMore: true,
   message: "",
@@ -39,6 +40,19 @@ export const readNotification = createAsyncThunk(
   }
 );
 
+export const deleteNotification = createAsyncThunk(
+  "notification/deleteNotification",
+  async ({ formData }, thunkAPI) => {
+    try {
+      const response = await notificationService.deleteNotification(formData);
+      return response;
+    } catch (error) {
+      const message = error?.response?.data || "Failed to delete notification";
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 const notificationSlice = createSlice({
   name: "notification",
   initialState,
@@ -68,6 +82,24 @@ const notificationSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
+
+      .addCase(deleteNotification.pending, (state) => {
+        state.deleteNotificationStatus = "loading";
+        state.error = null;
+      })
+      .addCase(deleteNotification.fulfilled, (state, action) => {
+        state.deleteNotificationStatus = "succeeded";
+        const deletedId = action.payload?.deleted;
+        if (deletedId) {
+          state.notifications = state.notifications.filter(
+            (n) => n.id !== deletedId
+          );
+        }
+      })
+      .addCase(deleteNotification.rejected, (state, action) => {
+        state.deleteNotificationStatus = "failed";
+        state.error = action.payload || "Error deleting notification";
+      })
       .addCase(getNofitications.pending, (state) => {
         state.notificationStatus = "loading";
       })

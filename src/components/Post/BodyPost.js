@@ -30,6 +30,8 @@ function BodyPost({ post }) {
 
       {/* Media Section */}
       <div className="post__images">
+        {/* Tags */}
+        {post?.tags && <div className="post_tags">{renderTags(post.tags)}</div>}
         <div className="post_media">
           {post?.images && <FeedImageCard images={post.images.split(",")} />}
 
@@ -49,9 +51,6 @@ function BodyPost({ post }) {
           )}
         </div>
       </div>
-
-      {/* Tags */}
-      {post?.tags && <div className="post_tags">{renderTags(post.tags)}</div>}
     </div>
   );
 }

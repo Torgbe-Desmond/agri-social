@@ -5,6 +5,7 @@
   overflow-y: scroll;
   width: 100%;
   display: grid;
+  gap: 10px;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */

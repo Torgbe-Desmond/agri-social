@@ -18,6 +18,7 @@ const CommentChat = ({
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "40px",
+      bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
       height: "50px",
     },
   };
@@ -25,7 +26,7 @@ const CommentChat = ({
     <Box
       sx={{
         p: 1,
-        bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
+        bgcolor: systemPrefersDark ? "transparent" : "transparent",
         borderColor: "divider",
       }}
       display="flex"
@@ -35,7 +36,6 @@ const CommentChat = ({
       gap={1}
       alignItems="center"
       pt={1}
-      bgcolor="#FFF"
     >
       <TextField
         sx={textFieldStyles}
