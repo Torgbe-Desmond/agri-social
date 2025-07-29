@@ -145,19 +145,33 @@ const Post = forwardRef(({ post }, ref) => {
 
   const handleJoin = () => {};
 
-  return (
-    <Box
-      sx={{ borderBottom: 1, borderColor: "divider" }}
-      className="post"
-      id={`post-${post?.post_id}`}
-      ref={ref}
-    >
-      {/* <RePosts /> */}
-      <HeaderPost post={post} />
-      <BodyPost post={post} />
-      <FooterPost actions={actions} post_id={post?.post_id} />
-    </Box>
-  );
+  let component;
+
+  if (post) {
+    component = (
+      <Box
+        sx={{ borderBottom: 1, borderColor: "divider" }}
+        className="post"
+        id={`post-${post?.post_id}`}
+        ref={ref}
+      >
+        {/* <RePosts /> */}
+        <HeaderPost post={post} />
+        <BodyPost post={post} />
+        <FooterPost actions={actions} post_id={post?.post_id} />
+      </Box>
+    );
+  } else {
+    component = (
+      <Box
+        sx={{ border: 1, borderColor: "divider", borderRadius: "30px", p: 2 ,m:2 }}
+      >
+        Post does not exist
+      </Box>
+    );
+  }
+
+  return component;
 });
 
 export default Post;

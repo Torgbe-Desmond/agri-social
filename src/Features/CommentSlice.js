@@ -199,9 +199,14 @@ const commentSlice = createSlice({
       })
       .addCase(likeComment.fulfilled, (state, action) => {
         const { comment_id, liked } = action.payload;
-        state.comments = state.comments?.map((c) => {
+
+        // Debug log (optional)
+        console.log("Like Comment ID:", comment_id, "Liked:", liked);
+
+        // Safely update comment list
+        state.comments = (state.comments || []).map((c) => {
           if (c.id === comment_id) {
-            const currentLikes = Number(c.likes) || 0;
+            const currentLikes = Number(c.likes ?? 0);
             return {
               ...c,
               likes: liked ? currentLikes + 1 : Math.max(currentLikes - 1, 0),
@@ -211,15 +216,17 @@ const commentSlice = createSlice({
           return c;
         });
 
-        if (state.singleComment) {
+        // Safely update singleComment if it exists
+        if (state.singleComment && state.singleComment.id === comment_id) {
+          const currentLikes = Number(state.singleComment.likes ?? 0);
           state.singleComment = {
             ...state.singleComment,
-            likes: liked
-              ? (Number(state.singleComment.likes) || 0) + 1
-              : Math.max((Number(state.singleComment.likes) || 0) - 1, 0),
+            likes: liked ? currentLikes + 1 : Math.max(currentLikes - 1, 0),
             liked: liked,
           };
         }
+
+        // Set status
         state.likeCommentStatus = "succeeded";
       })
       .addCase(likeComment.rejected, (state, action) => {

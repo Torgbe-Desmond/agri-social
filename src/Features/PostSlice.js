@@ -290,31 +290,35 @@ const postSlice = createSlice({
     updatePostLike: (state, action) => {
       const { post_id, liked } = action.payload;
 
-      state.postData = state.postData?.map((p) => {
+      state.postData = (state.postData || []).map((p) => {
         if (p.post_id === post_id) {
-          const currentLikes = Number(p.likes) || 0;
-          console.log("currentLikes", currentLikes);
-
+          const currentLikes = Number(p.likes ?? 0);
           return {
             ...p,
             likes: liked ? currentLikes + 1 : Math.max(currentLikes - 1, 0),
+            liked: liked,
           };
         }
         return p;
       });
     },
+
     updateStreamSaved: (state, action) => {
       const { post_id, saved } = action.payload;
-      state.streamData = state.streamData?.map((p) => {
+
+      state.streamData = (state.streamData || []).map((p) => {
         if (p.post_id === post_id) {
+          const currentSaves = Number(p.saves ?? 0);
           return {
             ...p,
-            saved: saved ? (p.saved || 0) + 1 : p.saved - 1,
+            saves: saved ? currentSaves + 1 : Math.max(currentSaves - 1, 0),
+            saved: saved,
           };
         }
         return p;
       });
     },
+
     updateStreamComment: (state, action) => {
       const { comment_id } = action.payload;
       state.streamData = state.streamData?.map((c) => {
@@ -485,30 +489,33 @@ const postSlice = createSlice({
       })
       .addCase(likePost.fulfilled, (state, action) => {
         const { post_id, liked } = action.payload;
-        state.postData = state.postData?.map((p) => {
+
+        // Update postData list
+        state.postData = (state.postData || []).map((p) => {
           if (p.post_id === post_id) {
-            const currentLikes = Number(p.likes) || 0;
+            const currentLikes = Number(p.likes ?? 0);
             return {
               ...p,
               likes: liked ? currentLikes + 1 : Math.max(currentLikes - 1, 0),
-              liked: liked,
+              liked,
             };
           }
           return p;
         });
 
-        if (state.post) {
+        // Update detailed post view
+        if (state.post && state.post.post_id === post_id) {
+          const currentLikes = Number(state.post.likes ?? 0);
           state.post = {
             ...state.post,
-            likes: liked
-              ? (Number(state.post.likes) || 0) + 1
-              : Math.max((Number(state.post.likes) || 0) - 1, 0),
-            liked: liked,
+            likes: liked ? currentLikes + 1 : Math.max(currentLikes - 1, 0),
+            liked,
           };
         }
 
         state.likeStatus = "succeeded";
       })
+
       .addCase(likePost.rejected, (state, action) => {
         state.likeStatus = "failed";
       })
@@ -519,9 +526,11 @@ const postSlice = createSlice({
       })
       .addCase(savePost.fulfilled, (state, action) => {
         const { post_id, saved } = action.payload;
-        state.postData = state.postData?.map((p) => {
+
+        // Update the postData array safely
+        state.postData = (state.postData || []).map((p) => {
           if (p.post_id === post_id) {
-            const currentSaved = Number(p.saves) || 0;
+            const currentSaved = Number(p.saves ?? 0);
             return {
               ...p,
               saves: saved ? currentSaved + 1 : Math.max(currentSaved - 1, 0),
@@ -530,6 +539,8 @@ const postSlice = createSlice({
           }
           return p;
         });
+
+        // Update status flag
         state.savedStatus = "succeeded";
       })
       .addCase(savePost.rejected, (state, action) => {

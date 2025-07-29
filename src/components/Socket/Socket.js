@@ -26,7 +26,7 @@ export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    socketRef.current = io(url[0], {
+    socketRef.current = io(url[1], {
       transports: ["websocket"],
       withCredentials: true,
     });

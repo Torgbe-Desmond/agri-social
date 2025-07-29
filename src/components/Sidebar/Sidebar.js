@@ -26,8 +26,15 @@ function Sidebar() {
   const location = useLocation();
   const dispatch = useDispatch();
   const socket = useSocket();
-  const [notifyCounts, setNotifyCount] = useState(0);
+  const { userDetails } = useSelector((state) => state.auth);
+  const [notifyCounts, setNotifyCount] = useState(
+    userDetails?.notification_count
+  );
   const reference_id = localStorage.getItem("reference_id");
+
+  useEffect(() => {
+    if (!socket) return;
+  }, []);
 
   // if (isMobile) return null;
 

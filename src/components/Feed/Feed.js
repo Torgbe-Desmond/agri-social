@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Post from "../Post/Post";
 import "./Feed.css";
-import { clearPostData, getPosts, setOffset } from "../../Features/PostSlice";
+import { clearPostData, getPosts, setOffset, updatePostLike } from "../../Features/PostSlice";
 import { useOutletContext } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, CircularProgress } from "@mui/material";
@@ -23,6 +23,7 @@ function Feed() {
   const itemRefs = useRef([]);
   const [visiblePostId, setVisiblePostId] = useState(null);
   const isFetchingRef = useRef(false);
+  const { userDetails } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(getPosts({ offset, limit: 10 }))
@@ -39,8 +40,6 @@ function Feed() {
       dispatch(setScrolling(false));
     };
   }, [dispatch]);
-
-  console.log("Fetching page", offset);
 
   const lastPostRef = useCallback(
     (node) => {
@@ -175,6 +174,31 @@ function Feed() {
 
     setVisiblePostId(postId);
   }
+
+  // useEffect(() => {
+  //   if (!socket || !userDetails?.id) return;
+
+  //   const handleLikeNotification = (data) => {
+  //     // Ignore self-generated events
+  //     if (data.user_id !== userDetails.id) {
+  //       if (data.type === "like" && data.entity_type === "post") {
+  //         dispatch(
+  //           updatePostLike({
+  //             post_id: data.entity_id,
+  //             liked: data.liked,
+  //           })
+  //         );
+  //       }
+  //     }
+  //   };
+
+  //   socket.on("foot_notifications", handleLikeNotification);
+
+  //   // Cleanup to avoid duplicate listeners
+  //   return () => {
+  //     socket.off("foot_notifications", handleLikeNotification);
+  //   };
+  // }, [socket, userDetails?.id, dispatch]);
 
   return (
     <Box

@@ -60,6 +60,12 @@ const CreatePost = () => {
     if (file) {
       formData.append("file", file);
     }
+    if (mediaType === "video") {
+      formData.append("has_video", 1);
+    }
+    if (mediaType === "image") {
+      formData.append("has_video", 0);
+    }
 
     dispatch(createPost({ formData }))
       .unwrap()
@@ -196,12 +202,16 @@ const CreatePost = () => {
             </IconButton>
 
             {mediaType === "image" ? (
-              <img src={media} alt="Preview" />
+              <img
+                src={media}
+                style={{ width: "100%", height: "300px", borderRadius: 8 }}
+                alt="Preview"
+              />
             ) : (
               <video
                 controls
                 src={media}
-                style={{ width: "100%", borderRadius: 8 }}
+                style={{ width: "100%", height: "300px", borderRadius: 8 }}
               />
             )}
           </Box>
