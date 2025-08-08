@@ -17,7 +17,9 @@ import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
-import { createPost } from "../../Features/PostSlice";
+import { addNewPost } from "../../Features/PostSlice";
+import { useOutletContext } from "react-router-dom";
+import { useCreatePostMutation } from "../../Features/postApi";
 
 const CreatePost = () => {
   const [content, setContent] = useState("");
@@ -26,9 +28,8 @@ const CreatePost = () => {
   const [mediaType, setMediaType] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
   const dispatch = useDispatch();
-  const postStatus = useSelector((state) => state.post.createPostStatus);
   const predefinedTags = [];
-  const { userDetails } = useSelector((state) => state.auth);
+  const [createPost, { isLoading }] = useCreatePostMutation();
 
   const handleMediaUpload = (event, type) => {
     const file = event.target.files[0];
@@ -48,7 +49,7 @@ const CreatePost = () => {
     setMediaType(null);
   };
 
-  const handlePost = () => {
+  const handlePost = async () => {
     if (!content && !media) return;
 
     const formData = new FormData();
@@ -67,16 +68,14 @@ const CreatePost = () => {
       formData.append("has_video", 0);
     }
 
-    dispatch(createPost({ formData }))
-      .unwrap()
-      .then(() => {
-        dispatch(popComponent());
-      });
+    const payload = await createPost({ formData }).unwrap();
+    dispatch(addNewPost({ payload }));
 
     setContent("");
     setMedia(null);
     setMediaType(null);
     setSelectedTags([]);
+    dispatch(popComponent());
   };
 
   const handleTagChange = (event, value) => {
@@ -186,6 +185,16 @@ const CreatePost = () => {
             position="relative"
             justifyContent="center"
             display="flex"
+            sx={{
+              position: "relative",
+              display: "inline-block",
+              width: 100,
+              height: 60,
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 1,
+              overflow: "hidden",
+            }}
           >
             <IconButton
               size="small"
@@ -227,7 +236,6 @@ const CreatePost = () => {
           <Button
             variant="outlined"
             color="primary"
-            // className="sidebar__tweet"
             sx={{
               mt: 2,
               borderRadius: "32px",
@@ -236,7 +244,7 @@ const CreatePost = () => {
             }}
             fullWidth
             onClick={() => dispatch(popComponent())}
-            disabled={postStatus === "loading"}
+            disabled={isLoading}
           >
             Cancel
           </Button>
@@ -247,9 +255,9 @@ const CreatePost = () => {
             sx={{ mt: 2 }}
             fullWidth
             onClick={handlePost}
-            disabled={(!content && !media) || postStatus === "loading"}
+            disabled={(!content && !media) || isLoading}
           >
-            {postStatus === "loading" ? (
+            {isLoading ? (
               <CircularProgress fontSize="small" />
             ) : (
               <span>Post</span>

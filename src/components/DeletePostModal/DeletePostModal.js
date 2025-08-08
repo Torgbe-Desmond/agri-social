@@ -10,7 +10,8 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
-import { deletePost } from "../../Features/PostSlice";
+import { removeDeletedPost } from "../../Features/PostSlice";
+import { useDeletePostMutation } from "../../Features/postApi";
 
 const style = {
   position: "absolute",
@@ -25,16 +26,12 @@ const style = {
 };
 
 const DeletePostModal = ({ post_id }) => {
-  const { postStatus, postData, selectedPostId, postDeleteStatus } =
-    useSelector((state) => state.post);
   const dispatch = useDispatch();
+  const [deletePost, { isLoading }] = useDeletePostMutation();
 
-  const handlePostDelete = () => {
-    dispatch(deletePost({ post_id }))
-      .unwrap()
-      .then((data) => {
-        dispatch(popComponent());
-      });
+  const handlePostDelete = async () => {
+    const payload = await deletePost({ post_id }).unwrap();
+    dispatch(removeDeletedPost({ payload }));
   };
 
   return (
@@ -56,15 +53,17 @@ const DeletePostModal = ({ post_id }) => {
             sx={{
               borderRadius: "32px !important",
             }}
+            disabled={isLoading}
             color="secondary"
             onClick={() => dispatch(popComponent())}
           >
             Cancel
           </Button>
-          {postDeleteStatus === "loading" ? (
+          {isLoading ? (
             <CircularProgress />
           ) : (
             <Button
+              disabled={isLoading}
               className="sidebar__tweet__contained"
               onClick={() => handlePostDelete()}
               variant="outlined"

@@ -1,41 +1,67 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-  Card,
-  CardHeader,
   Avatar,
-  Typography,
+  Box,
+  Divider,
+  IconButton,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  CircularProgress,
-  Box,
-  Divider,
+  Menu,
+  MenuItem,
+  Typography,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useNavigate } from "react-router-dom";
-import { setConversaionId } from "../../Features/MessageSlice";
 import { useDispatch } from "react-redux";
+import {
+  setConversaionId,
+  setCurrentlyConversingUserInformation,
+} from "../../Features/MessageSlice";
 
 const MessagedUsersList = ({ users }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const reference_id = localStorage.getItem("reference_id");
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const handleMoreClick = (event, user) => {
+    event.stopPropagation(); // Prevent list item click
+    setAnchorEl(event.currentTarget);
+    setSelectedUser(user);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+    setSelectedUser(null);
+  };
+
+  const handleDeleteUser = () => {
+    if (selectedUser) {
+      console.log("Deleting user:", selectedUser);
+      // TODO: Implement actual delete logic here
+      handleCloseMenu();
+    }
+  };
+
   const handleNavigateToChat = (user) => {
+    dispatch(setCurrentlyConversingUserInformation(user));
     navigate(
       `/${reference_id}/chat/${user?.conversation_id}/c/${user.reference_id}`
     );
   };
 
   return (
-    <Card
+    <Box
       sx={{
         maxWidth: "100%",
         margin: "auto",
-        p: 2,
-        cursor: "pointer",
         borderRadius: "0px",
+        bgcolor: "background.color",
       }}
     >
       <List>
@@ -45,6 +71,14 @@ const MessagedUsersList = ({ users }) => {
               <ListItem
                 onClick={() => handleNavigateToChat(user)}
                 alignItems="flex-start"
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    onClick={(e) => handleMoreClick(e, user)}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                }
               >
                 <ListItemAvatar>
                   <Avatar src={user.user_image}>
@@ -75,7 +109,18 @@ const MessagedUsersList = ({ users }) => {
             </React.Fragment>
           ))}
       </List>
-    </Card>
+
+      {/* Action Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleCloseMenu}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <MenuItem onClick={handleDeleteUser}>Delete</MenuItem>
+      </Menu>
+    </Box>
   );
 };
 

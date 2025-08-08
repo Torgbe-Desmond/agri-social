@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   Modal,
   Avatar,
@@ -9,15 +8,18 @@ import {
   CircularProgress,
 } from "@mui/material";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
-import { useDispatch, useSelector } from "react-redux";
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
-import { updateUserImage } from "../../Features/AuthSlice";
+import { useUpdateUserImageMutation } from "../../Features/userApi";
 
-const UpdateProfilePicModal = ({  user_image }) => {
+const UpdateProfilePicModal = ({ user_image }) => {
+  const dispatch = useDispatch();
   const [selectedImage, setSelectedImage] = useState(null);
   const [preview, setPreview] = useState(null);
-  const { userImageStatus } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+
+  const [updateUserImage, { isLoading, isSuccess, isError }] =
+    useUpdateUserImageMutation();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -27,22 +29,22 @@ const UpdateProfilePicModal = ({  user_image }) => {
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!selectedImage) return;
+
     const formData = new FormData();
     formData.append("file", selectedImage);
-    dispatch(updateUserImage({ formData }));
-  };
 
-  const handleClose = () => {
-    dispatch(popComponent());
-  };
-
-  useEffect(() => {
-    if (userImageStatus === "succeeded") {
+    try {
+      await updateUserImage(formData).unwrap();
+      dispatch(popComponent());
       window.location.reload();
+    } catch (err) {
+      console.error("Image upload failed:", err);
     }
-  }, [userImageStatus]);
+  };
+
+  const handleClose = () => dispatch(popComponent());
 
   return (
     <Modal open onClose={handleClose}>
@@ -90,24 +92,18 @@ const UpdateProfilePicModal = ({  user_image }) => {
           <Button
             color="secondary"
             variant="outlined"
-            sx={{
-              borderRadius: "32px !important",
-            }}
+            sx={{ borderRadius: "32px !important" }}
             onClick={handleClose}
           >
             Cancel
           </Button>
           <Button
-            className="sidebar__tweet__contained"
             variant="outlined"
+            className="sidebar__tweet__contained"
             onClick={handleUpload}
-            disabled={userImageStatus === "loading"}
+            disabled={isLoading || !selectedImage}
           >
-            {userImageStatus === "loading" ? (
-              <CircularProgress size={20} />
-            ) : (
-              "Upload"
-            )}
+            {isLoading ? <CircularProgress size={20} /> : "Upload"}
           </Button>
         </Box>
       </Box>

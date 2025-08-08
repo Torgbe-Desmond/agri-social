@@ -8,21 +8,19 @@ import { updatePostLike } from "../../Features/PostSlice";
 function FooterPost({ actions }) {
   const socket = useSocket();
   const dispatch = useDispatch();
-  const { userDetails } = useSelector((state) => state.auth);
-
 
   return (
     <Box className="post__footer">
       {actions.map((action, index) => (
         <PostStatusIcons
-          id={action.id}
+          id={action?.id}
           key={index}
-          location={action.location}
+          location={action?.location}
           to={action?.to}
           icon={action.icon}
           count={action?.count}
-          action={action.action}
-          status={action.status}
+          action={action?.action}
+          status={action?.status}
         />
       ))}
     </Box>

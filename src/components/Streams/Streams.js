@@ -4,43 +4,42 @@ import "./Stream.css";
 import VideoCard from "../../components/VideoCard/VideoCard";
 import Header from "../Header/Header";
 import { useDispatch, useSelector } from "react-redux";
-import { getStreams } from "../../Features/PostSlice";
-
-// Slide transition for Dialog
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+import { useGetStreamsQuery } from "../../Features/postApi";
+import { updateStreamList } from "../../Features/PostSlice";
 
 const Streams = () => {
   const [open, setOpen] = useState(true); // Full-screen dialog starts open
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  const { streamData, hasMoreStreams, streamStatus } = useSelector(
-    (state) => state.post
-  );
   const [pageNumber, setPageNumber] = useState(1);
   const dispatch = useDispatch();
+  const { streamData } = useSelector((state) => state.post);
   const observer = useRef();
+
+  const { data, isLoading, isFetching, error } = useGetStreamsQuery({
+    offset: pageNumber,
+    limit: 10,
+  });
+
+  const hasMoreStreams = data?.posts.length > 0;
+
+  console.log("data", data);
+
+  useEffect(() => {
+    if (Array.isArray(data?.posts)) {
+      dispatch(updateStreamList({ streamData: data.posts }));
+    }
+  }, [dispatch, data?.posts]);
 
   // Toggle the full-screen dialog
   const handleToggleDialog = () => {
     setOpen(!open);
   };
 
-  useEffect(() => {
-    dispatch(
-      getStreams({
-        user_id: localStorage.getItem("cc_ft"),
-        offset: pageNumber,
-        limit: 3,
-      })
-    );
-  }, [pageNumber]);
-
   // Filter data based on search term
   useEffect(() => {
     const searchedData = searchTerm
-      ? streamData.filter((video) =>
+      ? streamData?.filter((video) =>
           video.username.toLowerCase().includes(searchTerm.toLowerCase())
         )
       : streamData;
@@ -53,7 +52,7 @@ const Streams = () => {
         observer.current.disconnect();
       }
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMoreStreams) {
+        if (entries[0].isIntersecting && hasMoreStreams && !isFetching) {
           setPageNumber((prev) => prev + 1);
         }
       });
@@ -70,8 +69,8 @@ const Streams = () => {
       }}
       className="list-container"
     >
-      {filteredData.map((file, index) => {
-        const isLast = index === streamData.length - 1;
+      {filteredData?.map((file, index) => {
+        const isLast = index === streamData?.length - 1;
         return (
           <div
             ref={isLast ? lasStreamRef : null}

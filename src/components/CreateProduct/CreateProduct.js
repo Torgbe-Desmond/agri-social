@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Modal,
   Box,
@@ -8,11 +8,13 @@ import {
   Stack,
   IconButton,
   CircularProgress,
+  Alert,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { createProduct } from "../../Features/ProductSlice";
+import { useCreateProductMutation } from "../../Features/productApi";
+import { addNewProduct } from "../../Features/ProductSlice";
 
 const style = {
   position: "absolute",
@@ -26,20 +28,20 @@ const style = {
   p: 4,
 };
 
-const CreateProduct = ({ open, onSubmit }) => {
+const CreateProduct = () => {
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    images: [], // store image files
+    images: [],
     price: "",
     oldPrice: "",
     unit: "",
   });
-
-  const dispatch = useDispatch();
   const [imagePreviews, setImagePreviews] = useState([]);
-  const { userDetails } = useSelector((state) => state.auth);
-  const { createProductStatus } = useSelector((state) => state.product);
+  const [createProduct, { isLoading, isSuccess, error }] =
+    useCreateProductMutation();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,24 +50,20 @@ const CreateProduct = ({ open, onSubmit }) => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-
-    const newPreviews = files.map((file) => ({
+    const previews = files.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
     }));
-
     setFormData((prev) => ({
       ...prev,
       images: [...prev.images, ...files],
     }));
-
-    setImagePreviews((prev) => [...prev, ...newPreviews]);
+    setImagePreviews((prev) => [...prev, ...previews]);
   };
 
   const handleRemoveImage = (index) => {
     const updatedImages = [...formData.images];
     const updatedPreviews = [...imagePreviews];
-
     updatedImages.splice(index, 1);
     updatedPreviews.splice(index, 1);
 
@@ -73,27 +71,31 @@ const CreateProduct = ({ open, onSubmit }) => {
     setImagePreviews(updatedPreviews);
   };
 
-  const handleFormSubmit = () => {
+  const handleFormSubmit = async () => {
     const productData = new FormData();
-    productData.append("title", formData?.title);
-    productData.append("description", formData?.description);
-    productData.append("price", formData?.price);
-    productData.append("oldPrice", formData?.oldPrice);
-    productData.append("unit", formData?.unit);
-    for (let i = 0; i < formData.images.length; i++) {
-      productData.append("files", formData?.images[i]);
+    productData.append("title", formData.title);
+    productData.append("description", formData.description);
+    productData.append("price", formData.price);
+    productData.append("oldPrice", formData.oldPrice);
+    productData.append("unit", formData.unit);
+    formData.images.forEach((img) => productData.append("files", img));
+
+    try {
+      const payload = await createProduct({ formData: productData }).unwrap();
+      dispatch(addNewProduct({ payload }));
+      setFormData({
+        title: "",
+        description: "",
+        images: [],
+        price: "",
+        oldPrice: "",
+        unit: "",
+      });
+      setImagePreviews([]);
+      dispatch(popComponent());
+    } catch (err) {
+      console.error("Product creation failed:", err);
     }
-    dispatch(createProduct({ formData: productData }));
-    // Reset form
-    // setFormData({
-    //   title: "",
-    //   description: "",
-    //   images: [],
-    //   price: "",
-    //   oldPrice: "",
-    //   unit: "",
-    // });
-    // setImagePreviews([]);
   };
 
   const handleClose = () => {
@@ -101,36 +103,38 @@ const CreateProduct = ({ open, onSubmit }) => {
   };
 
   return (
-    <Modal open={true}>
+    <Modal open>
       <Box sx={style}>
         <Typography variant="h6" gutterBottom>
           Create New Product
         </Typography>
 
         <Stack spacing={2}>
+          {error && (
+            <Alert severity="error">
+              {error?.data?.message ||
+                "Something went wrong while creating product."}
+            </Alert>
+          )}
+
           <TextField
-            disabled={createProductStatus === "loading"}
             label="Title"
             name="title"
             value={formData.title}
             onChange={handleChange}
             fullWidth
+            disabled={isLoading}
           />
           <TextField
-            disabled={createProductStatus === "loading"}
             label="Description"
             name="description"
             value={formData.description}
             onChange={handleChange}
             fullWidth
+            disabled={isLoading}
           />
 
-          <Button
-            disabled={createProductStatus === "loading"}
-            className="sidebar__tweet__contained"
-            variant="outlined"
-            component="label"
-          >
+          <Button variant="outlined" component="label" disabled={isLoading}>
             Upload Images
             <input
               type="file"
@@ -165,16 +169,16 @@ const CreateProduct = ({ open, onSubmit }) => {
                     }}
                   />
                   <IconButton
-                    disabled={createProductStatus === "loading"}
                     size="small"
                     onClick={() => handleRemoveImage(idx)}
                     sx={{
                       position: "absolute",
-                      top: 10,
-                      right: 10,
+                      top: 5,
+                      right: 5,
                       bgcolor: "#fff",
                       boxShadow: 1,
                     }}
+                    disabled={isLoading}
                   >
                     <DeleteIcon fontSize="small" />
                   </IconButton>
@@ -189,7 +193,7 @@ const CreateProduct = ({ open, onSubmit }) => {
             value={formData.price}
             onChange={handleChange}
             fullWidth
-            disabled={createProductStatus === "loading"}
+            disabled={isLoading}
           />
           <TextField
             label="Old Price"
@@ -197,40 +201,34 @@ const CreateProduct = ({ open, onSubmit }) => {
             value={formData.oldPrice}
             onChange={handleChange}
             fullWidth
-            disabled={createProductStatus === "loading"}
+            disabled={isLoading}
           />
           <TextField
             label="Unit"
             name="unit"
-            disabled={createProductStatus === "loading"}
             value={formData.unit}
             onChange={handleChange}
             fullWidth
+            disabled={isLoading}
           />
 
           <Stack direction="row" justifyContent="flex-end" spacing={1}>
             <Button
-              sx={{
-                borderRadius: "32px !important",
-              }}
-              disabled={createProductStatus === "loading"}
               variant="outlined"
               color="secondary"
               onClick={handleClose}
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            {createProductStatus === "loading" ? (
-              <CircularProgress />
-            ) : (
-              <Button
-                className="sidebar__tweet__contained"
-                onClick={handleFormSubmit}
-                variant="outlined"
-              >
-                Save
-              </Button>
-            )}
+            <Button
+              onClick={handleFormSubmit}
+              variant="outlined"
+              className="sidebar__tweet__contained"
+              disabled={isLoading}
+            >
+              {isLoading ? <CircularProgress size={20} /> : "Save"}
+            </Button>
           </Stack>
         </Stack>
       </Box>

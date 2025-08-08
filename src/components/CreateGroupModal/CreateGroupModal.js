@@ -14,6 +14,7 @@ import { popComponent } from "../../Features/StackSlice";
 import { createGroup } from "../../Features/MessageSlice";
 import ImageIcon from "@mui/icons-material/Image";
 import CloseIcon from "@mui/icons-material/Close";
+import { useCreateGroupMutation } from "../../Features/messageApi";
 
 const modalStyle = {
   position: "absolute",
@@ -33,6 +34,7 @@ const CreateGroupModal = () => {
   const [media, setMedia] = useState(null);
   const [file, setFile] = useState(null);
   const dispatch = useDispatch();
+  const [createGroup, { isLoading, isError, error }] = useCreateGroupMutation();
 
   const handleMediaUpload = (event, type) => {
     const file = event.target.files[0];
@@ -50,7 +52,7 @@ const CreateGroupModal = () => {
     setMedia(null);
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!groupName.trim()) return;
 
     const formData = new FormData();
@@ -58,7 +60,7 @@ const CreateGroupModal = () => {
     formData.append("description", description.trim());
     formData.append("is_group", "1");
 
-    dispatch(createGroup({ formData }));
+    const payload = await createGroup({ formData });
     dispatch(popComponent());
   };
 

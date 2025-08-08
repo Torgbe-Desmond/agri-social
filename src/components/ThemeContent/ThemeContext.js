@@ -48,7 +48,7 @@ const AppDarkTheme = createTheme({
   palette: {
     mode: "dark",
     background: {
-      default: "rgb(3, 13, 18)",
+      default: "#000",
       paper: "rgb(31, 33, 34)",
     },
      primary: {

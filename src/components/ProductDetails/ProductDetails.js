@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./ProductDetails.css";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import {
   Box,
   TextField,
@@ -18,28 +16,35 @@ import {
   Phone as PhoneIcon,
   Send as SendIcon,
 } from "@mui/icons-material";
-import { fetchProduct } from "../../Features/ProductSlice";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useGetProductQuery } from "../../Features/productApi";
 
 function ProductDetails() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { product_id } = useParams();
-  const observer = useRef();
-  const dispatch = useDispatch();
-  const { user_id, darkMode, systemPrefersDark } = useOutletContext();
-  const { product, loading } = useSelector((state) => state.product);
   const navigate = useNavigate();
+  const { systemPrefersDark } = useOutletContext();
 
-  useEffect(() => {
-    if (product_id) {
-      dispatch(fetchProduct({ product_id }));
-    }
-  }, [product_id, dispatch]);
+  const {
+    data: product,
+    isLoading,
+    isFetching,
+  } = useGetProductQuery({ product_id }, { skip: !product_id });
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   const handlePrev = () => {
     setSelectedIndex((prev) =>
-      prev === 0 ? (product?.product_images?.length || 1) - 1 : prev - 1
+      prev === 0 ? (renderImages(product?.product_images)?.length || 1) - 1 : prev - 1
     );
+  };
+
+  const handleNext = () => {
+    const length = renderImages(product?.product_images)?.length || 1;
+    setSelectedIndex((prev) => (prev === length - 1 ? 0 : prev + 1));
   };
 
   const renderImages = (images) => {
@@ -48,16 +53,7 @@ function ProductDetails() {
       : [];
   };
 
-  const handleNext = () => {
-    let imagesLength = product?.product_images?.split(",");
-    setSelectedIndex((prev) =>
-      prev === (imagesLength.length || 1) - 1 ? 0 : prev + 1
-    );
-  };
-
-  const handleGoBack = () => {
-    navigate(-1);
-  };
+  const imagesArray = renderImages(product?.product_images);
 
   return (
     <Box className="profile">
@@ -66,29 +62,25 @@ function ProductDetails() {
           <ArrowBackIcon cursor="pointer" onClick={handleGoBack} /> Product
         </h2>
       </Box>
-      {loading === "loading" ? (
+
+      {isLoading || isFetching ? (
         <div className="product_progress">
           <CircularProgress />
         </div>
       ) : (
-        <Box
-          sx={{
-            overflow: "hidden",
-            fontFamily: "sans-serif",
-          }}
-        >
-          {/* Main Image with Carousel Controls */}
+        <Box sx={{ overflow: "hidden", fontFamily: "sans-serif" }}>
+          {/* Image Carousel */}
           <Box position="relative">
             <img
               src={
-                renderImages(product?.product_images)[selectedIndex] ||
+                imagesArray[selectedIndex] ||
                 "https://via.placeholder.com/600x320?text=No+Image"
               }
               alt="product"
               style={{ width: "100%", height: 320, objectFit: "cover" }}
             />
 
-            {renderImages(product?.product_images).length > 1 && (
+            {imagesArray.length > 1 && (
               <>
                 <IconButton
                   onClick={handlePrev}
@@ -118,7 +110,7 @@ function ProductDetails() {
 
           {/* Thumbnails */}
           <Stack direction="row" spacing={1} justifyContent="center" py={1}>
-            {product?.product_images.split(",")?.map((img, index) => (
+            {imagesArray.map((img, index) => (
               <Avatar
                 key={index}
                 src={img}
@@ -139,37 +131,34 @@ function ProductDetails() {
 
           {/* Product Info */}
           <Box px={2} pb={2}>
-            {/* Phone */}
             {product?.contact && (
               <Stack direction="row" alignItems="center" spacing={1} mt={1}>
                 <PhoneIcon fontSize="small" />
-                <Typography variant="body2">{product?.contact}</Typography>
+                <Typography variant="body2">{product.contact}</Typography>
               </Stack>
             )}
 
-            {/* Location */}
             {product?.city && (
               <Stack direction="row" alignItems="center" spacing={1} mt={1}>
                 <LocationOnIcon fontSize="small" />
-                <Typography variant="body2">{product?.city}</Typography>
+                <Typography variant="body2">{product.city}</Typography>
               </Stack>
             )}
           </Box>
         </Box>
       )}
 
-      {/* Sticky Bottom Input */}
+      {/* Sticky Bottom Review Input */}
       <Box
-        sx={systemPrefersDark ? { p: 1 } : { p: 1 }}
+        sx={{ p: 1 }}
         display="flex"
         position="sticky"
         bottom="0"
         zIndex="100"
         gap={1}
         alignItems="center"
-        pt={1}
-        // borderTop="1px solid #ddd"
-        // bgcolor={systemPrefersDark ? darkMode.background : "#FFF"}
+        bgcolor={systemPrefersDark ? "background.paper" : "#FFF"}
+        borderTop="1px solid #ddd"
       >
         <TextField
           fullWidth

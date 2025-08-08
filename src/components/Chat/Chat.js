@@ -1,11 +1,16 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useOutletContext } from "react-router-dom";
 import {
   clearMessages,
   getConversation,
-  getdMessages,
   sendMessage,
 } from "../../Features/MessageSlice";
 import { useSocket } from "../Socket/Socket";
@@ -14,39 +19,43 @@ import ChatMessageList from "./ChatMessageList";
 import ChatInput from "./ChatInput";
 import ImagePreview from "./ImagePreview";
 import "./Chat.css";
+import {
+  useGetMessagesQuery,
+  useSendMessageMutation,
+} from "../../Features/messageApi";
 
 function Chat() {
-  const { userDetails } = useSelector((state) => state.auth);
-  const { predictionStatus, prediction } = useSelector(
-    (state) => state.prediction
-  );
-  const { getConversationStatus, messages } = useSelector(
-    (state) => state.message
-  );
+  const { user } = useOutletContext();
   const [chatMessages, setChatMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const scrollAnchorRef = useRef(null);
-
   const socket = useSocket();
   const dispatch = useDispatch();
   const { darkMode, systemPrefersDark } = useOutletContext();
   const { conversation_id, recipient_id } = useParams();
+  const [sendMessage, { error: sendMessageError, isLoading:sendMessageLoading }] = useSendMessageMutation();
+  const { currentlyConversingUser } = useSelector((state) => state.message);
+  const [media, setMedia] = useState([]);
+  const [v_media, setVMedia] = useState([]);
+  const [file, setFile] = useState([]);
+  const [mediaType, setMediaType] = useState(null);
 
   useEffect(() => {
     return () => dispatch(clearMessages());
   }, []);
 
+  const { data, isFetching, isSuccess, isLoading, error } =
+    useGetMessagesQuery(conversation_id);
+
+  const messages = useMemo(() => {
+    return Array.isArray(data) ? data : [];
+  }, [data]);
+
   useEffect(() => {
     setChatMessages(messages);
   }, [messages]);
-
-  useEffect(() => {
-    if (conversation_id) {
-      dispatch(getdMessages({ conversation_id }));
-    }
-  }, [conversation_id]);
 
   useEffect(() => {
     if (scrollAnchorRef.current) {
@@ -54,29 +63,49 @@ function Chat() {
     }
   }, [chatMessages]);
 
-  const handleSend = () => {
-    if (!files || !message) return;
+  const handleMediaUpload = (event, type) => {
+    const selectedFiles = event.target.files;
+    if (selectedFiles.length) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (type === "image") {
+          setMedia((prev) => [...prev, reader.result]);
+        } else {
+          setVMedia((prev) => [...prev, reader.result]);
+        }
+      };
+      reader.readAsDataURL(selectedFiles[0]);
+      setFile((prev) => [...prev, selectedFiles[0]]);
+      setMediaType(type);
+    }
+  };
+
+  const handleSend = async () => {
+    if (!message) return;
 
     const formData = new FormData();
-    const member_ids = [recipient_id, userDetails?.refernce_id];
+    const member_ids = [recipient_id, user?.refernce_id];
     formData.append("member_ids", member_ids);
     formData.append("content", message);
+    file.forEach((file) => formData.append("files", file));
     if (conversation_id) formData.append("conversation_id", conversation_id);
-    dispatch(sendMessage({ formData }));
+
+    const payload = await sendMessage({ formData }).unwrap();
 
     setChatMessages((prev) => [
       ...prev,
       {
-        sender_id: userDetails?.id,
+        sender_id: payload?.id,
         conversation_id,
-        image: files,
-        content: message,
-        profilePicture: userDetails?.user_image || "/user-avatar.png",
+        images: payload?.vidoes || null,
+        videos: payload?.images || null,
+        content: payload?.content,
+        profilePicture: user?.user_image || "/user-avatar.png",
       },
     ]);
 
     setMessage("");
-    setFiles([]);
+    setFile([]);
     setUploadedFiles([]);
   };
 
@@ -89,14 +118,11 @@ function Chat() {
           sender_id: data?.sender_id,
           conversation_id: data?.conversation_id,
           content: data?.content,
-          profilePicture: "/user-avatar.png",
+          image_urls: data?.image_urls,
+          video_urls: data?.video_urls,
+          profilePicture: data?.user_image,
         },
       ]);
-      // "id": str(row.id),
-      // "conversation_id": str(row.conversation_id),
-      // "sender_id": str(row.sender_id),
-      // "content": row.content,
-      // "created_at": row.created_at.isoformat(),
     });
   }, [socket]);
 
@@ -123,19 +149,31 @@ function Chat() {
 
   return (
     <Box className="chat">
-      <ChatHeader userImage={userDetails?.user_image} onlineStatus={socket} />
+      <ChatHeader
+        userImage={currentlyConversingUser?.user_image}
+        userId={currentlyConversingUser?.user_id}
+        name={currentlyConversingUser?.username}
+        onlineStatus={socket}
+      />
       <ChatMessageList
         messages={chatMessages}
-        userDetails={userDetails}
+        userDetails={user}
         systemPrefersDark={systemPrefersDark}
         scrollRef={scrollAnchorRef}
       />
-      <ImagePreview
-        files={files}
-        setFiles={setFiles}
-        setUploadedFiles={setUploadedFiles}
-      />
+      {/* <ImagePreview
+        files={file}
+      /> */}
       <ChatInput
+        setFile={setFile}
+        media={media}
+        file={file}
+        sendMessageLoading={sendMessageLoading}
+        v_media={v_media}
+        handleMediaUpload={handleMediaUpload}
+        setVMedia={setVMedia}
+        mediaType={mediaType}
+        setMedia={setMedia}
         message={message}
         setMessage={setMessage}
         handleSend={handleSend}

@@ -1,14 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Box } from "@mui/material";
-import {
-  addComment,
-  clearPost,
-  getComments,
-  getPost,
-} from "../../Features/PostSlice";
-import { clearComments, likeComment } from "../../Features/CommentSlice";
+import { addComment, clearPost, getPost } from "../../Features/PostSlice";
+import { clearComments } from "../../Features/CommentSlice";
 import { popComponent } from "../../Features/StackSlice";
 import "./PostComment.css";
 import Post from "../Post/Post";
@@ -17,194 +12,177 @@ import CommentChat from "../Comment/commentChat";
 import CommentReplyList from "../Comment/CommentReplyList";
 import ReplyIndicator from "../Comment/ReplyIndicator";
 import Comment_Header from "../Comment/Comment_Header";
+import {
+  useAddCommentMutation,
+  useGetCommentsQuery,
+} from "../../Features/commentApi";
+import { useGetPostQuery } from "../../Features/postApi";
+import { useError } from "../Errors/Errors";
 
 function PostComment() {
   const { post_id } = useParams();
-  const [tabIndex, setTabIndex] = useState(0);
-  const [pageNumber, setPageNumber] = useState(1);
-  const observer = useRef();
   const dispatch = useDispatch();
-  const { userDetails } = useSelector((state) => state.auth);
+  const { darkMode, systemPrefersDark, user } = useOutletContext();
+  const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const [addLocalComment, setAddLocalComment] = useState([]);
-  const [data, setData] = useState(null);
-  const commentsEndRef = useRef(null);
-  const [togetherComments, setTogetherComments] = useState([]);
-  const { darkMode, systemPrefersDark } = useOutletContext();
+  const [media, setMedia] = useState([]);
+  const [file, setFile] = useState([]);
+  const [mediaType, setMediaType] = useState(null);
   const [emojiAnchor, setEmojiAnchor] = useState(null);
   const chatContainerRef = useRef(null);
+  const [v_media, setVMedia] = useState([]);
   const scrollAnchorRef = useRef(null);
-  const navigate = useNavigate();
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [allComments, setAllComments] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const { message, setMessage } = useError();
 
-  const { post, singlePostStatus, scrollTo } = useSelector(
-    (state) => state.post
-  );
+  const [addCommentMutation, { isLoading: isAddingComment }] =
+    useAddCommentMutation();
+  const { data: post, isLoading: singlePostStatus } = useGetPostQuery(post_id, {
+    skip: !post_id,
+  });
 
+  // Fetch comments using RTK Query
   const {
-    comments: commentData,
-    likeCommentStatus,
-    commentStatus,
-  } = useSelector((state) => state.comment);
+    data = {},
+    isLoading: commentsLoading,
+    isError,
+    isFetching: isFetchingReplies,
+    refetch: refetchReplies,
+    error: commentsError,
+  } = useGetCommentsQuery(post_id, {
+    skip: !post_id,
+  });
 
   useEffect(() => {
-    if (post_id) {
-      dispatch(getPost({ post_id }))
-        .unwrap()
-        .then(() => {
-          if (post_id) {
-            const postEl = document.querySelector(`#post-${post_id}`);
-            if (!post_id || !postEl) return;
-
-            const hasImage = postEl.querySelector(
-              ".post__images .post_media img"
-            );
-
-            if (hasImage) {
-              console.log("has image");
-              hasImage.style.display = "flex";
-            }
-            dispatch(getComments({ post_id }));
-          }
-        })
-        .catch((error) => {
-          // ❌ Failure logic here
-          console.error("Failed to save post:", error);
-        });
+    if (isError && commentsError?.data?.detail) {
+      setMessage(commentsError.data.detail);
     }
-  }, []);
+  }, [isError, commentsError, setMessage]);
 
+  const { comments = [], numb_found = 0 } = data;
+
+  // Combine server comments and local added comments
   useEffect(() => {
-    // if (post_id) {
-    //   dispatch(getComments({ post_id }));
-    // }
-    return () => {
-      dispatch(clearComments());
-      dispatch(clearPost());
-      setTogetherComments([]);
-      setAddLocalComment([]);
-    };
-  }, [dispatch]);
-
-  useEffect(() => {
-    setTogetherComments([...commentData, ...addLocalComment]);
-  }, [addLocalComment, commentData]);
-
-  const onEmojiSelect = (emoji) => {
-    setComment((prev) => prev + emoji.native);
-  };
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (scrollAnchorRef.current) {
-        scrollAnchorRef.current.scrollIntoView({
-          behavior: "smooth",
-          ininline: "end",
-        });
-      }
-    }, 10);
-  }, [addLocalComment]);
-
-  const handleAddComment = () => {
-    if (comment.trim()) {
-      // "id": str(row.id),
-      //       "post_id": str(row.post_id),
-      //       "user_id": str(row.user_id),
-      //       "likes": row.likes,
-      //       "username": row.username,
-      //       "content": row.content,
-      //       "replies": row.replies,
-      //       "created_at": row.created_at,
-      //       "user_image": row.user_image,
-      //       "liked":row.liked,
-      //       "parent_id": str(row.parent_id) if row.parent_id else None,
-
-      const formData = new FormData();
-      formData.append("content", comment);
-      formData.append("post_owner", post?.user_id);
-      dispatch(addComment({ post_id, formData }))
-        .unwrap()
-        .then((payload) => {
-          const { id, post_id, user_id, content, created_at } = payload;
-          const newCommentMessage = {
-            id,
-            post_id,
-            user_id,
-            content,
-            created_at,
-            likes: 0,
-            user_image: userDetails?.user_image,
-            username: userDetails?.username,
-          };
-          setAddLocalComment((prev) => [...prev, newCommentMessage]);
-          setComment("");
-        });
+    if (comments.length > 0) {
+      const togetherComments = [...comments, ...addLocalComment];
+      setAllComments((prev) => [...prev, ...togetherComments]);
     }
-  };
+  }, [comments, addLocalComment]);
 
-  const openEmojiPicker = (e) => setEmojiAnchor(e.currentTarget);
-  const closeEmojiPicker = () => setEmojiAnchor(null);
-
-  const handleClose = () => {
-    dispatch(popComponent());
-  };
-
-  //   const lastPostRef = useCallback(
-  //     (node) => {
-  //       if (observer.current) observer.current.disconnect();
-  //       observer.current = new IntersectionObserver((entries) => {
-  //         if (entries[0].isIntersecting && hasMore) {
-  //           setPageNumber((prev) => prev + 1);
-  //         }
-  //       });
-  //       if (node) observer.current.observe(node);
-  //     },
-  //     [hasMore]
-  //   );
-
-  // Scroll to bottom when chatMessages change
-
+  // Scroll to bottom when new local comment added
   useEffect(() => {
     if (scrollAnchorRef.current) {
       scrollAnchorRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [addLocalComment]);
 
-  const handleTabChange = (event, newValue) => {
-    setTabIndex(newValue);
+  const onEmojiSelect = (emoji) => {
+    setComment((prev) => prev + emoji.native);
   };
 
-  useEffect(() => {
-    if (scrollTo) {
-      const el = document.getElementById(`post-${scrollTo}`);
-      if (el) {
-        el.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-          inline: "nearest",
-        });
-
-        el.classList.add("highlight-blink");
-
-        const timeoutId = setTimeout(() => {
-          el.classList.remove("highlight-blink");
-        }, 2000);
-
-        return () => clearTimeout(timeoutId);
-      }
+  const handleMediaUpload = (event, type) => {
+    const selectedFiles = event.target.files;
+    if (selectedFiles.length) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (type === "image") {
+          setMedia((prev) => [...prev, reader.result]);
+        } else {
+          setVMedia((prev) => [...prev, reader.result]);
+        }
+      };
+      reader.readAsDataURL(selectedFiles[0]);
+      setFile((prev) => [...prev, selectedFiles[0]]);
+      setMediaType(type);
     }
-  }, [togetherComments, scrollTo]);
+  };
 
-  // if (commentStatus === "loading") {
-  //   return (
-  //     <p className="circular__progress">
-  //       <CircularProgress size="small" />
-  //     </p>
-  //   );
-  // }
+  const handleAddComment = async () => {
+    if (!comment.trim()) return;
+
+    const formData = new FormData();
+    formData.append("content", comment);
+    formData.append("post_owner", post?.user_id ?? "");
+    file.forEach((file) => formData.append("files", file));
+    if (selectedTags) {
+      formData.append("tags", selectedTags.join(","));
+    }
+    if (mediaType === "video") formData.append("has_video", 1);
+    if (mediaType === "image") formData.append("has_video", 0);
+
+    try {
+      const payload = await addCommentMutation({ post_id, formData }).unwrap();
+
+      const {
+        id,
+        post_id: payloadPostId,
+        user_id,
+        videos,
+        images,
+        content: payloadContent,
+        created_at,
+      } = payload;
+
+      const newComment = {
+        id,
+        post_id: payloadPostId,
+        user_id,
+        content: payloadContent,
+        images,
+        videos,
+        created_at,
+        likes: 0,
+        user_image: user?.user_image,
+        username: user?.username,
+      };
+
+      setAddLocalComment((prev) => [...new Set([...prev, newComment])]);
+      setComment("");
+      setFile([]);
+      setMedia([]);
+      setVMedia([]);
+      setSelectedTags([]);
+      // refetchReplies();
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+      // Handle error UI if needed
+    }
+  };
+
+  const openEmojiPicker = (e) => setEmojiAnchor(e.currentTarget);
+  const closeEmojiPicker = () => setEmojiAnchor(null);
+
+  const toggleDrawer = (value) => () => setOpenDrawer(value);
+
+  const handleClose = () => {
+    dispatch(popComponent());
+  };
 
   const handleGoBack = () => {
     navigate(-1);
   };
+
+  // useEffect(() => {
+  //   if (scrollTo) {
+  //     const el = document.getElementById(`post-${scrollTo}`);
+  //     if (el) {
+  //       el.scrollIntoView({
+  //         behavior: "smooth",
+  //         block: "center",
+  //         inline: "nearest",
+  //       });
+  //       el.classList.add("highlight-blink");
+  //       const timeoutId = setTimeout(
+  //         () => el.classList.remove("highlight-blink"),
+  //         2000
+  //       );
+  //       return () => clearTimeout(timeoutId);
+  //     }
+  //   }
+  // }, [togetherComments, scrollTo]);
 
   return (
     <Box className="post__comment">
@@ -216,23 +194,37 @@ function PostComment() {
 
       <Post post={post} />
 
-      {togetherComments.length > 0 && <ReplyIndicator />}
+      {allComments.length > 0 && <ReplyIndicator />}
 
       <CommentReplyList
+        isFetchingReplies={isFetchingReplies}
+        refetchReplies={refetchReplies}
+        commentsLoading={commentsLoading}
         chatContainerRef={chatContainerRef}
-        commentReplies={togetherComments}
+        commentReplies={allComments}
         scrollAnchorRef={scrollAnchorRef}
       />
 
       <CommentChat
         message={comment}
+        setFile={setFile}
+        media={media}
+        file={file}
+        setMedia={setMedia}
+        v_media={v_media}
         setMessage={setComment}
+        mediaType={mediaType}
+        setSelectedTags={setSelectedTags}
+        setVMedia={setVMedia}
+        handleMediaUpload={handleMediaUpload}
+        openDrawer={openDrawer}
         handleAddComment={handleAddComment}
         systemPrefersDark={systemPrefersDark}
         emojiAnchor={emojiAnchor}
         closeEmojiPicker={closeEmojiPicker}
         onEmojiSelect={onEmojiSelect}
         openEmojiPicker={openEmojiPicker}
+        toggleDrawer={toggleDrawer}
       />
 
       <EmojiPickerPopover

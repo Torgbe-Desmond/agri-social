@@ -8,12 +8,9 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  clearPrediction,
-  deletePrediction,
-  setPredictionToIdle,
-} from "../../Features/PredictionSlice";
+import { removeDeletePrediction } from "../../Features/PredictionSlice";
 import { popComponent } from "../../Features/StackSlice";
+import { useDeletePredictionMutation } from "../../Features/predictionApi";
 
 const style = {
   position: "absolute",
@@ -28,26 +25,22 @@ const style = {
 };
 
 const DeletePredictionModal = ({ predictionId }) => {
-  const { deletePredictionStatus } = useSelector((state) => state.prediction);
   const dispatch = useDispatch();
+  const [deletePrediction, { isLoading }] = useDeletePredictionMutation();
 
-  const handlePredictionDelete = () => {
-    if (predictionId) {
-      dispatch(deletePrediction({ prediction_id: predictionId }));
-    }
+  const handlePredictionDelete = async () => {
+    const payload = await deletePrediction({
+      prediction_id: predictionId,
+    }).unwrap();
+    dispatch(removeDeletePrediction({ payload }));
+    dispatch(popComponent());
   };
 
   useEffect(() => {
-    if (deletePredictionStatus === "succeeded") {
+    if (isLoading) {
       dispatch(popComponent());
     }
-  }, [deletePredictionStatus, dispatch]);
-
-  useEffect(() => {
-    return () => {
-      dispatch(setPredictionToIdle());
-    };
-  }, [dispatch]);
+  }, [isLoading, dispatch]);
 
   return (
     <Modal open={true}>
@@ -66,12 +59,12 @@ const DeletePredictionModal = ({ predictionId }) => {
               borderRadius: "32px !important",
             }}
             color="secondary"
-            disabled={deletePredictionStatus === "loading"}
+            disabled={isLoading}
             onClick={() => dispatch(popComponent())}
           >
             Cancel
           </Button>
-          {deletePredictionStatus === "loading" ? (
+          {isLoading ? (
             <CircularProgress />
           ) : (
             <Button

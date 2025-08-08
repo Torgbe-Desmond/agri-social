@@ -5,7 +5,7 @@ import ComponentStack from "../HandleStack/HandleStack";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../Header/Header";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
-import { clearGroups, getGroupConversation } from "../../Features/MessageSlice";
+// import { clearGroups, getGroupConversation } from "../../Features/MessageSlice";
 
 const Group = () => {
   const handleJoin = () => {
@@ -44,13 +44,13 @@ const Group = () => {
   //   },
   // ];
 
-  useEffect(() => {
-    const formData = new FormData();
-    formData.append("user_id", localStorage.getItem("cc_ft"));
-    dispatch(getGroupConversation({ formData }));
+  // useEffect(() => {
+  //   const formData = new FormData();
+  //   formData.append("user_id", localStorage.getItem("cc_ft"));
+  //   dispatch(getGroupConversation({ formData }));
 
-    return () => dispatch(clearGroups());
-  }, []);
+  //   return () => dispatch(clearGroups());
+  // }, []);
 
   const handleCreateGroup = () => {
     const stack = new ComponentStack(dispatch);

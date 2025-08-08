@@ -26,10 +26,8 @@ function Sidebar() {
   const location = useLocation();
   const dispatch = useDispatch();
   const socket = useSocket();
-  const { userDetails } = useSelector((state) => state.auth);
-  const [notifyCounts, setNotifyCount] = useState(
-    userDetails?.notification_count
-  );
+  // const { userDetails } = useSelector((state) => state.auth);
+  const [notifyCounts, setNotifyCount] = useState(0);
   const reference_id = localStorage.getItem("reference_id");
 
   useEffect(() => {
@@ -44,22 +42,22 @@ function Sidebar() {
     window.location.reload();
   };
 
-  useEffect(() => {
-    if (!socket) return;
+  // useEffect(() => {
+  //   if (!socket) return;
 
-    const handleNoficationCount = (data) => {
-      const { notification_count } = data;
-      console.log("notification_count", notification_count);
+  //   const handleNoficationCount = (data) => {
+  //     const { notification_count } = data;
+  //     console.log("notification_count", notification_count);
 
-      setNotifyCount(notification_count);
-    };
+  //     setNotifyCount(notification_count);
+  //   };
 
-    socket.on("notification_count", handleNoficationCount);
+  //   socket.on("notification_count", handleNoficationCount);
 
-    return () => {
-      socket.off("notification_count", handleNoficationCount);
-    };
-  }, [socket]);
+  //   return () => {
+  //     socket.off("notification_count", handleNoficationCount);
+  //   };
+  // }, [socket]);
 
   useEffect(() => {
     const page = location.pathname.split("/")[2];

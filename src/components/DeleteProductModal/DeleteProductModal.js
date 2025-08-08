@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   Box,
   Modal,
@@ -6,13 +5,13 @@ import {
   Button,
   Divider,
   CircularProgress,
-  Alert,
   Stack,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
-import { deletePost } from "../../Features/PostSlice";
-import { deleteProduct, handleStatus } from "../../Features/ProductSlice";
+import { useDeleteProductMutation } from "../../Features/productApi";
+import { removeDeletedProduct } from "../../Features/ProductSlice";
 
 const style = {
   position: "absolute",
@@ -27,54 +26,55 @@ const style = {
 };
 
 const DeleteProductModal = ({ product_id }) => {
-  const { deleteProductStatus } = useSelector((state) => state.product);
   const dispatch = useDispatch();
+  const [deleteProduct, { isLoading, isSuccess }] = useDeleteProductMutation();
 
   useEffect(() => {
-    if (deleteProductStatus === "succeeded") {
+    if (isSuccess) {
       dispatch(popComponent());
     }
-  }, [deleteProductStatus]);
+  }, [isSuccess]);
 
-  useEffect(() => {
-    return () => dispatch(handleStatus());
-  }, []);
-
-  const handlePostDelete = () => {
-    dispatch(deleteProduct({ product_id }));
+  const handleProductDelete = async () => {
+    try {
+      const payload = await deleteProduct(product_id).unwrap();
+      dispatch(removeDeletedProduct({ payload }));
+      dispatch(popComponent());
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+    }
   };
 
   return (
     <Modal open={true}>
       <Box sx={style}>
-        {/* Title */}
         <Typography variant="h6" gutterBottom>
           Delete
         </Typography>
         <Divider sx={{ mb: 2 }} />
-
         <Typography sx={{ mb: 2 }}>
-          Are you sure you want to delete this product ?
+          Are you sure you want to delete this product?
         </Typography>
-        {/* Action Buttons */}
+
         <Stack direction="row" spacing={2} justifyContent="flex-end">
           <Button
             color="secondary"
-            sx={{
-              borderRadius: "32px !important",
-            }}
+            sx={{ borderRadius: "32px !important" }}
             variant="outlined"
+            disabled={isLoading}
             onClick={() => dispatch(popComponent())}
           >
             Cancel
           </Button>
-          {deleteProductStatus === "loading" ? (
-            <CircularProgress />
+          {isLoading ? (
+            <CircularProgress size={24} />
           ) : (
             <Button
               className="sidebar__tweet__contained"
-              onClick={() => handlePostDelete()}
+              onClick={handleProductDelete}
               variant="outlined"
+              disabled={isLoading}
+              color="error"
             >
               Delete
             </Button>

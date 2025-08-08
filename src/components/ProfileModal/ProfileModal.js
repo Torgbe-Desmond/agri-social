@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
 import {
   Autocomplete,
   Avatar,
   Box,
   Button,
   Chip,
-  Grid,
   IconButton,
   InputAdornment,
   Modal,
@@ -13,76 +11,58 @@ import {
   TextField,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
-import { useDispatch } from "react-redux";
-import { popComponent } from "../../Features/StackSlice";
-import { updateUserInformation } from "../../Features/AuthSlice";
-import { useOutletContext } from "react-router-dom";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
+import { popComponent } from "../../Features/StackSlice";
 import ComponentStack from "../HandleStack/HandleStack";
+import { useUpdateUserInformationMutation } from "../../Features/userApi";
 
 const ProfileModal = ({ user, systemPrefersDark, darkMode }) => {
-  const [selectedInterests, setSelectedInterests] = useState([]);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const predefinedTags = [];
+  const [selectedTags, setSelectedTags] = useState(
+    user?.interests?.split(",") || []
+  );
 
-  const [userData, setUserData] = useState({
-    user_image: "",
-    firstname: "",
-    lastname: "",
-    username: "",
-    email: "",
-    city: "",
-    interests: "",
-  });
-
-  const interests = [""];
-
+  const [updateUserInformation, { isLoading }] = useUpdateUserInformationMutation(); 
   const dispatch = useDispatch();
 
-  // Populate initial user data
-  useEffect(() => {
-    if (user && Object.keys(user).length > 0) {
-      setUserData({
-        user_image: user.user_image || "",
-        firstname: user.firstname || "",
-        lastname: user.lastname || "",
-        username: user.username || "",
-        email: user.email || "",
-        city: user.city || "",
-        interests: user.interests || "",
-      });
-    }
-  }, [user]);
+  const [form, setForm] = useState({
+    firstname: user?.firstname || "",
+    lastname: user?.lastname || "",
+    username: user?.username || "",
+    email: user?.email || "",
+    city: user?.city || "",
+  });
 
   const handleChange = (field) => (event) => {
-    setUserData((prev) => ({
+    setForm((prev) => ({
       ...prev,
       [field]: event.target.value,
     }));
   };
 
-  const handleTagChange = (event, value) => {
-    if (event && (event.key === "Enter" || event.key === " ")) {
-    }
+  const handleTagChange = (_, value) => {
     setSelectedTags(value);
   };
 
-  const handleSave = () => {
-    const formData = new FormData();
-    if (userData.firstname) formData.append("firstname", userData.firstname);
-    if (userData.lastname) formData.append("lastname", userData.lastname);
-    if (userData.username) formData.append("username", userData.username);
-    if (userData.email) formData.append("email", userData.email);
-    if (userData.city) formData.append("city", userData.city);
-    if (userData.interests) formData.append("interests", userData.interests);
+  const handleSave = async () => {
+    try {
+      const formData = new FormData();
+      Object.entries(form).forEach(([key, val]) => {
+        if (val) formData.append(key, val);
+      });
+      if (selectedTags.length > 0) {
+        formData.append("interests", selectedTags.join(","));
+      }
 
-    dispatch(updateUserInformation({formData }));
-    dispatch(popComponent());
+      await updateUserInformation(formData).unwrap();
+      dispatch(popComponent());
+    } catch (err) {
+      console.error("Failed to update profile", err);
+    }
   };
 
-  const handlePopComponent = () => {
-    dispatch(popComponent());
-  };
+  const handlePopComponent = () => dispatch(popComponent());
 
   const updateProfileImage = () => {
     const stack = new ComponentStack(dispatch);
@@ -108,11 +88,12 @@ const ProfileModal = ({ user, systemPrefersDark, darkMode }) => {
         }}
       >
         <Stack spacing={3}>
+          {/* Avatar + Name */}
           <Stack direction="row" spacing={2} alignItems="center">
             <Box sx={{ position: "relative", mr: 3 }}>
               <Avatar
-                alt="Desmond"
-                src={userData?.user_image}
+                alt="User"
+                src={user?.user_image}
                 sx={{ width: 72, height: 72 }}
               />
               <IconButton
@@ -127,49 +108,49 @@ const ProfileModal = ({ user, systemPrefersDark, darkMode }) => {
                   p: 0.5,
                   "&:hover": { bgcolor: "darkblue" },
                 }}
-                size="small"
               >
                 <AddCircleIcon />
               </IconButton>
             </Box>
-            {/* <Avatar src={userData.user_image} sx={{ width: 64, height: 64 }} /> */}
             <Box>
               <TextField
                 fullWidth
                 label="Firstname"
-                value={userData.firstname}
+                value={form.firstname}
                 onChange={handleChange("firstname")}
                 margin="dense"
               />
               <TextField
                 fullWidth
                 label="Lastname"
-                value={userData.lastname}
+                value={form.lastname}
                 onChange={handleChange("lastname")}
                 margin="dense"
               />
             </Box>
           </Stack>
 
+          {/* City / Username */}
           <Stack direction="row" spacing={2}>
             <TextField
               fullWidth
               label="City"
-              value={userData.city}
+              value={form.city}
               onChange={handleChange("city")}
             />
             <TextField
               fullWidth
               label="Username"
-              value={userData.username}
+              value={form.username}
               onChange={handleChange("username")}
             />
           </Stack>
 
+          {/* Email */}
           <TextField
             fullWidth
             label="Email address"
-            value={userData.email}
+            value={form.email}
             onChange={handleChange("email")}
             InputProps={{
               startAdornment: (
@@ -179,57 +160,44 @@ const ProfileModal = ({ user, systemPrefersDark, darkMode }) => {
               ),
             }}
           />
-          <Box mt={2} sx={{ width: "100%" }}>
-            <Autocomplete
-              multiple
-              freeSolo
-              options={predefinedTags}
-              value={selectedTags}
-              onChange={handleTagChange}
-              sx={{
-                borderRadius: 1,
-                padding: "2px",
-              }}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    variant="outlined"
-                    label={option}
-                    {...getTagProps({ index })}
-                    key={index}
-                  />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Interests"
-                  placeholder="Add Interest (Press enter after each interest)"
-                  variant="outlined"
-                />
-              )}
-            />
-          </Box>
 
+          {/* Interests */}
+          <Autocomplete
+            multiple
+            freeSolo
+            options={[]}
+            value={selectedTags}
+            onChange={handleTagChange}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  variant="outlined"
+                  label={option}
+                  {...getTagProps({ index })}
+                  key={index}
+                />
+              ))
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Interests"
+                placeholder="Add interest and press enter"
+              />
+            )}
+          />
+
+          {/* Action Buttons */}
           <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button
-              sx={{
-                borderRadius: "32px !important",
-              }}
-              variant="outlined"
-              color="secondary"
-              onClick={handlePopComponent}
-            >
+            <Button variant="outlined" onClick={handlePopComponent}>
               Cancel
             </Button>
             <Button
-              elevation="none"
-              variant="outlined"
-              className="sidebar__tweet__contained"
-              color="primary"
+              variant="contained"
               onClick={handleSave}
+              disabled={isLoading}
             >
-              Save Changes
+              {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </Stack>
         </Stack>

@@ -1,30 +1,28 @@
-import React, { useEffect, useRef } from "react";
-import Avatar from "@mui/material/Avatar";
+import React from "react";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import RepeatIcon from "@mui/icons-material/Repeat";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-import StatusIcons from "../StatusIcons/StatusIcons";
-import { likeComment } from "../../Features/CommentSlice";
-import { useDispatch } from "react-redux";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { Box, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import HeaderPost from "../Post/HeaderPost";
 import BodyPost from "../Post/BodyPost";
 import FooterPost from "../Post/FooterPost";
-import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useLikeCommentMutation } from "../../Features/commentApi";
 
 function Replies({ reply }) {
-  const dispatch = useDispatch();
-  const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
   const navigate = useNavigate();
   const reference_id = localStorage.getItem("reference_id");
+  const [likeComment] = useLikeCommentMutation();
 
-  const handleLikeComment = () => {
+  const handleLikeComment = async () => {
     const formData = new FormData();
     formData.append("comment_id", reply?.id);
     formData.append("post_owner", reply.user_id);
-    dispatch(likeComment({ comment_id: reply?.id, formData }));
+    try {
+      await likeComment({ comment_id: reply?.id, formData }).unwrap();
+    } catch (error) {
+      console.error("Failed to like comment:", error);
+    }
   };
 
   const handleNavigateToProfile = () => {
@@ -48,20 +46,13 @@ function Replies({ reply }) {
         <FavoriteBorderIcon fontSize="small" />
       ),
       count: reply?.likes,
-      action: () => handleLikeComment(),
+      action: handleLikeComment,
     },
-    // {
-    //   id: "bookmark",
-    //   location: "post",
-    //   icon: <BookmarkBorderIcon fontSize="small" />,
-    //   count: save?.saved,
-    //   action: () => handleUnsaved(),
-    // },
   ];
 
   return (
     <Box
-      sx={{ border: 1, borderColor: "divider" , borderRadius:"20px"}}
+      sx={{ borderBottom: 1, borderColor: "divider" }}
       id={`post-${reply?.id}`}
       className="post"
     >

@@ -17,15 +17,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useState } from "react";
 import StatusIcons from "../StatusIcons/StatusIcons";
 import { useNavigate } from "react-router-dom";
-import {
-  deletePost,
-  likePost,
-  savePost,
-  updateStreamLike,
-  updateStreamSaved,
-} from "../../Features/PostSlice";
 import { useDispatch } from "react-redux";
-import { predictImageInPost } from "../../Features/PredictionSlice";
 import ComponentStack from "../HandleStack/HandleStack";
 import PostInfo from "../PostInfo/PostInfo";
 export default function VideoActions({
@@ -58,15 +50,15 @@ export default function VideoActions({
     const formData = new FormData();
     formData.append("user_id", localStorage.getItem("cc_ft"));
     formData.append("post_owner", user_id);
-    dispatch(likePost({ post_id, formData }))
-      .unwrap()
-      .then((payload) => {
-        dispatch(updateStreamLike(payload));
-      })
-      .catch((error) => {
-        // ❌ Failure logic here
-        console.error("Failed to save post:", error);
-      });
+    // dispatch(likePost({ post_id, formData }))
+    //   .unwrap()
+    //   .then((payload) => {
+    //     dispatch(updateStreamLike(payload));
+    //   })
+    //   .catch((error) => {
+    //     // ❌ Failure logic here
+    //     console.error("Failed to save post:", error);
+    //   });
   };
 
   const handleNavigateToProfile = () => {
@@ -86,25 +78,25 @@ export default function VideoActions({
     console.log(localStorage.getItem("cc_ft"));
     console.log("post_id", post_id);
     formData.append("user_id", localStorage.getItem("cc_ft"));
-    dispatch(savePost({ post_id, formData }))
-      .unwrap()
-      .then((payload) => {
-        dispatch(updateStreamSaved(payload));
-      })
-      .catch((error) => {
-        // ❌ Failure logic here
-        console.error("Failed to save post:", error);
-      });
+    // dispatch(savePost({ post_id, formData }))
+    //   .unwrap()
+    //   .then((payload) => {
+    //     dispatch(updateStreamSaved(payload));
+    //   })
+    //   .catch((error) => {
+    //     // ❌ Failure logic here
+    //     console.error("Failed to save post:", error);
+    //   });
   };
 
   const handlePostDelete = () => {
-    dispatch(deletePost({ post_id }));
+    // dispatch(deletePost({ post_id }));
   };
 
   const handlePredictImageInPost = () => {
     const formData = new FormData();
     formData.append("post_id", post_id);
-    dispatch(predictImageInPost({ formData }));
+    // dispatch(predictImageInPost({ formData }));
   };
 
   function formatDuration(value) {

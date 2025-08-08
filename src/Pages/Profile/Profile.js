@@ -23,27 +23,19 @@ function Profile() {
   const { user_id, darkMode, systemPrefersDark } = useOutletContext();
   const [scrolling, setScroll] = useState(0);
 
-  // useEffect(() => {
-  //   dispatch(setScrolling(true));
-  //   return () => dispatch(setScrolling(false));
-  // }, []);
-
-  // alert(systemPrefersDark)
-
-   
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
 
   const tabData = [
     {
-      label: "Post",
+      // label: "Post",
       content: <PostHistory />,
     },
-    {
-      label: "Groups",
-      content: <Group />,
-    },
+    // {
+    //   label: "Groups",
+    //   content: <Group />,
+    // },
   ];
 
   <CustomTabs tabs={tabData} />;

@@ -2,13 +2,12 @@ import React from "react";
 import "./Notification.css";
 import { Avatar, Box, Tooltip } from "@mui/material";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { setPostScrollTo } from "../../Features/PostSlice";
+// import { setPostScrollTo } from "../../Features/PostSlice";
 import { setCommentScrollTo } from "../../Features/CommentSlice";
 import { useDispatch } from "react-redux";
 import FeedVideoCard from "../FeedVideoCard/FeedVideoCard";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import NotificationFooter from "./NotificationFooter";
-import { deleteNotification } from "../../Features/notificationSlice";
 import ComponentStack from "../HandleStack/HandleStack";
 
 function Notification({ notification }) {
@@ -27,7 +26,7 @@ function Notification({ notification }) {
       (type === "like" && entity_type === "comment");
 
     if (goPost) {
-      dispatch(setPostScrollTo(notification?.action_id));
+      // dispatch(setPostScrollTo(notification?.action_id));
       navigate(`/${referenceId}/post/${notification?.id}`);
     }
     if (goComment) {

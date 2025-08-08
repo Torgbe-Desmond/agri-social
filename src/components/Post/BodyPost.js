@@ -56,3 +56,6 @@ function BodyPost({ post }) {
 }
 
 export default BodyPost;
+
+
+

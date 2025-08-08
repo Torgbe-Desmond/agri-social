@@ -19,7 +19,6 @@ import PrivateRoute from "./Layout/PrivateRoute";
 import Sidebar from "./components/Sidebar/Sidebar";
 import BottomBar from "./components/BottomBar/BottomBar";
 import Widgets from "./components/Widgets/Widgets";
-
 import Main from "./Pages/Main/Main";
 import Profile from "./Pages/Profile/Profile";
 import Bookmarks from "./Pages/Bookmarks/Bookmarks";
@@ -47,7 +46,7 @@ import axiosInstance from "./Services/AxiosInstance";
 import Chat from "./components/Chat/Chat";
 import Streams from "./components/Streams/Streams";
 import Conversations from "./components/Conversations/Conversations";
-import GroupConversation from "./components/GroupConversation/GroupConversation";
+// import GroupConversation from "./components/GroupConversation/GroupConversation";
 import { clearOnLineStatus } from "./Features/StackSlice";
 import Posts from "./Pages/Posts/Posts";
 import Products from "./Pages/Products/Products";
@@ -149,10 +148,10 @@ function App() {
                 path="/:reference_id/chat/:conversation_id/c/:recipient_id"
                 element={<Chat />}
               />
-              <Route
+              {/* <Route
                 path="/:reference_id/group-chat/:conversation_id"
                 element={<GroupConversation />}
-              />
+              /> */}
               <Route path="/:reference_id/streams" element={<Streams />} />
             </Route>
           ) : (

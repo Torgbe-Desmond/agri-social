@@ -8,7 +8,7 @@ export const CustomTabs = ({ tabs }) => {
 
   return (
     <Box className="custom-tabs">
-      <Paper elevation="0" sx={{ borderRadius: "none" }} className="tab-header">
+      <Paper elevation={0} sx={{ borderRadius: "none" }} className="tab-header">
         {tabs.map((tab, index) => (
           <Button
             sx={{ borderRadius: "0px" }}
@@ -16,7 +16,7 @@ export const CustomTabs = ({ tabs }) => {
             className={`tab-button ${index === activeTab ? "active" : ""}`}
             onClick={() => setActiveTab(index)}
           >
-            {tab.label}
+            {tab?.label}
           </Button>
         ))}
       </Paper>

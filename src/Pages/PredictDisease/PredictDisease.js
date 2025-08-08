@@ -9,33 +9,38 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import InsertPhotoOutlinedIcon from "@mui/icons-material/InsertPhotoOutlined";
-import { useDispatch, useSelector } from "react-redux";
-import { predictImage } from "../../Features/PredictionSlice";
+import { useSelector } from "react-redux";
 import { useOutletContext } from "react-router-dom";
-import { setScrolling } from "../../Features/StackSlice";
+import { usePredictImageMutation } from "../../Features/predictionApi";
+import { useError } from "../../components/Errors/Errors";
 
 function PredictDisease() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [chatMessages, setChatMessages] = useState([]);
-  const { predictionStatus, prediction } = useSelector(
-    (state) => state.prediction
-  );
-  const { userDetails } = useSelector((state) => state.auth);
+  const [prediction, setPrediction] = useState(null);
+  const { systemPrefersDark, user } = useOutletContext();
+  const { message, setMessage } = useError();
   const fileInputRef = useRef();
-  const dispatch = useDispatch();
-  const { darkMode, systemPrefersDark } = useOutletContext();
-
   const chatContainerRef = useRef(null);
   const scrollAnchorRef = useRef(null);
+  const [predictImage, { isLoading, isError, error: predictionError }] =
+    usePredictImageMutation();
 
-  // Scroll to bottom when chatMessages change
+  useEffect(() => {
+    if (isError && predictionError?.data?.detail) {
+      setMessage(predictionError.data.detail);
+    }
+  }, [isError, predictionError, setMessage]);
+
+  // Auto-scroll to bottom when chat updates
   useEffect(() => {
     if (scrollAnchorRef.current) {
       scrollAnchorRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [chatMessages]);
 
+  // Handle file upload and preview
   const handleMediaUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -48,13 +53,14 @@ function PredictDisease() {
     setSelectedFile(file);
   };
 
-  const handleSend = () => {
+  // Send image for prediction
+  const handleSend = async () => {
     if (!previewImage || !selectedFile) return;
 
     const userMessage = {
       sender: "user",
       image: previewImage,
-      profilePicture: userDetails?.user_image || "/user-avatar.png",
+      profilePicture: user?.user_image || "/user-avatar.png",
       text: "",
     };
 
@@ -62,31 +68,41 @@ function PredictDisease() {
 
     const formData = new FormData();
     formData.append("file", selectedFile);
-    dispatch(predictImage({ formData }));
 
-    // Clear preview
+    try {
+      const result = await predictImage({ formData }).unwrap();
+      setPrediction(result);
+    } catch (error) {
+      console.error("Prediction failed:", error);
+    }
+
+    // Reset preview
     setPreviewImage(null);
     setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  // Display prediction result from API
   useEffect(() => {
-    if (predictionStatus === "succeeded" && prediction) {
-      const { filename, prediction_label, confidence } = prediction;
+    if (prediction) {
+      const { prediction_label, confidence } = prediction;
       const responseText = `The uploaded image was predicted as <strong>${prediction_label}</strong> with a confidence of ${(
         confidence * 100
       ).toFixed(2)}%.`;
 
       const botMessage = {
         sender: "bot",
-        image: null, // Bot sends only text, no image
+        image: null,
         profilePicture: require("../../assets/icons8-farmer-64.png"),
         text: responseText,
       };
 
       setChatMessages((prev) => [...prev, botMessage]);
+      setPrediction(null); // Reset after using
     }
-  }, [predictionStatus, prediction]);
+  }, [prediction]);
 
+  // Clear chat on unmount
   useEffect(() => {
     return () => setChatMessages([]);
   }, []);
@@ -103,7 +119,7 @@ function PredictDisease() {
         </div>
       </Box>
 
-      {/* Chat Area */}
+      {/* Chat Display */}
       <div
         ref={chatContainerRef}
         style={{ overflowY: "auto" }}
@@ -120,14 +136,11 @@ function PredictDisease() {
             mb={2}
             className={`chat__message ${msg.sender}`}
           >
-            {/* Avatar */}
             <Avatar
               src={msg.profilePicture}
               alt={msg.sender}
               sx={{ width: 40, height: 40 }}
             />
-
-            {/* User: show image only */}
             {msg.sender === "user" && msg.image && (
               <img
                 src={msg.image}
@@ -140,8 +153,6 @@ function PredictDisease() {
                 }}
               />
             )}
-
-            {/* Bot: show text only */}
             {msg.sender === "bot" && (
               <Box
                 sx={{
@@ -159,10 +170,13 @@ function PredictDisease() {
         <div ref={scrollAnchorRef} />
       </div>
 
-      {/* Input Section */}
-      {/* Input Section */}
+      {/* Bottom Input Area */}
       <Box
-        sx={{ p: 1, bgcolor: systemPrefersDark && "background.color",borderTop: 1, borderColor: "divider" }}
+        sx={{
+          p: 1,
+          borderTop: 1,
+          borderColor: "divider",
+        }}
         display="flex"
         position="sticky"
         bottom="0"
@@ -170,16 +184,9 @@ function PredictDisease() {
         gap={1}
         alignItems="center"
         pt={1}
-        bgcolor="#FFF"
       >
-        {/* Image Preview and Remove Button */}
         {previewImage && (
-          <Box
-            sx={{
-              position: "relative",
-              display: "inline-block",
-            }}
-          >
+          <Box sx={{ position: "relative", display: "inline-block" }}>
             <img
               src={previewImage}
               alt="preview"
@@ -215,7 +222,7 @@ function PredictDisease() {
         {/* Upload Button */}
         <Tooltip title="Add Image">
           <label htmlFor="image-upload" style={{ cursor: "pointer" }}>
-            {predictionStatus === "loading" ? (
+            {isLoading ? (
               <CircularProgress size={24} />
             ) : (
               <InsertPhotoOutlinedIcon />

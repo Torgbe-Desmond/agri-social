@@ -1,105 +1,95 @@
-import React, {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import "./Post.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearActionId,
   deletePost,
   likePost,
-  savePost,
-  setActionId,
+  updatePostLike,
+  updatePostList,
+  updatePostSaved,
+  // setActionId,
 } from "../../Features/PostSlice";
-import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
-import { predictImageInPost } from "../../Features/PredictionSlice";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { Box, CircularProgress } from "@mui/material";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 import HeaderPost from "../Post/HeaderPost";
 import BodyPost from "./BodyPost";
 import FooterPost from "./FooterPost";
-import RePosts from "./RePosts";
-import GroupPost from "./GroupPost";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
+import { predictImageInPost } from "../../Features/PredictionSlice";
+import {
+  useLikePostMutation,
+  useSavePostMutation,
+} from "../../Features/postApi";
+import { usePredictImageInPostMutation } from "../../Features/predictionApi";
 
 const Post = forwardRef(({ post }, ref) => {
   const dispatch = useDispatch();
-  const { userDetails } = useSelector((state) => state.auth);
-  const { singlePostStatus, likeStatus, savedStatus } = useSelector(
-    (state) => state.post
-  );
-  const [successMessage, setSuccessMessage] = useState(null);
+  const { user } = useOutletContext();
   const { imageInPostPrediction, imageInPostPredictionStatus } = useSelector(
     (state) => state.prediction
   );
-  // const location = useLocation();
   const navigate = useNavigate();
   const reference_id = localStorage.getItem("reference_id");
+  const [likePost] = useLikePostMutation();
+  const [savePost] = useSavePostMutation();
+
+  console.log("post", post);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
-    let responseText = `The image in the post by ${
-      post?.username
-    } was predicted as ${
-      imageInPostPrediction?.prediction_label
-    } with a confidence of ${(imageInPostPrediction?.confidence * 100).toFixed(
-      2
-    )}%.`;
     if (imageInPostPredictionStatus === "succeeded") {
+      const responseText = `The image in the post by ${
+        post?.username
+      } was predicted as ${
+        imageInPostPrediction?.prediction_label
+      } with a confidence of ${(
+        imageInPostPrediction?.confidence * 100
+      ).toFixed(2)}%.`;
       setSuccessMessage(responseText);
     }
     return () => setSuccessMessage(null);
-  }, [imageInPostPrediction, imageInPostPredictionStatus]);
+  }, [imageInPostPrediction, imageInPostPredictionStatus, post?.username]);
 
-  const handleSnackbarClose = () => {
-    setSuccessMessage(null);
-  };
-
-  const handleLikePost = () => {
+  const handleLikePost = async () => {
     const formData = new FormData();
     formData.append("post_owner", post?.user_id);
-    dispatch(setActionId(`like-${post?.post_id}`));
-    dispatch(likePost({ post_id: post?.post_id, formData }))
-      .unwrap()
-      .then(() => {
-        // dispatch(clearActionId());
-      })
-      .finally(() => {
-        // dispatch(clearActionId());
-      });
+
+    try {
+      const payload = await likePost({
+        post_id: post?.post_id,
+        formData,
+      }).unwrap();
+
+      dispatch(updatePostLike(payload));
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
   };
 
-  const handleNavigateToProfile = () => {
-    navigate(`/user/${post?.user_id}`);
-  };
-
-  const handleSavePost = () => {
+  async function handleSavePost() {
     const formData = new FormData();
-    formData.append("user_id", userDetails?.id);
-    dispatch(setActionId(`bookmark-${post?.post_id}`));
-    dispatch(savePost({ post_id: post?.post_id, formData }))
-      .unwrap()
-      .then(() => {
-        dispatch(clearActionId());
-      })
-      .finally(() => {
-        dispatch(clearActionId());
-      });
-  };
+    formData.append("user_id", user?.id);
+    const payload = await savePost({
+      post_id: post?.post_id,
+      formData,
+    }).unwrap();
+    dispatch(updatePostSaved(payload));
+  }
 
   const handlePostDelete = () => {
-    dispatch(deletePost({ post_id: post?.post_id }));
+    // dispatch(deletePost({ post_id: post?.post_id }));
   };
 
   const handlePredictImageInPost = () => {
     const formData = new FormData();
     formData.append("post_id", post?.post_id);
-    dispatch(predictImageInPost({ formData }));
+    // const [predictImage] = usePredictImageInPostMutation()
+    // dispatch(predictImageInPost({ formData }));
   };
 
   const actions = [
@@ -119,8 +109,8 @@ const Post = forwardRef(({ post }, ref) => {
         <FavoriteBorderIcon fontSize="small" />
       ),
       count: post?.likes,
-      action: () => handleLikePost(),
-      status: likeStatus,
+      action: handleLikePost,
+      status: null,
     },
     {
       id: "bookmark",
@@ -131,38 +121,20 @@ const Post = forwardRef(({ post }, ref) => {
         <BookmarkBorderIcon fontSize="small" />
       ),
       count: post?.saves,
-      action: () => handleSavePost(),
+      action: handleSavePost,
     },
   ];
 
-  if (singlePostStatus === "loading") {
+  // if (singlePostStatus === "loading") {
+  //   return (
+  //     <p className="circular__progress">
+  //       <CircularProgress />
+  //     </p>
+  //   );
+  // }
+
+  if (!post) {
     return (
-      <p className="circular__progress">
-        <CircularProgress />
-      </p>
-    );
-  }
-
-  const handleJoin = () => {};
-
-  let component;
-
-  if (post) {
-    component = (
-      <Box
-        sx={{ border: 1, borderColor: "divider", borderRadius: "20px" }}
-        className="post"
-        id={`post-${post?.post_id}`}
-        ref={ref}
-      >
-        {/* <RePosts /> */}
-        <HeaderPost post={post} />
-        <BodyPost post={post} />
-        <FooterPost actions={actions} post_id={post?.post_id} />
-      </Box>
-    );
-  } else {
-    component = (
       <Box
         sx={{
           border: 1,
@@ -172,12 +144,23 @@ const Post = forwardRef(({ post }, ref) => {
           m: 2,
         }}
       >
-        Post does not exist
+        Post is currently not available
       </Box>
     );
   }
 
-  return component;
+  return (
+    <Box
+      sx={{ borderBottom: 1, borderColor: "divider" }}
+      className="post"
+      id={`post-${post?.post_id}`}
+      ref={ref}
+    >
+      <HeaderPost post={post} />
+      <BodyPost post={post} />
+      <FooterPost actions={actions} post_id={post?.post_id} />
+    </Box>
+  );
 });
 
 export default Post;

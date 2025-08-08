@@ -16,26 +16,17 @@ import { useOutletContext } from "react-router-dom";
 import { follow } from "../../Features/AuthSlice";
 
 const TwitterProfileUI = () => {
-  const { userDetails, userDetailsStatus } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const { darkMode, systemPrefersDark } = useOutletContext();
+  const { darkMode, systemPrefersDark, user } = useOutletContext();
 
   const handleEditProfile = () => {
     const stack = new ComponentStack(dispatch);
     stack.handleStack("Profile", {
-      user: userDetails,
+      user,
       systemPrefersDark,
       darkMode,
     });
   };
-
-  if (userDetailsStatus === "loading") {
-    return (
-      <p className="circular__progress">
-        <CircularProgress />
-      </p>
-    );
-  }
 
   return (
     <Box
@@ -45,13 +36,13 @@ const TwitterProfileUI = () => {
         boxSizing: "border-box",
         display: "flex",
         justifyContent: "flex-start",
-        pt:1,
-        pb:1
+        pt: 1,
+        pb: 1,
       }}
     >
       <Box sx={{ position: "relative", px: 2, pb: 0 }}>
         <Avatar
-          src={userDetails?.user_image}
+          src={user?.user_image}
           sx={{
             width: 100,
             height: 100,
@@ -68,10 +59,7 @@ const TwitterProfileUI = () => {
           flexDirection: "column",
         }}
       >
-        {/* <Typography variant="h6" fontWeight="bold">
-          {userDetails?.username}
-        </Typography> */}
-        <Typography color="gray">@{userDetails?.username}</Typography>
+        <Typography color="gray">@{user?.username}</Typography>
 
         <Box
           sx={{
@@ -82,28 +70,28 @@ const TwitterProfileUI = () => {
             color: "gray",
           }}
         >
-          {userDetails?.city && (
+          {user?.city && (
             <>
               <LocationOnIcon sx={{ fontSize: 18 }} />
-              <Typography variant="body2">{userDetails?.city}</Typography>
+              <Typography variant="body2">{user?.city}</Typography>
             </>
           )}{" "}
           <CalendarTodayIcon sx={{ fontSize: 18 }} />
           <Typography variant="body2">
             Joined{" "}
-            {new Date(userDetails?.created_at).toLocaleString("default", {
+            {new Date(user?.created_at).toLocaleString("default", {
               month: "long",
             })}{" "}
-            {new Date(userDetails?.created_at).getFullYear()}
+            {new Date(user?.created_at).getFullYear()}
           </Typography>
         </Box>
 
         <Box sx={{ display: "flex", gap: 3, mt: 1, color: "gray", pl: 0.5 }}>
           <Typography variant="body2">
-            <strong>{userDetails?.following}</strong> Following
+            <strong>{user?.following}</strong> Following
           </Typography>
           <Typography variant="body2">
-            <strong>{userDetails?.followers}</strong> Followers
+            <strong>{user?.followers}</strong> Followers
           </Typography>
         </Box>
 

@@ -1,6 +1,7 @@
 import React from "react";
 import FeedVideoCard from "../FeedVideoCard/FeedVideoCard";
 import { Typography } from "@mui/material";
+import FeedImageCard from "../FeedImageCard/FeedImageCard";
 
 function CommentBody({ comment }) {
   const renderTags = (tags) => {
@@ -30,8 +31,12 @@ function CommentBody({ comment }) {
           </div>
         </div>
         <div className="comment__images">
-          <div className="comment_media">
+          <div className="post_media">
             {comment?.images && (
+              <FeedImageCard images={comment.images.split(",")} />
+            )}
+
+            {/* {comment?.images && (
               <img
                 style={{
                   display: "none",
@@ -42,7 +47,7 @@ function CommentBody({ comment }) {
                 src={comment?.images}
                 alt="Comment visual"
               />
-            )}
+            )} */}
 
             {comment?.videos && (
               <div

@@ -10,11 +10,6 @@ import GroupMessages from "../Messages/GroupMessages";
 import { setScrolling } from "../../Features/StackSlice";
 import Header from "../Header/Header";
 import { CustomTabs } from "../CustomTab/CustomTabs";
-// import PostHistory from "../../components/PostHistory/PostHistory";
-// import TwitterProfileUI from "../../components/TopProfile/TopProfile";
-// import MarketPlace from "../../components/MarketPlace/MarketPlace";
-// import UserProducts from "../../components/UserProducts/UserProducts";
-// import { clearProducts } from "../../Features/ProductSlice";
 
 function Conversations() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -24,28 +19,13 @@ function Conversations() {
   const { user_id, darkMode, systemPrefersDark } = useOutletContext();
   const [scrolling, setScroll] = useState(0);
 
-  // alert(systemPrefersDark)
-
-  //   const lastPostRef = useCallback(
-  //     (node) => {
-  //       if (observer.current) observer.current.disconnect();
-  //       observer.current = new IntersectionObserver((entries) => {
-  //         if (entries[0].isIntersecting && hasMore) {
-  //           setPageNumber((prev) => prev + 1);
-  //         }
-  //       });
-  //       if (node) observer.current.observe(node);
-  //     },
-  //     [hasMore]
-  //   );
-
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
 
   useEffect(() => {
-    dispatch(setScrolling(true));
-    return () => dispatch(setScrolling(false));
+    // dispatch(setScrolling(true));
+    // return () => dispatch(setScrolling(false));
   }, []);
 
   const tabData = [

@@ -19,8 +19,8 @@ function FeedFooter({
     onSeek(newTime);
   };
   const style = {
-    fontSize: "32px",
-    filter: "drop-shadow(2px 2px 4px rgba(9, 8, 8, 0.5))",
+    filter: "drop-shadow(5px 5px 10px rgba(9, 8, 8, 0.5))",
+    color: "white",
   };
 
   return (
@@ -32,22 +32,13 @@ function FeedFooter({
 
         <IconButton sx={{ p: 0 }} onClick={() => toggleMute()}>
           {isMuted ? (
-            <VolumeOffIcon style={{ color: "white" }} />
+            <VolumeOffIcon style={style} />
           ) : (
-            <VolumeUpIcon style={{ color: "white" }} />
+            <VolumeUpIcon style={style} />
           )}
         </IconButton>
       </div>
-      {/* <input
-        className="video-seek"
-        type="range"
-        min={0}
-        max={duration}
-        step={0.1}
-        value={currentTime}
-        onChange={handleChange}
-        style={{ width: "100%", color: "#FFF" }}
-      /> */}
+
       <Slider
         aria-label="time-indicator"
         size="small"
@@ -59,6 +50,7 @@ function FeedFooter({
         sx={(t) => ({
           color: "#FFF",
           height: 4,
+          filter: "drop-shadow(5px 5px 10px rgba(9, 8, 8, 0.5))",
           "& .MuiSlider-thumb": {
             width: 8,
             height: 8,

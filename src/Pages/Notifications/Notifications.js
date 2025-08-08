@@ -1,60 +1,57 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import "./Notifications.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useOutletContext } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
-import {
-  clearHasMore,
-  clearNotificationData,
-  getNofitications,
-  readNotification,
-  setNotificationOffset,
-  updateReadNofitications,
-} from "../../Features/notificationSlice";
+import { updateNotificationList } from "../../Features/notificationSlice";
 import Notification from "../../components/Notification/Notification";
 import { useSocket } from "../../components/Socket/Socket";
 import { setScrolling } from "../../Features/StackSlice";
 import Header from "../../components/Header/Header";
+import {
+  useGetNotificationsQuery,
+  useReadNotificationMutation,
+} from "../../Features/notificationApi";
 
 function Notifications() {
   const [tabIndex, setTabIndex] = useState(0);
-  const observer = useRef();
-  const dispatch = useDispatch();
-  const { notifications, hasMore, notificationStatus, notificationOffset } =
-    useSelector((state) => state.notification);
-  const socket = useSocket();
+  const [offset, setOffset] = useState(1);
+  const [notification_ids, setNotification_ids] = useState([]);
   const itemRefs = useRef([]);
   const scrollRef = useRef();
-  const [notification_ids, setNotification_ids] = useState([]);
+  const observer = useRef();
+  const socket = useSocket();
+  const dispatch = useDispatch();
   const [scrolling, setScroll] = useState(0);
-  const isFetchingRef = useRef(false);
+  const { systemPrefersDark } = useOutletContext();
+  const { notifications: notificationData } = useSelector(
+    (state) => state.notification
+  );
+
+  const { data, isFetching, isSuccess, isLoading } = useGetNotificationsQuery({
+    offset,
+    limit: 10,
+  });
+
+  const [readNotification] = useReadNotificationMutation();
+
+  const notifications = useMemo(() => {
+    return Array.isArray(data?.notifications) ? data.notifications : [];
+  }, [data]);
+
+  const hasMore = notifications.length > 0;
 
   useEffect(() => {
-    dispatch(setScrolling(true));
-    return () => dispatch(setScrolling(true));
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      dispatch(clearHasMore());
-      dispatch(clearNotificationData());
-    };
-  }, []);
-
-  useEffect(() => {
-    dispatch(
-      getNofitications({
-        offset: notificationOffset,
-        limit: 10,
-      })
-    )
-      .then(() => {
-        isFetchingRef.current = false;
-      })
-      .catch(() => {
-        isFetchingRef.current = false;
-      });
-  }, [notificationOffset]);
+    if (notifications?.length > 0) {
+      dispatch(updateNotificationList({ notifications }));
+    }
+  }, [notifications]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,15 +59,11 @@ function Notifications() {
     };
 
     const el = scrollRef.current;
-    if (el) {
-      el.addEventListener("scroll", handleScroll);
-    }
+    if (el) el.addEventListener("scroll", handleScroll);
 
     return () => {
-      if (el) {
-        el.removeEventListener("scroll", handleScroll);
-        setScroll(0);
-      }
+      if (el) el.removeEventListener("scroll", handleScroll);
+      setScroll(0);
     };
   }, [scrolling]);
 
@@ -88,8 +81,6 @@ function Notifications() {
         ?.replace("notification-", "")
     );
 
-    console.log("visibleIds", visibleIds);
-
     if (visibleIds.length > 0) {
       setNotification_ids((prev) => {
         const merged = [...prev.filter(Boolean), ...visibleIds.filter(Boolean)];
@@ -100,37 +91,44 @@ function Notifications() {
 
   useEffect(() => {
     if (scrolling) return;
+
     const delayDebounce = setTimeout(() => {
-      const formData = new FormData();
-      notification_ids.map((id) => {
-        formData.append("notification_id", id);
-      });
       if (notification_ids.length > 0) {
-        dispatch(readNotification({ formData }));
+        const formData = new FormData();
+        notification_ids.forEach((id) =>
+          formData.append("notification_id", id)
+        );
+        readNotification(formData);
       }
     }, 3000);
 
-    return () => {
-      clearTimeout(delayDebounce);
-    };
-  }, [scrolling, dispatch, socket]);
+    return () => clearTimeout(delayDebounce);
+  }, [notification_ids, scrolling, readNotification]);
 
   const lastPostRef = useCallback(
     (node) => {
       if (observer.current) observer.current.disconnect();
+
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore && !isFetchingRef.current) {
-          isFetchingRef.current = true;
-          dispatch(setNotificationOffset());
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
+          setOffset((prev) => prev + 1);
         }
       });
+
       if (node) observer.current.observe(node);
     },
-    [hasMore]
+    [hasMore, isFetching, dispatch]
   );
 
-  const desmond = [{ id: [] }];
   const groupByPost = (notifications) => {
+    if (!Array.isArray(notifications)) {
+      console.warn(
+        "Expected notifications to be an array, but got:",
+        notifications
+      );
+      return [];
+    }
+
     const groupedMap = {};
 
     notifications.forEach((notif) => {
@@ -142,7 +140,7 @@ function Notifications() {
       }
     });
 
-    const desmond = Object.entries(groupedMap).map(([id, notifs]) => {
+    return Object.entries(groupedMap).map(([id, notifs]) => {
       const uniqueActorsMap = new Map();
       notifs.forEach((n) => {
         if (!uniqueActorsMap.has(n.actor_id)) {
@@ -167,17 +165,9 @@ function Notifications() {
         created_at: notifs[0]?.created_at,
       };
     });
-
-    return desmond;
   };
 
-  const grouped = groupByPost(notifications);
-
-  console.log(grouped);
-
-  const handleTabChange = (event, newValue) => {
-    setTabIndex(newValue);
-  };
+  const grouped = groupByPost(notificationData);
 
   return (
     <Header
@@ -200,9 +190,9 @@ function Notifications() {
               </div>
             );
           })}
-          {notificationStatus === "loading" && (
+          {isLoading && (
             <p className="circular__progress">
-              <CircularProgress fontSize="small" />
+              <CircularProgress size={20} />
             </p>
           )}
         </Box>

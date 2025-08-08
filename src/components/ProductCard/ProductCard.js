@@ -13,10 +13,10 @@ const ProductCard = ({
   unit,
 }) => {
   const navigate = useNavigate();
+  const reference_id = localStorage.getItem("reference_id");
 
   const handleNavigate = () => {
-    console.log("Navigating to product_id:", product_id); // now logs only on click
-    navigate(`/product/${product_id}`);
+    navigate(`/${reference_id}/product/${product_id}`);
   };
 
   const renderImages = (images) => {

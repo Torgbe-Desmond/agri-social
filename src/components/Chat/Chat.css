@@ -73,6 +73,18 @@
   flex: 1;
 }
 
+.chat__chat-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.chat__chat-container {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
 
 .css-1ky6zaq-MuiFormControl-root-MuiTextField-root,
 .css-1pjy560-MuiFormControl-root-MuiTextField-root {

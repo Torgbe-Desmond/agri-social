@@ -1,57 +1,41 @@
-import React, { useEffect } from "react";
-import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { getUser } from "../Features/AuthSlice";
-import { useSocket } from "../components/Socket/Socket";
-import BottomBar from "../components/BottomBar/BottomBar";
-import Sidebar from "../components/Sidebar/Sidebar";
-import "../App.css";
+import React from "react";
+import { Outlet } from "react-router-dom";
 import { Box } from "@mui/material";
-import TopHeader from "../components/TopHeader/TopHeader";
+import { useGetUserQuery } from "../Features/userApi";
 
-function PrivateRoute({
-  darkMode,
-  systemPrefersDark,
-  isMobile,
-  isAuthenticated,
-}) {
-  const dispatch = useDispatch();
-  const socket = useSocket();
-  const navigate = useNavigate();
-  const status = useSelector((state) => state.auth.status);
+function PrivateRoute({ darkMode, systemPrefersDark, isMobile, isAuthenticated }) {
   const user_id = localStorage.getItem("access_token");
   const reference_id = localStorage.getItem("reference_id");
 
-  // Fetch user on mount
-  useEffect(() => {
-    if (user_id) {
-      dispatch(getUser());
-    }
-  }, [dispatch, navigate, user_id]);
+  // Fetch user with RTK Query if needed
+  const { data: user, isLoading, isError } = useGetUserQuery(undefined, {
+    skip: !user_id,
+  });
 
   const sharedProps = {
     user_id,
     darkMode,
     systemPrefersDark,
+    user,
   };
 
-  let component;
-  if (isAuthenticated) {
-    component = (
-      <Box
-        // sx={{
-        //   borderLeft: 1,
-        //   borderRight: 1,
-        //   borderColor: "divider",
-        // }}
-        className="private-route"
-      >
-        <Outlet context={sharedProps} />
-      </Box>
-    );
+  if (!isAuthenticated) {
+    // Could redirect here or return null if you handle auth elsewhere
+    return null;
   }
 
-  return component;
+  return (
+    <Box
+      sx={{
+        borderLeft: 1,
+        borderRight: 1,
+        borderColor: "divider",
+      }}
+      className="private-route"
+    >
+      <Outlet context={sharedProps} />
+    </Box>
+  );
 }
 
 export default PrivateRoute;

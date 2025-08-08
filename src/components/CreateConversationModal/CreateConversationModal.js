@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Modal,
@@ -6,12 +6,10 @@ import {
   Button,
   Divider,
   CircularProgress,
-  Alert,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
-import { deletePost } from "../../Features/PostSlice";
-import { createConversation } from "../../Features/MessageSlice";
+import { useCreateConversationMutation } from "../../Features/messageApi";
 
 const style = {
   position: "absolute",
@@ -28,55 +26,53 @@ const style = {
 const CreateConversationModal = ({ conversee }) => {
   const dispatch = useDispatch();
   const { userDetails } = useSelector((state) => state.auth);
-  const { createConversationStatus } = useSelector((state) => state.message);
 
-  const handleCreateConversation = () => {
+  const [createConversation, { isLoading }] = useCreateConversationMutation();
+
+  const handleCreateConversation = async () => {
     const formData = new FormData();
     const member_ids = [conversee?.id, userDetails?.id];
-    member_ids.forEach((member) => formData.append("member_ids", member));
-    dispatch(createConversation({ formData }))
-      .unwrap()
-      .then((data) => {
-        alert(data.message);
-        dispatch(popComponent());
-      });
+    member_ids.forEach((id) => formData.append("member_ids", id));
+
+    try {
+      const response = await createConversation({ formData }).unwrap();
+      alert(response.message || "Conversation created");
+      dispatch(popComponent());
+    } catch (err) {
+      console.error("Failed to create conversation", err);
+      alert("Failed to create conversation");
+    }
   };
 
   return (
-    <Modal open={true}>
+    <Modal open={true} onClose={() => dispatch(popComponent())}>
       <Box sx={style}>
-        {/* Title */}
         <Typography variant="h6" gutterBottom>
           Create Conversation
         </Typography>
         <Divider sx={{ mb: 2 }} />
-
         <Typography sx={{ mb: 2 }}>
-          Create group with {conversee.username} ?
+          Create group with <strong>{conversee?.username}</strong>?
         </Typography>
-        {/* Action Buttons */}
+
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
           <Button
             variant="outlined"
-            sx={{
-              borderRadius: "32px !important",
-            }}
             color="secondary"
             onClick={() => dispatch(popComponent())}
+            sx={{ borderRadius: "32px !important" }}
+            disabled={isLoading}
           >
             Cancel
           </Button>
-          {createConversationStatus === "loading" ? (
-            <CircularProgress />
-          ) : (
-            <Button
-              className="sidebar__tweet__contained"
-              onClick={() => handleCreateConversation()}
-              variant="outlined"
-            >
-              Create
-            </Button>
-          )}
+          <Button
+            variant="outlined"
+            onClick={handleCreateConversation}
+            className="sidebar__tweet__contained"
+            disabled={isLoading}
+          >
+            {isLoading ? <CircularProgress size={20} /> : "Create"}
+          </Button>
         </Box>
       </Box>
     </Modal>

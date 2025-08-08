@@ -65,7 +65,11 @@ function Header({
         {userDetailComponent && userDetailComponent}
         {allowedSearch && (
           <Box
-            sx={{ bgcolor: "background.paper", border: "1px solid #ccc" }}
+            sx={{
+              bgcolor: "background.paper",
+              border: "1px solid #ccc",
+              borderRadius: "20px",
+            }}
             className="resuable__input"
           >
             <SearchIcon className="resuable__searchIcon" />
@@ -94,12 +98,7 @@ function Header({
           <CircularProgress size={20} />
         </Box>
       ) : (
-        <Box
-          className="scrolling-component"
-          // sx={{ height: "100%", overflowY: "auto" }}
-        >
-          {children}
-        </Box>
+        <Box className="scrolling-component">{children}</Box>
       )}
 
       {reloadAction && status === "failed" && (

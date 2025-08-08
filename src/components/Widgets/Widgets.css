@@ -1,6 +1,9 @@
 .widgets {
   flex: 0.25;
+  padding: 10px;
   /* border-left: 0.5px solid var(--twitter-background); */
+  padding-top: 20px;
+
 }
 
 .widgets__input {
@@ -17,7 +20,7 @@
 .widgets__input>input {
   border: none;
   /* background-color: var(--twitter-background); */
-  
+
 }
 
 .widgets__searchIcon {

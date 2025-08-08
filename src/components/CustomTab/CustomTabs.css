@@ -6,6 +6,10 @@
     display: flex;
 }
 
+.css-8dar8x-MuiPaper-root {
+    background: #FFF !important;
+}
+
 .tab-button {
     flex: 1;
     padding: 0px 16px;

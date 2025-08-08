@@ -1,164 +1,160 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import "./UserFeed.css";
-import Avatar from "@mui/material/Avatar";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import RepeatIcon from "@mui/icons-material/Repeat";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-import StatusIcons from "../StatusIcons/StatusIcons";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  deletePost,
-  getPostHistory,
-  getUserPostHistory,
-} from "../../Features/PostSlice";
-import { useOutletContext, useParams } from "react-router-dom";
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
 import Post from "../Post/Post";
 import Header from "../Header/Header";
-import { setScrolling } from "../../Features/StackSlice";
+import { useOutletContext, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  useGetUserPostHistoryQuery,
+} from "../../Features/postApi";
+import { useConversingMutation } from "../../Features/messageApi";
+import { useGetAnotherUserProfileQuery } from "../../Features/userApi";
 import UserInfo from "../UserInfo/UserInfo";
-import { clearConversationId, conversing } from "../../Features/MessageSlice";
-import { _getUser } from "../../Features/AuthSlice";
+import {
+  emptyUserPostHistory,
+  setUserPostHistoryOffset,
+  updateUserPostHistoryList,
+} from "../../Features/PostSlice";
+import { useError } from "../Errors/Errors";
 
-function UserFeed({ _conversation_id }) {
-  const dispatch = useDispatch();
-  const postRef = useRef();
-  const {
-    userPostHistory,
-    postDeleteStatus,
-    userPostHistoryStatus,
-    hasMoreUserPostHistory,
-  } = useSelector((state) => state.post);
-  const [filteredData, setFilteredData] = useState([]);
+function UserFeed() {
   const { _user_id } = useParams();
-  const feedRef = useRef(null);
-  const lastScrollTop = useRef(0);
-  const [scrolling, setScroll] = useState(0);
+  const { user } = useOutletContext();
+  const { message, setMessage } = useError();
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [pageNumber, setPageNumber] = useState(1);
-  const isFetchingRef = useRef(false);
-  const itemRefs = useRef([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [visiblePostId, setVisiblePostId] = useState(null);
+  const [conversationId, setConversationId] = useState("");
+  const itemRefs = useRef([]);
   const observer = useRef(null);
-  const { _userDetails, _userDetailsStatus, userDetails } = useSelector(
-    (state) => state.auth
+  const feedRef = useRef(null);
+
+  const dispatch = useDispatch();
+  const { userPostHistory, userPostHistoryOffset } = useSelector(
+    (state) => state.post
   );
 
+  const {
+    data: userDetails,
+    isLoading: isUserLoading,
+    error: userDetailsError,
+  } = useGetAnotherUserProfileQuery(_user_id);
+
+  const {
+    data,
+    isFetching: isPostLoading,
+    error: userPostError,
+  } = useGetUserPostHistoryQuery(
+    { user_id: userDetails?.id, offset: userPostHistoryOffset, limit: 10 },
+    { skip: !userDetails?.id }
+  );
+
+  // Handle errors
   useEffect(() => {
-    dispatch(_getUser({ user_id: _user_id }));
-    return () => dispatch(clearConversationId());
-  }, [dispatch, userDetails, _userDetails]);
+    if (userDetailsError?.data?.detail) {
+      setMessage(userDetailsError.data.detail);
+    }
+  }, [userDetailsError, setMessage]);
 
   useEffect(() => {
-    const member_ids = [userDetails?.id, _userDetails?.id];
-    const formData = new FormData();
-    member_ids.forEach((member) => formData.append("member_ids", member));
-    dispatch(conversing({ formData }));
-  }, []);
+    if (userPostError?.data?.detail) {
+      setMessage(userPostError.data.detail);
+    }
+  }, [userPostError, setMessage]);
+
+  // Memoize posts
+  const postHistory = useMemo(() => {
+    return Array.isArray(data?.posts) ? data.posts : [];
+  }, [data]);
+
+  // Update post history list
+  useEffect(() => {
+    if (postHistory.length > 0) {
+      dispatch(updateUserPostHistoryList({ userPostHistory: postHistory }));
+    }
+  }, [postHistory, dispatch]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      dispatch(emptyUserPostHistory());
+    };
+  }, [dispatch]);
+
+  const hasMore = postHistory?.length > 0;
+
+  // Setup conversation
+  const [conversing] = useConversingMutation();
 
   useEffect(() => {
-    dispatch(
-      getUserPostHistory({
-        user_id: _userDetails?.id,
-        offset: pageNumber,
-        limit: 10,
-      })
-    )
-      .unwrap()
-      .then(() => {
-        isFetchingRef.current = false;
-      })
-      .catch(() => {
-        isFetchingRef.current = false;
-      });
-  }, [dispatch, _userDetails?.id, pageNumber]);
+    const startConversation = async () => {
+      if (user?.id && userDetails?.id) {
+        const formData = new FormData();
+        formData.append("member_ids", user.id);
+        formData.append("member_ids", userDetails.id);
+        try {
+          const response = await conversing({ formData }).unwrap();
+          setConversationId(response?.conversation_id || "");
+        } catch (err) {
+          console.error("Error creating conversation:", err);
+        }
+      }
+    };
+    startConversation();
+  }, [user?.id, userDetails?.id, conversing]);
 
+  // Infinite scroll observer
   const lastPostRef = useCallback(
     (node) => {
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
-        if (
-          entries[0].isIntersecting &&
-          hasMoreUserPostHistory &&
-          !isFetchingRef
-        ) {
-          isFetchingRef.current = true;
-          setPageNumber((prev) => prev + 1);
+        if (entries[0].isIntersecting && !isPostLoading && hasMore) {
+          dispatch(setUserPostHistoryOffset());
         }
       });
       if (node) observer.current.observe(node);
     },
-    [hasMoreUserPostHistory]
+    [dispatch, hasMore, isPostLoading]
   );
 
+  // Search filter
   useEffect(() => {
-    let searchedData;
-    searchedData = searchTerm
-      ? userPostHistory?.filter(
-          (st) =>
-            st.username
-              ?.toLocaleLowerCase()
-              ?.includes(searchTerm.toLocaleLowerCase()) ||
-            st.content
-              ?.toLocaleLowerCase()
-              ?.includes(searchTerm.toLocaleLowerCase())
+    if (!userPostHistory) return;
+    const search = searchTerm.toLowerCase();
+    const result = search
+      ? userPostHistory.filter(
+          (post) =>
+            post.username?.toLowerCase().includes(search) ||
+            post.content?.toLowerCase().includes(search)
         )
       : userPostHistory;
-    setFilteredData(searchedData);
+    setFilteredData(result);
   }, [searchTerm, userPostHistory]);
 
-  const reloadAction = () => {
-    getUserPostHistory({
-      user_id: _userDetails?.id,
-      offset: pageNumber,
-      limit: 10,
-    })
-      .then(() => {
-        isFetchingRef.current = false;
-      })
-      .catch(() => {
-        isFetchingRef.current = false;
-      });
-  };
-
+  // Media visibility logic
   useEffect(() => {
     itemRefs.current.forEach((el) => {
       el?.classList.remove("visible-post", "visible-post-next");
     });
-    onVideoReach(itemRefs);
-    onImageReach(itemRefs);
-  }, [scrolling, userPostHistory]);
+    handleVideoAutoplay();
+    handleImageReveal();
+  }, [userPostHistory]);
 
-  function onImageReach(itemRefs) {
-    const visibleItems = itemRefs.current.filter((el) => {
-      if (!el) return false;
-      const rect = el.getBoundingClientRect();
-      return (
-        rect.top >= window.innerHeight / 10 && rect.bottom <= window.innerHeight
-      );
-    });
-
-    const postIds = visibleItems
-      .map((el) =>
-        el.querySelector(".post")?.getAttribute("id")?.replace("post-", "")
-      )
-      .filter(Boolean);
-
-    postIds.forEach((id) => {
-      const currentImage = document.querySelector(`#post-${id} img`);
-      if (currentImage) {
-        currentImage.style.display = "flex";
-      }
-    });
-  }
-
-  function onVideoReach(itemRefs) {
+  const handleVideoAutoplay = () => {
     const visibleItem = itemRefs.current.find((el) => {
       if (!el) return false;
       const rect = el.getBoundingClientRect();
       return (
-        rect.top >= window.innerHeight / 10 && rect.bottom <= window.innerHeight
+        rect.top >= window.innerHeight / 10 &&
+        rect.bottom <= window.innerHeight
       );
     });
 
@@ -172,46 +168,61 @@ function UserFeed({ _conversation_id }) {
     );
     if (!isVideoPost) return;
 
-    // Pause previously playing video
     if (visiblePostId && visiblePostId !== postId) {
-      const prev = document.querySelector(`#post-${visiblePostId} video`);
-
-      if (prev) prev.pause();
+      const prevVideo = document.querySelector(`#post-${visiblePostId} video`);
+      if (prevVideo) prevVideo.pause();
     }
 
     const currentVideo = document.querySelector(`#post-${postId} video`);
-
     if (currentVideo) {
-      currentVideo.play().catch((err) => console.warn("Autoplay failed:", err));
+      currentVideo
+        .play()
+        .catch((err) =>
+          console.warn("Autoplay blocked or failed:", err.message)
+        );
     }
-    setVisiblePostId(postId);
-  }
 
-  if (userPostHistoryStatus === "loading") {
-    return (
-      <p className="circular__progress">
-        <CircularProgress />
-      </p>
-    );
-  }
+    setVisiblePostId(postId);
+  };
+
+  const handleImageReveal = () => {
+    itemRefs.current.forEach((el) => {
+      const rect = el?.getBoundingClientRect();
+      if (
+        rect?.top >= window.innerHeight / 10 &&
+        rect?.bottom <= window.innerHeight
+      ) {
+        const id = el.querySelector(".post")?.id?.replace("post-", "");
+        if (id) {
+          const image = document.querySelector(`#post-${id} img`);
+          if (image) {
+            image.style.display = "flex";
+          }
+        }
+      }
+    });
+  };
+
+  const reloadAction = () => {
+    dispatch(emptyUserPostHistory());
+  };
+
+  const userDetailComponent = (
+    <UserInfo
+      _userDetails={userDetails}
+      _conversation_id={conversationId}
+      _userDetailsStatus={isUserLoading}
+    />
+  );
 
   return (
     <Header
-      status={userPostHistoryStatus}
       allowedSearch={true}
-      name={"Posts"}
-      setScroll={setScroll}
+      name="User"
+      userDetailComponent={userDetailComponent}
+      setScroll={() => {}}
       reloadAction={reloadAction}
       searchTerm={searchTerm}
-      userDetailComponent={
-        <>
-          <UserInfo
-            _userDetails={_userDetails}
-            _conversation_id={_conversation_id}
-            _userDetailsStatus={_userDetailsStatus}
-          />
-        </>
-      }
       setSearchTerm={setSearchTerm}
       feedRef={feedRef}
       children={
@@ -220,10 +231,10 @@ function UserFeed({ _conversation_id }) {
             <p style={{ padding: "1rem", color: "#555" }}>No posts yet.</p>
           ) : (
             filteredData.map((post, index) => {
-              const isLast = index === userPostHistory.length - 1;
+              const isLast = index === filteredData.length - 1;
               return (
                 <div
-                  key={index}
+                  key={post.post_id ?? `fallback-${index}`}
                   ref={(el) => {
                     itemRefs.current[index] = el;
                     if (isLast) lastPostRef(el);

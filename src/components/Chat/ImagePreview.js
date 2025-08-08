@@ -6,10 +6,6 @@ const ImagePreview = ({ files, setFiles, setUploadedFiles }) => {
       <img src={img} alt={`preview-${idx}`} style={{ width: 120, height: 120, borderRadius: 8, objectFit: "cover" }} />
       <IconButton
         size="small"
-        onClick={() => {
-          setFiles((prev) => prev.filter((_, i) => i !== idx));
-          setUploadedFiles((prev) => prev.filter((_, i) => i !== idx));
-        }}
         sx={{
           position: "absolute",
           top: 0,

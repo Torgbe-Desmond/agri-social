@@ -1,34 +1,44 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./Bookmarks.css";
-import { useDispatch, useSelector } from "react-redux";
+import { Box, Button, CircularProgress } from "@mui/material";
 import Saved from "../../components/Saved/Saved";
-import { Box, CircularProgress } from "@mui/material";
-import { getSavedHistory } from "../../Features/PostSlice";
 import Header from "../../components/Header/Header";
-import { setScrolling } from "../../Features/StackSlice";
+import { useGetSavedHistoryQuery } from "../../Features/postApi";
+import { updateSavedPostList } from "../../Features/PostSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const Bookmarks = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
   const [visiblePostId, setVisiblePostId] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const dispatch = useDispatch();
   const feedRef = useRef(null);
   const itemRefs = useRef([]);
-  const { savedStatus, savedHistory, hasMoreSaved } = useSelector(
-    (state) => state.post
-  );
   const observer = useRef();
-
-  // Scrolling trigger
   const [scrolling, setScroll] = useState(0);
+  const [filteredData, setFilteredData] = useState([]);
+  const { savedHistory } = useSelector((state) => state.post);
+  const dispatch = useDispatch();
 
-  // Get saved history
+  const { data, isFetching, isLoading, isError, error, refetch } =
+    useGetSavedHistoryQuery({
+      offset: pageNumber,
+      limit: 10,
+    });
+
+  console.log("error", error);
+
+  const postData = useMemo(() => {
+    return Array.isArray(data?.posts) ? data.posts : [];
+  }, [data]);
+
+  const hasMore = postData?.length > 0;
+
   useEffect(() => {
-    dispatch(getSavedHistory({ offset: pageNumber, limit: 10 }));
-  }, [pageNumber, dispatch]);
+    if (postData?.length > 0) {
+      dispatch(updateSavedPostList({ postData }));
+    }
+  }, [postData]);
 
-  // Filter results
   useEffect(() => {
     const filtered = searchTerm
       ? savedHistory.filter(
@@ -44,16 +54,15 @@ const Bookmarks = () => {
     (node) => {
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMoreSaved) {
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
           setPageNumber((prev) => prev + 1);
         }
       });
       if (node) observer.current.observe(node);
     },
-    [hasMoreSaved]
+    [hasMore, isFetching]
   );
 
-  // Scroll effect to track visible video/image
   useEffect(() => {
     itemRefs.current.forEach((el) => {
       el?.classList.remove("visible-post", "visible-post-next");
@@ -71,20 +80,16 @@ const Bookmarks = () => {
       );
     });
 
-    const postIds = visibleItems
-      .map((el) =>
-        el
-          .querySelector(".post")
-          ?.getAttribute("id")
-          ?.replace("post-bookmarks-", "")
-      )
-      .filter(Boolean);
+    visibleItems.forEach((el) => {
+      const postId = el
+        ?.querySelector(".post")
+        ?.id?.replace("post-bookmarks-", "");
+      if (!postId) return;
 
-    postIds.forEach((id) => {
-      const currentImage = document.querySelector(`#post-bookmarks-${id} img`);
-      if (currentImage) {
-        currentImage.style.display = "flex";
-      }
+      const currentImage = document.querySelector(
+        `#post-bookmarks-${postId} img`
+      );
+      if (currentImage) currentImage.style.display = "flex";
     });
   }
 
@@ -100,7 +105,7 @@ const Bookmarks = () => {
     if (!visibleItem) return;
 
     const postId = visibleItem
-      .querySelector(".post")
+      ?.querySelector(".post")
       ?.id?.replace("post-bookmarks-", "");
     if (!postId) return;
 
@@ -109,19 +114,16 @@ const Bookmarks = () => {
     );
     if (!isVideoPost) return;
 
-    // Pause previously playing video
     if (visiblePostId && visiblePostId !== postId) {
       const prev = document.querySelector(
         `#post-bookmarks-${visiblePostId} video`
       );
-
       if (prev) prev.pause();
     }
 
     const currentVideo = document.querySelector(
       `#post-bookmarks-${postId} video`
     );
-
     if (currentVideo) {
       currentVideo.play().catch((err) => console.warn("Autoplay failed:", err));
     }
@@ -138,7 +140,7 @@ const Bookmarks = () => {
       ref={feedRef}
       children={
         <Box>
-          {filteredData.map((saved, index) => {
+          {filteredData?.map((saved, index) => {
             const isLast = index === savedHistory.length - 1;
             return (
               <div
@@ -153,9 +155,14 @@ const Bookmarks = () => {
               </div>
             );
           })}
-          {savedStatus === "loading" && (
+          {isLoading && (
             <p className="circular__progress">
-              <CircularProgress fontSize="large" />
+              <CircularProgress size={20} />
+            </p>
+          )}
+          {isError && (
+            <p className="circular__progress">
+              Something went wrong. <Button onClick={refetch}>Retry</Button>
             </p>
           )}
         </Box>

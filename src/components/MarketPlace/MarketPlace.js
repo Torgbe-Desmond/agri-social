@@ -1,50 +1,63 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Button, CircularProgress, Grid } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Box, CircularProgress, Grid } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import "./MarketPlace.css";
 
 import ProductCard from "../ProductCard/ProductCard";
-import { clearProducts, fetchProducts } from "../../Features/ProductSlice";
-import ComponentStack from "../HandleStack/HandleStack";
 import Header from "../Header/Header";
+import ComponentStack from "../HandleStack/HandleStack";
+import { useGetProductsQuery } from "../../Features/productApi";
+import { updateProductList } from "../../Features/ProductSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 function MarketPlace() {
-  const [tabIndex, setTabIndex] = useState(0);
-  const [pageNumber, setPageNumber] = useState(1);
   const observer = useRef();
+  const [pageNumber, setPageNumber] = useState(1);
+  const { darkMode, systemPrefersDark } = useOutletContext();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
+  const { products: productsData } = useSelector((state) => state.product);
   const dispatch = useDispatch();
 
-  const { user_id, darkMode, systemPrefersDark } = useOutletContext();
-  const { products, hasMore, loading } = useSelector((state) => state.product);
+  const { data, isFetching, isLoading, refetch } = useGetProductsQuery({
+    offset: pageNumber,
+    limit: 10,
+  });
 
-  // Modal State
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [notificationId, setNotificationId] = useState(null);
+  const products = useMemo(() => {
+    return Array.isArray(data?.products) ? data.products : [];
+  }, [data]);
 
-  const openDeleteModal = (id) => {
-    setNotificationId(id);
-    setShowDeleteModal(true);
-  };
-
-  const closeDeleteModal = () => {
-    setNotificationId(null);
-    setShowDeleteModal(false);
-  };
+  const hasMore = products.length > 0;
 
   useEffect(() => {
-    dispatch(fetchProducts({ offset: pageNumber, limit: 6 }));
-  }, [pageNumber]);
+    if (Array.isArray(data?.products)) {
+      dispatch(updateProductList({ products: data.products }));
+    }
+  }, [dispatch, data?.products]);
 
   useEffect(() => {
-    return () => dispatch(clearProducts());
-  }, []);
+    let searchedData;
+    searchedData = searchTerm
+      ? productsData.filter((product) =>
+          product.title?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      : productsData;
+
+    setFilteredData(searchedData);
+  }, [searchTerm, productsData]);
 
   const lastProductRef = useCallback(
     (node) => {
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
           setPageNumber((prev) => prev + 1);
         }
       });
@@ -53,52 +66,50 @@ function MarketPlace() {
     [hasMore]
   );
 
-  const handleSearchProduct = () => {
-    const stack = new ComponentStack(dispatch);
-    stack.handleStack("SearchModal", {});
-  };
-
   const reloadAction = () => {
-    dispatch(fetchProducts({ offset: pageNumber, limit: 6 }));
+    refetch();
   };
 
   return (
-    <>
-      <Header
-        status={loading}
-        allowedSearch={true}
-        reloadAction={reloadAction}
-        name={"Market Place"}
-        searchTerm={""}
-        setSearchTerm={() => {}}
-        children={
-          <Box sx={{ padding: 3 }} className="market__place">
-            <Grid
-              container
-              sx={{ width: "100%", justifyContent: "center" }}
-              spacing={3}
-            >
-              {products.map((product, index) => {
-                const isLast = index === products.length - 1;
-                return (
-                  <Grid
-                    key={product.id || index}
-                    ref={isLast ? lastProductRef : null}
-                    item
-                    xs={12}
-                    sm={12}
-                    md={4}
-                    lg={3}
-                  >
-                    <ProductCard {...product} />
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Box>
-        }
-      />
-    </>
+    <Header
+      status={isLoading}
+      allowedSearch={true}
+      reloadAction={reloadAction}
+      name={"Market Place"}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+      children={
+        <Box sx={{ padding: 3 }} className="market__place">
+          <Grid
+            container
+            sx={{ width: "100%", justifyContent: "center" }}
+            spacing={3}
+          >
+            {filteredData.map((product, index) => {
+              const isLast = index === productsData.length - 1;
+              return (
+                <Grid
+                  key={product.id || index}
+                  ref={isLast ? lastProductRef : null}
+                  item
+                  xs={12}
+                  sm={12}
+                  md={4}
+                  lg={3}
+                >
+                  <ProductCard {...product} />
+                </Grid>
+              );
+            })}
+          </Grid>
+          {isFetching && (
+            <p className="circular__progress">
+              <CircularProgress size={24} />
+            </p>
+          )}
+        </Box>
+      }
+    />
   );
 }
 

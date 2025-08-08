@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   TextField,
   Button,
@@ -11,11 +10,11 @@ import {
   Alert,
   useMediaQuery,
 } from "@mui/material";
-import { clearError, register } from "../../Features/AuthSlice";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import "./Register.css";
 import { Link, useNavigate } from "react-router-dom";
+import { useRegisterMutation } from "../../Features/authApi"; // <-- import your RTK Query mutation here
 
 const Register = () => {
   const [userInfo, setUserInfo] = useState({
@@ -27,18 +26,28 @@ const Register = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const dispatch = useDispatch();
-  const registerStatus = useSelector((state) => state.auth.registerStatus);
-  const error = useSelector((state) => state.auth.error);
   const navigate = useNavigate();
   const reference_Id = localStorage.getItem("reference_Id");
   const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
+  const [register, { isLoading, error, data }] = useRegisterMutation();
+
   useEffect(() => {
-    if (registerStatus === "succeeded" && reference_Id) {
+    // Navigate when registration succeeds and reference_Id exists
+    if (data && reference_Id) {
       navigate(`/${reference_Id}/directories`);
     }
-  }, [registerStatus, reference_Id, navigate]);
+  }, [data, reference_Id, navigate]);
+
+  useEffect(() => {
+    // Show error snackbar if RTK Query mutation error occurs
+    if (error) {
+      // error could be an object or string, adjust as needed
+      const errorMsg = error?.data?.message || error?.message || "Registration failed";
+      setSnackbarMessage(errorMsg);
+      setOpenSnackbar(true);
+    }
+  }, [error]);
 
   const handleSnackbarClose = () => {
     setOpenSnackbar(false);
@@ -82,25 +91,16 @@ const Register = () => {
     formData.append("email", userInfo.email);
     formData.append("password", userInfo.password);
 
-    dispatch(register({ formData }))
+    register({ formData })
       .unwrap()
       .then(() => {
         navigate(`/`);
         window.location.reload();
       })
-      .catch(() => {});
+      .catch(() => {
+        // error is handled by useEffect, no need to do anything here
+      });
   };
-
-  useEffect(() => {
-    if (error) {
-      setSnackbarMessage(error);
-      setOpenSnackbar(true);
-    }
-
-    return () => {
-      dispatch(clearError());
-    };
-  }, [error, dispatch]);
 
   const darkMode = {
     color: isDarkMode ? "#FFF" : "",
@@ -134,7 +134,7 @@ const Register = () => {
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
-                disabled={registerStatus === "loading"}
+                disabled={isLoading}
               />
             </Box>
 
@@ -154,7 +154,7 @@ const Register = () => {
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
-                disabled={registerStatus === "loading"}
+                disabled={isLoading}
               />
             </Box>
 
@@ -175,7 +175,7 @@ const Register = () => {
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
-                disabled={registerStatus === "loading"}
+                disabled={isLoading}
               />
             </Box>
 
@@ -197,7 +197,7 @@ const Register = () => {
                 fullWidth
                 margin="normal"
                 error={passwordError}
-                disabled={registerStatus === "loading"}
+                disabled={isLoading}
                 helperText={passwordError ? "Passwords don't match" : ""}
               />
             </Box>
@@ -208,10 +208,10 @@ const Register = () => {
               variant="outlined"
               color={passwordError ? "error" : "primary"}
               fullWidth
-              disabled={registerStatus === "loading"}
+              disabled={isLoading}
               style={{ position: "relative", marginTop: 10, height: "50px" }}
             >
-              {registerStatus === "loading" ? (
+              {isLoading ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
                 "Register"

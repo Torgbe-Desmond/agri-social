@@ -6,9 +6,6 @@ import { useSelector } from "react-redux";
 
 function PostStatusIcons({ id, icon, count, to, action, location, status }) {
   const navigate = useNavigate();
-  const { aciton_id } = useSelector((state) => state.post);
-  const { systemPrefersDark } = useOutletContext();
-  console.log(aciton_id);
 
   const handleClick = () => {
     if (to) {

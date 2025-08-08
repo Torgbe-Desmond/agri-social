@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Chat from "../Chat/Chat";
 import { useOutletContext } from "react-router-dom";
@@ -10,6 +16,7 @@ import { clearGroups, getGroupConversation } from "../../Features/MessageSlice";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import ComponentStack from "../HandleStack/HandleStack";
 import GroupMessageList from "../GroupMesageList/GroupMesageList";
+import { useGetGroupConversationQuery } from "../../Features/messageApi";
 
 function GroupMessages() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -19,10 +26,11 @@ function GroupMessages() {
   const { user_id, darkMode, systemPrefersDark } = useOutletContext();
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const { userDetails } = useSelector((state) => state.auth);
-  const { groups, getGroupConversationStatus } = useSelector(
-    (state) => state.message
-  );
+  const { data, isLoading, isError, refetch, errro } =
+    useGetGroupConversationQuery();
+  // const { groups, getGroupConversationStatus } = useSelector(
+  //   (state) => state.message
+  // );
 
   //   const lastPostRef = useCallback(
   //     (node) => {
@@ -37,18 +45,21 @@ function GroupMessages() {
   //     [hasMore]
   //   );
 
+  const groups = useMemo(() => {
+    return Array.isArray(data) ? data : [];
+  }, [data]);
+
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
 
   useEffect(() => {
-    dispatch(getGroupConversation());
-
-    return () => dispatch(clearGroups());
+    // dispatch(getGroupConversation());
+    // return () => dispatch(clearGroups());
   }, []);
 
   const reloadAction = () => {
-    dispatch(getGroupConversation());
+    // dispatch(getGroupConversation());
   };
 
   useEffect(() => {
@@ -71,7 +82,7 @@ function GroupMessages() {
       icons={[
         { icon: <GroupsOutlinedIcon key="group" />, action: handleCreateGroup },
       ]}
-      status={getGroupConversationStatus}
+      status={isLoading}
       allowedSearch={true}
       reloadAction={reloadAction}
       searchTerm={searchTerm}

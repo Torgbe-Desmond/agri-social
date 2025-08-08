@@ -12,11 +12,18 @@ function srcset(image, size, rows = 1, cols = 1) {
 }
 
 export default function FeedImageCard({ images }) {
+  console.log("images", images);
   const length = images?.length || 1;
 
   return (
     <ImageList
-      sx={{ width: "100%", height: "auto" }}
+      sx={{
+        width: "100%",
+        height: "auto",
+        border: 1,
+        borderColor: "divider",
+        borderRadius: "8px",
+      }}
       variant="quilted"
       cols={length > 1 ? 2 : 1}
       rowHeight={400}
@@ -26,7 +33,10 @@ export default function FeedImageCard({ images }) {
           key={index}
           cols={length > 1 ? 1 : 2}
           rows={1}
+          gap={1}
           sx={{
+            border: 1,
+            borderColor: "divider",
             overflow: "hidden",
             borderRadius: 2,
           }}
@@ -38,6 +48,8 @@ export default function FeedImageCard({ images }) {
             style={{
               width: "100%",
               height: "100%",
+              border: 1,
+              borderColor: "#ccc",
               objectFit: `${length > 1 ? "contain" : "cover"}`,
               borderRadius: "8px",
             }}

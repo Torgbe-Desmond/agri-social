@@ -6,7 +6,7 @@ function PredictionList({ predictionStatus, filteredData, userDetails }) {
   return (
     <Box className="scrolling-component" sx={{ height: "100%", overflowY: "auto" }}>
       <div className="predictions__holder">
-        {filteredData.length > 0 &&
+        {filteredData?.length > 0 &&
           filteredData.map(
             ({
               created_at,

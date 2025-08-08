@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   TextField,
   Button,
@@ -11,29 +10,25 @@ import {
   Typography,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
+import { useLoginMutation } from "../../Features/authApi"; // <-- keep only this
 import "./Login.css";
-import { login } from "../../Features/AuthSlice";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { userDetails } = useSelector((state) => state.auth);
-  const status = useSelector((state) => state.auth.status);
+
+  // RTK Query mutation hook provides loading & error states
+  const [login, { isLoading, error }] = useLoginMutation();
+
+  console.log(error);
 
   const handleChange = (e) => {
     setCredentials((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSnackbarClose = () => setOpenSnackbar(false);
-
-  // const handleNavigate = () => {
-  //   if (userDetails.user.reference_id) {
-  //     navigate(`/${userDetails.user.reference_id}`);
-  //   }
-  // };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -51,12 +46,14 @@ const Login = () => {
     formData.append("email", email);
     formData.append("password", password);
 
-    dispatch(login({ formData }))
+    login({ formData })
       .unwrap()
       .then((data) => {
-        console.log("touched here");
+        console.log(data);
         if (data?.user?.reference_id) {
-          navigate(`/${data?.user?.reference_id}`);
+          localStorage.setItem("reference_id", data?.user?.reference_id);
+          localStorage.setItem("access_token", data?.access_token);
+          navigate(`/${data.user.reference_id}`);
           window.location.reload();
         }
       })
@@ -70,8 +67,8 @@ const Login = () => {
 
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
-      borderRadius: "40px",
-      height:"50px"
+      // borderRadius: "40px",
+      height: "40px",
     },
   };
 
@@ -93,7 +90,7 @@ const Login = () => {
               fullWidth
               margin="normal"
               autoComplete="new-email"
-              disabled={status === "loading"}
+              disabled={isLoading}
             />
             <TextField
               sx={textFieldStyles}
@@ -105,7 +102,7 @@ const Login = () => {
               fullWidth
               margin="normal"
               autoComplete="new-password"
-              disabled={status === "loading"}
+              disabled={isLoading}
             />
 
             <Typography align="right" sx={{ margin: 2 }}>
@@ -116,10 +113,9 @@ const Login = () => {
               type="submit"
               variant="outlined"
               fullWidth
-              className="tweetBox__tweetButton"
-              disabled={status === "loading"}
+              disabled={isLoading}
             >
-              {status === "loading" ? (
+              {isLoading ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
                 "Login"

@@ -10,6 +10,7 @@ import {
   ListItemText,
   useTheme,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
@@ -29,7 +30,9 @@ function TopHeader({ systemPrefersDark }) {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { searchedUserDetails } = useSelector((state) => state.search);
+  const { searchedUserDetails, searchedUserStatus } = useSelector(
+    (state) => state.search
+  );
   const reference_id = localStorage.getItem("reference_id");
 
   useEffect(() => {
@@ -77,18 +80,20 @@ function TopHeader({ systemPrefersDark }) {
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "100%", position: "static", zIndex: 999 }}>
       <AppBar
         position="static"
         sx={{
-          bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
           color: "#000",
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
           px: 2,
           py: 1,
+          boxShadow: 0,
+          borderBottom: 1,
+          bgcolor: systemPrefersDark ? "#000" : "#FFF",
+          borderColor: "divider",
         }}
       >
-        <Toolbar sx={{ justifyContent: "space-between", gap: 2 }}>
+        <Toolbar sx={{ justifyContent: "space-evenly", gap: 2 }}>
           {/* Logo */}
           <Box display="flex" alignItems="center" gap={1}>
             <img
@@ -127,16 +132,19 @@ function TopHeader({ systemPrefersDark }) {
               InputProps={{
                 disableUnderline: true,
                 endAdornment: (
-                  <IconButton
-                    onClick={() => {
-                      setSearchTerm("");
-                      dispatch(clearSearch());
-                    }}
-                  >
-                    <CloseIcon sx={{ color: "#888" }} />
+                  <IconButton onClick={() => setSearchTerm("")}>
+                    {searchedUserStatus == "loading" ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <CloseIcon />
+                    )}
                   </IconButton>
                 ),
-                startAdornment: <SearchIcon sx={{ color: "#888", mr: 1 }} />,
+                startAdornment: (
+                  <IconButton onClick={() => setSearchTerm("")}>
+                    <SearchIcon />
+                  </IconButton>
+                ),
               }}
             />
           </Box>
@@ -145,13 +153,15 @@ function TopHeader({ systemPrefersDark }) {
           <Button
             onClick={handleOpenPostModal}
             variant="contained"
+            elevation="0"
             sx={{
               textTransform: "none",
               borderRadius: 20,
+              boxShadow: 0,
             }}
             startIcon={<AddIcon />}
           >
-            Create
+            {/* Create */}
           </Button>
         </Toolbar>
       </AppBar>
@@ -160,20 +170,17 @@ function TopHeader({ systemPrefersDark }) {
       {filteredData.length > 0 && (
         <Box
           sx={{
-            position: "absolute",
-            top: "60px",
-            left: "51.5%",
-            transform: "translateX(-50%)",
+            position: "sticky",
+            // top: "70px",
+            // left: "50%",
+            // transform: "translateX(-50%)",
             width: "100%",
-            maxWidth: 500,
+            // maxWidth: 500,
             bgcolor: "background.paper",
             boxShadow: 4,
-            borderRadius: 2,
-            mt: 1,
-            zIndex: 999,
-            maxHeight: 300,
+            zIndex: 9999,
+            maxHeight: "auto",
             overflowY: "auto",
-            border: "1px solid #e0e0e0",
           }}
         >
           <List dense>

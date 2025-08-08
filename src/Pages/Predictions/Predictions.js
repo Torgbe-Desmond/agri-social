@@ -1,54 +1,32 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Predictions.css";
 import { useOutletContext } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import PredictionCard from "../../components/PredictionCard/PredictionCard";
-import { getPredictions } from "../../Features/PredictionSlice";
-import { Box, CircularProgress, TextField, Typography } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import { Box, CircularProgress } from "@mui/material";
 import Header from "../../components/Header/Header";
-import { setScrolling } from "../../Features/StackSlice";
 import PredictionHeader from "./PredictionHeader";
 import PredictionList from "./PredictionList";
+import { useDispatch, useSelector } from "react-redux";
+import { setScrolling } from "../../Features/StackSlice";
+import { useGetPredictionsQuery } from "../../Features/predictionApi";
+import ErrorInfoAndReload from "../../components/Errors/ErrorInfoAndReload";
 
 function Predictions() {
-  const { user_id } = useOutletContext();
-  const { prediction, predictionStatus, deletePredictionStatus } = useSelector(
-    (state) => state.prediction
-  );
-  const { userDetails } = useSelector((state) => state.auth);
-  const [tabIndex, setTabIndex] = useState(0);
-  const [pageNumber, setPageNumber] = useState(1);
-  const observer = useRef();
+  const { user_id, systemPrefersDark, user } = useOutletContext();
   const dispatch = useDispatch();
-  const { darkMode, systemPrefersDark } = useOutletContext();
-  const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
   const [scrolling, setScroll] = useState(0);
   const lastScrollTop = useRef(0);
+
+  const { data, isLoading, isFetching, isError, refetch, error } =
+    useGetPredictionsQuery();
 
   useEffect(() => {
     dispatch(setScrolling(true));
     return () => dispatch(setScrolling(false));
   }, []);
 
-  useEffect(() => {
-    dispatch(getPredictions({ user_id }));
-  }, [dispatch, user_id]);
-
-  //   const lastPostRef = useCallback(
-  //     (node) => {
-  //       if (observer.current) observer.current.disconnect();
-  //       observer.current = new IntersectionObserver((entries) => {
-  //         if (entries[0].isIntersecting && hasMore) {
-  //           setPageNumber((prev) => prev + 1);
-  //         }
-  //       });
-  //       if (node) observer.current.observe(node);
-  //     },
-  //     [hasMore]
-  //   );
-
+  // Scroll tracking (optional logic)
   useEffect(() => {
     const scrollContainer = document.querySelector(".resuable");
     if (!scrollContainer) return;
@@ -61,23 +39,18 @@ function Predictions() {
 
     scrollContainer.addEventListener("scroll", handleScroll);
     return () => scrollContainer.removeEventListener("scroll", handleScroll);
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
-    let searchedData;
-    searchedData = searchTerm
-      ? prediction?.filter((st) =>
-          st.prediction_label
-            ?.toLocaleLowerCase()
-            ?.includes(searchTerm.toLocaleLowerCase())
+    const searchedData = searchTerm
+      ? data?.predictions.filter((item) =>
+          item.prediction_label
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase())
         )
-      : prediction;
+      : data?.predictions;
     setFilteredData(searchedData);
-  }, [searchTerm, prediction]);
-
-  const handleTabChange = (event, newValue) => {
-    setTabIndex(newValue);
-  };
+  }, [searchTerm, data?.predictions]);
 
   return (
     <Box className="predictions">
@@ -86,24 +59,16 @@ function Predictions() {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
       />
-
-      {predictionStatus === "loading" ? (
-        <p className="circular__progress">
-          <CircularProgress size={20} />
-        </p>
-      ) : (
-        <PredictionList
-          predictionStatus={predictionStatus}
-          filteredData={filteredData}
-          userDetails={userDetails}
-        />
-      )}
-
-      {predictionStatus === "failed" && (
-        <p className="circular__progress">
-          {/* Error message or retry button */}
-        </p>
-      )}
+      <PredictionList
+        predictionStatus="succeeded"
+        filteredData={filteredData}
+        userDetails={user}
+      />
+      <ErrorInfoAndReload
+        isLoading={isLoading}
+        isFetching={isFetching}
+        refetch={refetch}
+      />
     </Box>
   );
 }
