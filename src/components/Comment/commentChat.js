@@ -1,10 +1,9 @@
 import {
   Box,
   IconButton,
-  SwipeableDrawer,
-  TextField,
   Menu,
   MenuItem,
+  TextField,
   Autocomplete,
   Chip,
 } from "@mui/material";
@@ -15,14 +14,15 @@ import AttachFileOutlinedIcon from "@mui/icons-material/AttachFileOutlined";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import VideoCameraBackOutlinedIcon from "@mui/icons-material/VideoCameraBackOutlined";
 import { useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useTheme } from "@mui/material/styles"; 
 import "./CommentChat.css";
 
 const CommentChat = ({
   message,
   setMessage,
   handleAddComment,
-  handleAddFile,
+  isAddingComment,
+  handleMediaUpload,
   setFile,
   file = [],
   emojiAnchor,
@@ -38,11 +38,13 @@ const CommentChat = ({
   toggleDrawer,
   openDrawer,
   selectedTags,
-  handleMediaUpload,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const attachmentMenuOpen = Boolean(anchorEl);
-  const { systemPrefersDark } = useOutletContext();
+
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === "dark";
+
   const predefinedTags = [];
 
   const handleAttachmentClick = (event) => {
@@ -96,8 +98,12 @@ const CommentChat = ({
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "40px",
-      bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
+      bgcolor: isDarkMode ? theme.palette.background.paper : "#FFF",
       height: "50px",
+      color: theme.palette.text.primary,
+      "& input": {
+        color: theme.palette.text.primary,
+      },
     },
   };
 
@@ -108,6 +114,7 @@ const CommentChat = ({
 
   const handleTagChange = (event, value) => {
     if (event && (event.key === "Enter" || event.key === " ")) {
+      // optional logic on Enter/Space
     }
     setSelectedTags(value);
   };
@@ -116,18 +123,16 @@ const CommentChat = ({
     <Box
       sx={{
         p: 1,
-        bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
-        // borderColor: "divider",
-        // borderTop: 0.5,
+        bgcolor: isDarkMode ? theme.palette.background.paper : "#FFF",
         boxShadow: "0px -1px 2px rgba(0, 0, 0, 0.1)",
+        display: "grid",
+        position: "sticky",
+        bottom: 0,
+        zIndex: 100,
+        gap: 1,
+        alignItems: "center",
+        pt: 1,
       }}
-      display="grid"
-      position="sticky"
-      bottom="0"
-      zIndex="100"
-      gap={1}
-      alignItems="center"
-      pt={1}
     >
       <Box mt={1} mb={0.5}>
         <Autocomplete
@@ -153,28 +158,39 @@ const CommentChat = ({
             <TextField
               {...params}
               variant="outlined"
+              disabled={isAddingComment}
               placeholder="Tags"
               size="small"
               sx={{
                 "& .MuiOutlinedInput-root": {
                   height: 36,
+                  color: theme.palette.text.primary,
+                  backgroundColor: isDarkMode
+                    ? theme.palette.background.default
+                    : "#f9f9f9",
                   "& fieldset": { borderColor: "transparent" },
                   "&:hover fieldset": { borderColor: "transparent" },
-                  "&.Mui-focused fieldset": { borderColor: "transparent" },
+                  "&.Mui-focused fieldset": {
+                    borderColor: theme.palette.primary.main,
+                  },
+                },
+                input: {
+                  color: theme.palette.text.primary,
                 },
               }}
             />
           )}
         />
       </Box>
+
       <Box
         sx={{
           p: 0.5,
           display: "flex",
-          flexWrap: "wrap", // allows wrapping
+          flexWrap: "wrap",
           gap: 1,
-          maxWidth: 600, // constrain width
-          maxHeight: "auto", // no longer fixed height
+          maxWidth: 600,
+          maxHeight: "auto",
           borderRadius: 1,
         }}
       >
@@ -187,7 +203,7 @@ const CommentChat = ({
               width: 100,
               height: 60,
               border: "1px solid",
-              borderColor: "divider",
+              borderColor: theme.palette.divider,
               borderRadius: 1,
               overflow: "hidden",
             }}
@@ -228,7 +244,7 @@ const CommentChat = ({
               width: 100,
               height: 60,
               border: "1px solid",
-              borderColor: "divider",
+              borderColor: theme.palette.divider,
               borderRadius: 1,
               overflow: "hidden",
             }}
@@ -266,6 +282,7 @@ const CommentChat = ({
         <TextField
           sx={textFieldStyles}
           fullWidth
+          disabled={isAddingComment}
           placeholder="Write a comment..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -275,13 +292,21 @@ const CommentChat = ({
           maxRows={3}
           InputProps={{
             endAdornment: (
-              <IconButton onClick={openEmojiPicker}>
+              <IconButton
+                disabled={isAddingComment}
+                onClick={openEmojiPicker}
+                sx={{ color: theme.palette.text.primary }}
+              >
                 <InsertEmoticonIcon />
               </IconButton>
             ),
             startAdornment: (
               <>
-                <IconButton onClick={handleAttachmentClick}>
+                <IconButton
+                  disabled={isAddingComment}
+                  onClick={handleAttachmentClick}
+                  sx={{ color: theme.palette.text.primary }}
+                >
                   <AttachFileOutlinedIcon />
                 </IconButton>
                 <Menu
@@ -290,6 +315,12 @@ const CommentChat = ({
                   onClose={handleCloseAttachmentMenu}
                   anchorOrigin={{ vertical: "top", horizontal: "right" }}
                   transformOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  PaperProps={{
+                    sx: {
+                      bgcolor: theme.palette.background.paper,
+                      color: theme.palette.text.primary,
+                    },
+                  }}
                 >
                   <MenuItem onClick={handleAddImage}>
                     <ImageOutlinedIcon sx={{ mr: 1 }} /> Add Image
@@ -303,7 +334,11 @@ const CommentChat = ({
           }}
         />
 
-        <IconButton onClick={handleCommentSubmit}>
+        <IconButton
+          disabled={isAddingComment}
+          onClick={handleCommentSubmit}
+          sx={{ color: theme.palette.primary.main }}
+        >
           <SendIcon />
         </IconButton>
 

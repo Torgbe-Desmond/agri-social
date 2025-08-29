@@ -1,12 +1,13 @@
 .saved {
-  /* display: flex; */
+  display: grid;
   /* align-items: flex-start; */
+  border-bottom: 0px;
+  gap: 0rem;
   /* padding-bottom: 10px; */
-  /* gap: 20px; */
-
-  /* justify-content: space-evenly; */
   width: 100%;
-  /* max-width: 600px; */
+
+  /* border: 1px solid rgba(255, 255, 255, 0.3); */
+  /* padding: 20px; */
 }
 
 .saved__body {
@@ -14,7 +15,7 @@
   padding: 10px;
 }
 
-.saved__body > img {
+.saved__body>img {
   border-radius: 20px;
 }
 
@@ -29,7 +30,7 @@
   font-size: 15px;
 }
 
-.saved__headerText > h3 {
+.saved__headerText>h3 {
   font-size: 15px;
   margin-bottom: 5px;
 }

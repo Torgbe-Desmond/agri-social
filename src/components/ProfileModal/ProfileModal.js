@@ -9,6 +9,7 @@ import {
   Modal,
   Stack,
   TextField,
+  useTheme,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -18,12 +19,13 @@ import { popComponent } from "../../Features/StackSlice";
 import ComponentStack from "../HandleStack/HandleStack";
 import { useUpdateUserInformationMutation } from "../../Features/userApi";
 
-const ProfileModal = ({ user, systemPrefersDark, darkMode }) => {
+const ProfileModal = ({ user }) => {
+  const theme = useTheme(); // 🔹 Access theme
   const [selectedTags, setSelectedTags] = useState(
     user?.interests?.split(",") || []
   );
-
-  const [updateUserInformation, { isLoading }] = useUpdateUserInformationMutation(); 
+  const [updateUserInformation, { isLoading }] =
+    useUpdateUserInformationMutation();
   const dispatch = useDispatch();
 
   const [form, setForm] = useState({
@@ -80,8 +82,9 @@ const ProfileModal = ({ user, systemPrefersDark, darkMode }) => {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          bgcolor: "background.paper",
-          borderRadius: 12,
+          bgcolor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
+          borderRadius: 3,
           boxShadow: 24,
           p: 4,
           width: 500,
@@ -102,11 +105,13 @@ const ProfileModal = ({ user, systemPrefersDark, darkMode }) => {
                   position: "absolute",
                   bottom: -5,
                   right: -5,
-                  bgcolor: "blue",
-                  color: "white",
+                  bgcolor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
                   borderRadius: "50%",
                   p: 0.5,
-                  "&:hover": { bgcolor: "darkblue" },
+                  "&:hover": {
+                    bgcolor: theme.palette.primary.dark,
+                  },
                 }}
               >
                 <AddCircleIcon />
@@ -155,7 +160,7 @@ const ProfileModal = ({ user, systemPrefersDark, darkMode }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <EmailIcon />
+                  <EmailIcon color="action" />
                 </InputAdornment>
               ),
             }}
@@ -189,11 +194,25 @@ const ProfileModal = ({ user, systemPrefersDark, darkMode }) => {
 
           {/* Action Buttons */}
           <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button variant="outlined" onClick={handlePopComponent}>
+            <Button
+              variant="outlined"
+              sx={{
+                borderColor: theme.palette.divider,
+                color: theme.palette.text.primary,
+              }}
+              onClick={handlePopComponent}
+            >
               Cancel
             </Button>
             <Button
               variant="contained"
+              sx={{
+                bgcolor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+                "&:hover": {
+                  bgcolor: theme.palette.primary.dark,
+                },
+              }}
               onClick={handleSave}
               disabled={isLoading}
             >

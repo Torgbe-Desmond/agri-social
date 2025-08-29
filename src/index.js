@@ -8,18 +8,19 @@ import { store } from "./Features/Store";
 import { ThemeProviderWrapper } from "./components/ThemeContent/ThemeContext";
 import { ErrorProvider } from "./components/Errors/Errors";
 import { SocketProvider } from "./components/Socket/Socket";
+import DynamicView from "./components/DynamicView/DynamicView";
 
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProviderWrapper>
-      <Provider store={store}>
+    <Provider store={store}>
+      <ThemeProviderWrapper>
         <SocketProvider>
           <ErrorProvider>
             <App />
           </ErrorProvider>
         </SocketProvider>
-      </Provider>
-    </ThemeProviderWrapper>
+      </ThemeProviderWrapper>
+    </Provider>
   </React.StrictMode>,
   document.getElementById("root")
 );

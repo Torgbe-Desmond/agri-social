@@ -3,10 +3,9 @@
     justify-content: space-between;
     align-items: center;
     position: sticky;
-    bottom: 0;
     z-index: 99;
     width: 100%;
-    padding: 0px 0px;
+    padding: 10px 0px;
 }
 
 .hide-feed-footer-holder {
@@ -30,24 +29,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    position: sticky;
+    position: absolute;
     flex-direction: column;
     bottom: 0;
     z-index: 99;
     width: 100%;
     padding: 0px 10px;
-    /* background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(1px);
-    -webkit-backdrop-filter: blur(1px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 15px; */
+    z-index: 1200;
 }
 
 .timestamp {
     /* background: #ccc; */
-    padding: 10px;
     color: #FFF;
-    font-size: 14px;
+    font-size: 17px;
     background: transparent;
     -webkit-backdrop-filter: blur(10px);
     border-radius: 50%;

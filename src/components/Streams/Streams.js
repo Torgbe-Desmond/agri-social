@@ -15,7 +15,7 @@ const Streams = () => {
   const dispatch = useDispatch();
   const { streamData } = useSelector((state) => state.post);
   const observer = useRef();
-
+  const cardRefs = useRef([]);
   const { data, isLoading, isFetching, error } = useGetStreamsQuery({
     offset: pageNumber,
     limit: 10,
@@ -36,30 +36,30 @@ const Streams = () => {
     setOpen(!open);
   };
 
-  // Filter data based on search term
   useEffect(() => {
-    const searchedData = searchTerm
-      ? streamData?.filter((video) =>
-          video.username.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      : streamData;
-    setFilteredData(searchedData);
-  }, [searchTerm, streamData]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.9) {
+            const index = Number(entry.target.dataset.index);
+            // If the visible card is the last one, load more
+            if (
+              index === streamData.length - 1 &&
+              hasMoreStreams &&
+              !isFetching
+            ) {
+              setPageNumber((prev) => prev + 1);
+            }
+          }
+        });
+      },
+      { threshold: 0.9 }
+    );
 
-  const lasStreamRef = useCallback(
-    (node) => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMoreStreams && !isFetching) {
-          setPageNumber((prev) => prev + 1);
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [hasMoreStreams]
-  );
+    cardRefs.current.forEach((ref) => ref && observer.observe(ref));
+
+    return () => observer.disconnect();
+  }, [streamData, hasMoreStreams, isFetching]);
 
   return (
     <List
@@ -69,30 +69,28 @@ const Streams = () => {
       }}
       className="list-container"
     >
-      {filteredData?.map((file, index) => {
-        const isLast = index === streamData?.length - 1;
-        return (
-          <div
-            ref={isLast ? lasStreamRef : null}
-            className="video-holder"
-            key={index}
-          >
-            <VideoCard
-              id={index}
-              user_image={file.user_image}
-              saved={file.saved}
-              comments={file.comments}
-              post_id={file.post_id}
-              likes={file.likes}
-              user_id={file.user_id}
-              url={file.videos}
-              content={file.content}
-              username={file.username}
-              handleToggleDialog={handleToggleDialog}
-            />
-          </div>
-        );
-      })}
+      {streamData?.map((file, index) => (
+        <div
+          key={file.post_id || index}
+          ref={(el) => (cardRefs.current[index] = el)}
+          data-index={index}
+          className="video-holder"
+        >
+          <VideoCard
+            id={index}
+            user_image={file.user_image}
+            saved={file.saved}
+            comments={file.comments}
+            post_id={file.post_id}
+            likes={file.likes}
+            user_id={file.user_id}
+            url={file.videos}
+            content={file.content}
+            username={file.username}
+            handleToggleDialog={handleToggleDialog}
+          />
+        </div>
+      ))}
     </List>
   );
 };

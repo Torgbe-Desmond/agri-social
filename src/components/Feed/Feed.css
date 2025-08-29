@@ -12,6 +12,12 @@
   display: none;
 }
 
+.highlight-visible {
+  border: 3px solid red;
+  border-radius: 8px;
+  transition: border 0.2s ease-in-out;
+}
+
 
 .visible-post {
   outline: 2px solid limegreen;

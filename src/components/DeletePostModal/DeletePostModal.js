@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Modal,
@@ -6,67 +6,79 @@ import {
   Button,
   Divider,
   CircularProgress,
-  Alert,
+  useTheme,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { removeDeletedPost } from "../../Features/PostSlice";
 import { useDeletePostMutation } from "../../Features/postApi";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: { xs: "80%", sm: "70%", md: "500px" },
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  borderRadius: 2,
-  p: 3,
-};
-
 const DeletePostModal = ({ post_id }) => {
   const dispatch = useDispatch();
+  const theme = useTheme(); // 🔹 Access current theme (light/dark)
   const [deletePost, { isLoading }] = useDeletePostMutation();
 
   const handlePostDelete = async () => {
     const payload = await deletePost({ post_id }).unwrap();
     dispatch(removeDeletedPost({ payload }));
+    dispatch(popComponent());
   };
 
   return (
     <Modal open={true}>
-      <Box sx={style}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: { xs: "80%", sm: "70%", md: "500px" },
+          bgcolor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
+          boxShadow: 24,
+          borderRadius: 2,
+          p: 3,
+        }}
+      >
         {/* Title */}
         <Typography variant="h6" gutterBottom>
           Delete
         </Typography>
-        <Divider sx={{ mb: 2 }} />
+        <Divider sx={{ mb: 2, borderColor: theme.palette.divider }} />
 
         <Typography sx={{ mb: 2 }}>
-          Are you sure you want to delete this post ?
+          Are you sure you want to delete this post?
         </Typography>
+
         {/* Action Buttons */}
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
           <Button
             variant="outlined"
             sx={{
-              borderRadius: "32px !important",
+              borderRadius: "32px",
+              borderColor: theme.palette.divider,
+              color: theme.palette.text.primary,
             }}
             disabled={isLoading}
-            color="secondary"
             onClick={() => dispatch(popComponent())}
           >
             Cancel
           </Button>
           {isLoading ? (
-            <CircularProgress />
+            <CircularProgress size={24} />
           ) : (
             <Button
               disabled={isLoading}
-              className="sidebar__tweet__contained"
-              onClick={() => handlePostDelete()}
-              variant="outlined"
+              onClick={handlePostDelete}
+              variant="contained"
+              sx={{
+                borderRadius: "32px",
+                bgcolor: theme.palette.error.main,
+                color: theme.palette.error.contrastText,
+                "&:hover": {
+                  bgcolor: theme.palette.error.dark,
+                },
+              }}
             >
               Delete
             </Button>

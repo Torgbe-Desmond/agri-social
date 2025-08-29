@@ -35,10 +35,11 @@ const Post = forwardRef(({ post }, ref) => {
   );
   const navigate = useNavigate();
   const reference_id = localStorage.getItem("reference_id");
-  const [likePost] = useLikePostMutation();
-  const [savePost] = useSavePostMutation();
+  const [likePost, { isLoading: isLoadingLiked, isError: isErrorLiked }] =
+    useLikePostMutation();
+  const [savePost, { isLoading: isLoadingSaved, isError: isErrorSaved }] =
+    useSavePostMutation();
 
-  console.log("post", post);
   const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
@@ -64,7 +65,6 @@ const Post = forwardRef(({ post }, ref) => {
         post_id: post?.post_id,
         formData,
       }).unwrap();
-
       dispatch(updatePostLike(payload));
     } catch (error) {
       console.error("Error liking post:", error);
@@ -99,6 +99,7 @@ const Post = forwardRef(({ post }, ref) => {
       to: `/${reference_id}/post/${post?.post_id}`,
       icon: <ChatBubbleOutlineIcon fontSize="small" />,
       count: post?.replies || post?.comments,
+      status: null,
     },
     {
       id: "like",
@@ -110,7 +111,7 @@ const Post = forwardRef(({ post }, ref) => {
       ),
       count: post?.likes,
       action: handleLikePost,
-      status: null,
+      status: isLoadingLiked,
     },
     {
       id: "bookmark",
@@ -122,16 +123,9 @@ const Post = forwardRef(({ post }, ref) => {
       ),
       count: post?.saves,
       action: handleSavePost,
+      status: isLoadingSaved,
     },
   ];
-
-  // if (singlePostStatus === "loading") {
-  //   return (
-  //     <p className="circular__progress">
-  //       <CircularProgress />
-  //     </p>
-  //   );
-  // }
 
   if (!post) {
     return (
@@ -139,7 +133,7 @@ const Post = forwardRef(({ post }, ref) => {
         sx={{
           border: 1,
           borderColor: "divider",
-          borderRadius: "30px",
+          borderRadius: "8px",
           p: 2,
           m: 2,
         }}
@@ -158,7 +152,12 @@ const Post = forwardRef(({ post }, ref) => {
     >
       <HeaderPost post={post} />
       <BodyPost post={post} />
-      <FooterPost actions={actions} post_id={post?.post_id} />
+      <FooterPost
+        actions={actions}
+        isLoadingSaved={isLoadingSaved}
+        isLoadingLiked={isLoadingLiked}
+        post_id={post?.post_id}
+      />
     </Box>
   );
 });

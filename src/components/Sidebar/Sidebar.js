@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Sidebar.css";
 import SidebarOption from "../SidebarOption/SidebarOption";
 import HomeIcon from "@mui/icons-material/Home";
@@ -6,35 +6,32 @@ import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import OnlinePredictionOutlinedIcon from "@mui/icons-material/OnlinePredictionOutlined";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
-import ComponentStack from "../HandleStack/HandleStack";
-import { Box, Button, Stack, useMediaQuery } from "@mui/material";
-import { useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { useSocket } from "../Socket/Socket";
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
 import StorefrontIcon from "@mui/icons-material/Storefront";
-import TimelineIcon from "@mui/icons-material/Timeline";
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
+import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
+import { useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useSocket } from "../Socket/Socket";
+import ComponentStack from "../HandleStack/HandleStack";
 
 function Sidebar() {
+  const theme = useTheme(); // 👈 Access theme colors here
   const isMobile = useMediaQuery("(max-width:640px)");
   const unShowIcons = useMediaQuery("(max-width:1020px)");
   const [currentPage, setCurrentPage] = useState("");
   const location = useLocation();
   const dispatch = useDispatch();
   const socket = useSocket();
-  // const { userDetails } = useSelector((state) => state.auth);
   const [notifyCounts, setNotifyCount] = useState(0);
   const reference_id = localStorage.getItem("reference_id");
 
   useEffect(() => {
-    if (!socket) return;
-  }, []);
-
-  // if (isMobile) return null;
+    const page = location.pathname.split("/")[2];
+    setCurrentPage(page || "");
+  }, [location]);
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
@@ -42,34 +39,19 @@ function Sidebar() {
     window.location.reload();
   };
 
-  // useEffect(() => {
-  //   if (!socket) return;
-
-  //   const handleNoficationCount = (data) => {
-  //     const { notification_count } = data;
-  //     console.log("notification_count", notification_count);
-
-  //     setNotifyCount(notification_count);
-  //   };
-
-  //   socket.on("notification_count", handleNoficationCount);
-
-  //   return () => {
-  //     socket.off("notification_count", handleNoficationCount);
-  //   };
-  // }, [socket]);
-
-  useEffect(() => {
-    const page = location.pathname.split("/")[2];
-    if (!page) {
-      setCurrentPage("");
-    } else {
-      setCurrentPage(page);
-    }
-  }, [location]);
+  const handleDynamicView = () => {
+    const stack = new ComponentStack(dispatch);
+    stack.handleStack("DynamicView", {});
+  };
 
   return (
-    <Box className="sidebar">
+    <Box
+      className="sidebar"
+      sx={{
+        color: theme.palette.text.primary,
+        padding: 2,
+      }}
+    >
       <SidebarOption
         unShowIcons={unShowIcons}
         isMobile={isMobile}
@@ -143,14 +125,6 @@ function Sidebar() {
         text="Market Place"
         to={`/${reference_id}/market-place`}
       />
-      {/* <SidebarOption
-        unShowIcons={unShowIcons}
-        isMobile={isMobile}
-        Icon={TimelineIcon}
-        active={currentPage === "post-history"}
-        text="Posts"
-        to={`/${reference_id}/post-history`}
-      /> */}
       <SidebarOption
         unShowIcons={unShowIcons}
         isMobile={isMobile}
@@ -159,18 +133,42 @@ function Sidebar() {
         text="Products"
         to={`/${reference_id}/products`}
       />
-      {/* <SidebarOption isMobile={isMobile} Icon={MoreHorizIcon} text="More" /> */}
-
-      {/* Button -> Tweet */}
 
       <Button
         onClick={handleLogout}
         variant="outlined"
-        className="sidebar__tweet"
         fullWidth
+        sx={{
+          marginTop: 2,
+          color: theme.palette.primary.main,
+          borderColor: theme.palette.primary.main,
+          borderRadius: "20px",
+          "&:hover": {
+            borderColor: theme.palette.primary.light,
+            backgroundColor: theme.palette.action.hover,
+          },
+        }}
       >
         Logout
       </Button>
+
+      {/* <Button
+        onClick={handleDynamicView}
+        variant="outlined"
+        fullWidth
+        sx={{
+          marginTop: 2,
+          color: theme.palette.primary.main,
+          borderColor: theme.palette.primary.main,
+          borderRadius: "20px",
+          "&:hover": {
+            borderColor: theme.palette.primary.light,
+            backgroundColor: theme.palette.action.hover,
+          },
+        }}
+      >
+        Dynamic View
+      </Button> */}
     </Box>
   );
 }

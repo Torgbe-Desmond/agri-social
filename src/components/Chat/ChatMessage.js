@@ -1,38 +1,55 @@
-import React from "react";
-import { Box, Avatar, IconButton } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Box,
+  Avatar,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+} from "@mui/material";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import DoneIcon from "@mui/icons-material/Done";
-
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 /**
  * ChatMessage component to display a single chat message
  *
  * @param {Object} msg - The message object containing content, images, sender info, etc.
  * @param {boolean} isUser - Indicates if the message is from the current user
  * @param {boolean} systemPrefersDark - Indicates if system is in dark mode
+ * @param {Function} onDelete - Callback when delete is clicked
  */
-const ChatMessage = ({ msg, isUser, systemPrefersDark }) => {
+const ChatMessage = ({ msg, isUser, systemPrefersDark, onDelete }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  // handle opening/closing the menu
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDelete = () => {
+    handleMenuClose();
+    if (onDelete) onDelete(msg); // pass message to parent for deletion
+  };
+
   // Safely split image and video strings into arrays
-
   const handleImageAndVideoConversion = (msg) => {
-    let imageList;
-    let videoList;
+    const imageList = Array.isArray(msg.images)
+      ? msg.images
+      : msg?.images
+      ? msg.images.split(",").filter(Boolean)
+      : [];
 
-    if (Array.isArray(msg.images)) {
-      imageList = msg.images;
-    } else {
-      imageList = msg?.images ? msg.images.split(",").filter(Boolean) : [];
-    }
+    const videoList = Array.isArray(msg.videos)
+      ? msg.videos
+      : msg?.videos
+      ? msg.videos.split(",").filter(Boolean)
+      : [];
 
-    if (Array.isArray(msg.images)) {
-      videoList = msg.video;
-    } else {
-      videoList = msg?.videos ? msg.videos.split(",").filter(Boolean) : [];
-    }
-
-    return {
-      imageList,
-      videoList,
-    };
+    return { imageList, videoList };
   };
 
   const { imageList, videoList } = handleImageAndVideoConversion(msg);
@@ -46,10 +63,12 @@ const ChatMessage = ({ msg, isUser, systemPrefersDark }) => {
       gap={2}
       mb={2}
       className={`chat__message ${msg.sender_id}`}
+      sx={{ position: "relative" }}
     >
       <Avatar src={msg?.user_image} sx={{ width: 40, height: 40 }} />
 
       <Box
+        className="glass-effect"
         sx={{
           background: isUser ? "#daf4ff" : "#e8fef1",
           color: systemPrefersDark ? "#000" : "inherit",
@@ -60,20 +79,16 @@ const ChatMessage = ({ msg, isUser, systemPrefersDark }) => {
           p: 1.5,
           maxWidth: "70%",
           gap: 1,
+          position: "relative",
         }}
       >
-        {/* Display images if any */}
+        {/* Ellipsis button (only show if user’s own message) */}
+
+        {/* Images */}
         {imageList.length > 0 && (
           <Box display="flex" flexWrap="wrap" gap={1}>
             {imageList.map((img, idx) => (
-              <Box
-                key={idx}
-                sx={{
-                  display: "inline-block",
-                  position: "relative",
-                  margin: "4px",
-                }}
-              >
+              <Box key={idx} sx={{ position: "relative" }}>
                 <img
                   src={img}
                   alt={`Uploaded image ${idx + 1}`}
@@ -84,27 +99,12 @@ const ChatMessage = ({ msg, isUser, systemPrefersDark }) => {
                     objectFit: "cover",
                   }}
                 />
-                {/* Optional image delete button */}
-                {/* <IconButton
-                  size="small"
-                  sx={{
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    bgcolor: "rgba(0,0,0,0.6)",
-                    color: "white",
-                    "&:hover": { bgcolor: "rgba(0,0,0,0.8)" },
-                  }}
-                  onClick={() => handleImageDelete(img)} // implement this if needed
-                >
-                  &times;
-                </IconButton> */}
               </Box>
             ))}
           </Box>
         )}
 
-        {/* Display videos if any */}
+        {/* Videos */}
         {videoList.length > 0 && (
           <Box display="flex" flexWrap="wrap" gap={1}>
             {videoList.map((video, idx) => (
@@ -123,18 +123,52 @@ const ChatMessage = ({ msg, isUser, systemPrefersDark }) => {
           </Box>
         )}
 
-        {/* Message text content */}
+        {/* Message text */}
         <Box>{msg.content}</Box>
 
-        {/* Message status (if user) */}
+        {/* Status (only if user) */}
         {isUser && (
-          <Box display="flex" justifyContent="flex-end" mt={0.5}>
-            {/* Example logic: adjust according to your actual status */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              justifyContent: "flex-end",
+            }}
+          >
+            {/* <Box display="flex" justifyContent="flex-end" mt={0.5}> */}
             {msg.status === "read" ? (
               <DoneAllIcon fontSize="small" />
             ) : (
               <DoneIcon fontSize="small" />
             )}
+            {/* </Box> */}
+
+            <Tooltip title="More options">
+              <IconButton
+                size="small"
+                onClick={handleMenuOpen}
+                sx={{
+                  position: "absolute",
+                  mt: 1,
+                  right: 4,
+                  opacity: 1,
+                  color: "#000",
+                  transition: "opacity 0.2s",
+                  // "&:hover": { opacity: 1 },
+                  // ".chat__message:hover &": { opacity: 1 },
+                }}
+              >
+                <MoreHorizIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem onClick={handleDelete}>Delete</MenuItem>
+            </Menu>
           </Box>
         )}
       </Box>

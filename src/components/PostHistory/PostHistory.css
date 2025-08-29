@@ -1,0 +1,104 @@
+.phd {
+  display: grid;
+  gap: 0;
+  width: 100%;
+}
+
+.phd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.phd-header-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.phd-header-user h3 {
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.phd-header-meta {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 12px;
+  color: gray;
+}
+
+.phd-header-username {
+  color: gray;
+}
+
+.phd-header-time {
+  color: gray;
+}
+
+.phd-header-action {
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.phd-body {
+  flex: 1;
+  display: grid;
+  padding: 10px;
+}
+
+.phd-content {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.phd-media-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.phd-media-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.phd-media-wrapper img,
+.phd-media-wrapper video {
+  max-width: 100%;
+  height: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.phd-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.phd-tag {
+  font-size: 13px;
+  color: #1976d2;
+  /* MUI blue */
+  cursor: pointer;
+}
+
+.phd-footer {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+  justify-content: flex-start;
+  padding: 5px 10px;
+}

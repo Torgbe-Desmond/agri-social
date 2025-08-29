@@ -1,5 +1,12 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { PredictionService } from "../Services/PredictionService";
+import { createSlice } from "@reduxjs/toolkit";
+
+const mergeUnique = (existing, incoming, key = "id") => {
+  const map = new Map();
+  [...existing, ...incoming].forEach((item) => {
+    map.set(item[key], item);
+  });
+  return Array.from(map.values());
+};
 
 const initialState = {
   prediction: [],
@@ -10,6 +17,22 @@ const predictionSlice = createSlice({
   name: "prediction",
   initialState,
   reducers: {
+    updatePredictionList: (state, action) => {
+      const { predictionData } = action.payload;
+      state.prediction = mergeUnique(state.prediction, predictionData, "id");
+      console.log(
+        "mergeUnique(state.prediction, predictionData)",
+        mergeUnique(state.prediction, predictionData, "id")
+      );
+    },
+    updatePredictionHistory: (state, action) => {
+      const { predictionHistory } = action.payload;
+      state.predictionHistory = mergeUnique(
+        state.predictionHistory,
+        predictionHistory,
+        "id"
+      );
+    },
     clearPrediction: (state) => {
       state.prediction = [];
     },
@@ -20,20 +43,26 @@ const predictionSlice = createSlice({
       state.deletePredictionStatus = "idle";
     },
     removeDeletePrediction: (state, action) => {
-      const idToDelete = action.payload?.prediction_id;
-      if (!idToDelete) return;
+      const {
+        payload: { prediction_id },
+      } = action.payload;
+      if (!prediction_id) return;
 
-      state.prediction = state.prediction?.filter((p) => p.id !== idToDelete);
+      state.prediction = state.prediction?.filter(
+        (p) => p.id !== prediction_id
+      );
     },
   },
-
   extraReducers: (builder) => {},
 });
 
 export const {
+  updatePredictionList,
+  updatePredictionHistory,
   clearPrediction,
   clearPredictionStatus,
   clearImagePrediction,
   removeDeletePrediction,
 } = predictionSlice.actions;
+
 export default predictionSlice.reducer;

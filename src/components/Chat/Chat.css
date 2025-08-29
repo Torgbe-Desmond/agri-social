@@ -90,3 +90,25 @@
 .css-1pjy560-MuiFormControl-root-MuiTextField-root {
   border-radius: 40px !important;
 }
+
+.conversations {
+  flex: 1;
+  min-width: fit-content;
+  overflow-y: scroll;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.conversations::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.conversations {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}

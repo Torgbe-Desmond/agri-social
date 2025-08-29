@@ -1,15 +1,15 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { Box, useMediaQuery } from "@mui/material";
+import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import HeaderPost from "../Post/HeaderPost";
 import BodyPost from "../Post/BodyPost";
 import FooterPost from "../Post/FooterPost";
 import { useLikeCommentMutation } from "../../Features/commentApi";
 
-function Replies({ reply }) {
+const Replies = forwardRef(({ reply }, ref) => {
   const navigate = useNavigate();
   const reference_id = localStorage.getItem("reference_id");
   const [likeComment] = useLikeCommentMutation();
@@ -53,14 +53,15 @@ function Replies({ reply }) {
   return (
     <Box
       sx={{ borderBottom: 1, borderColor: "divider" }}
-      id={`post-${reply?.id}`}
-      className="post"
+      id={`comment-single-post-${reply?.id}`}
+      className="comment-single-post"
+      ref={ref}   // ✅ now works
     >
       <HeaderPost post={reply} />
       <BodyPost post={reply} />
       <FooterPost actions={actions} />
     </Box>
   );
-}
+});
 
 export default Replies;

@@ -2,15 +2,12 @@ import axios from "axios";
 import SuccessMessage from "../components/SuccessMessage/SuccessMessage";
 import { errorMap } from "../components/Errors/ErrorStatus";
 import { Alert } from "@mui/material";
-const url = [
-  "https://agri-social-backend.onrender.com",
-  "http://localhost:8000",
-];
+import { Api } from "../Features/Api";
 
 // Create an Axios instance
 
 export const axiosInstance = axios.create({
-  baseURL: url[0],
+  baseURL: Api,
   headers: {
     "Content-Type": "application/json",
   },

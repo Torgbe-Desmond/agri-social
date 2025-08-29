@@ -8,17 +8,21 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import FooterPost from "../Post/FooterPost";
 import CommentHeader from "./CommentHeader";
 import CommentBody from "./commentBody";
-import { likeComment } from "../../Features/CommentSlice";
+import { useLikeCommentMutation } from "../../Features/postApi";
 
 const Comment = forwardRef(({ comment, singleCommentStatus }, ref) => {
-  const dispatch = useDispatch();
   const reference_id = localStorage.getItem("reference_id");
+  const [likeComment] = useLikeCommentMutation();
 
-  const handleLikeComment = () => {
+  const handleLikeComment = async () => {
     const formData = new FormData();
     formData.append("comment_id", comment?.id);
-    formData.append("post_owner", comment?.user_id);
-    dispatch(likeComment({ comment_id: comment?.id, formData }));
+    formData.append("post_owner", comment.user_id);
+    try {
+      await likeComment({ comment_id: comment?.id, formData }).unwrap();
+    } catch (error) {
+      console.error("Failed to like comment:", error);
+    }
   };
 
   const actions = [
@@ -42,15 +46,29 @@ const Comment = forwardRef(({ comment, singleCommentStatus }, ref) => {
     },
   ];
 
-  if (singleCommentStatus === "loading") {
+  // if (singleCommentStatus === "loading") {
+  //   return (
+  //     <p className="circular__progress">
+  //       <CircularProgress />
+  //     </p>
+  //   );
+  // }
+
+  if (!comment) {
     return (
-      <p className="circular__progress">
-        <CircularProgress />
-      </p>
+      <Box
+        sx={{
+          border: 1,
+          borderColor: "divider",
+          borderRadius: "8px",
+          p: 2,
+          m: 2,
+        }}
+      >
+        Post is currently not available
+      </Box>
     );
   }
-
-  console.log("comment", comment);
 
   return (
     <Box

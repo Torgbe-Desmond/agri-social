@@ -23,7 +23,6 @@ const PredictionCard = ({
   userDetails,
   id,
 }) => {
-  const { darkMode, systemPrefersDark } = useOutletContext();
   const dispatch = useDispatch();
 
   const handlePostDelete = () => {
@@ -32,7 +31,7 @@ const PredictionCard = ({
   };
 
   return (
-    <Box sx={{border: 1, borderColor: "divider"}} className="card">
+    <Box sx={{ border: 1, borderColor: "divider", mb: 1 }} className="card">
       <Box className="card__image">
         <img src={image_url} alt="Prediction" />
       </Box>
@@ -58,7 +57,7 @@ const PredictionCard = ({
         </div>
 
         <div className="card__actions">
-          <StatusIcons icon={<RepeatIcon fontSize="small" />} />
+          {/* <StatusIcons icon={<RepeatIcon fontSize="small" />} /> */}
           <StatusIcons
             icon={<DeleteIcon fontSize="small" />}
             action={handlePostDelete}

@@ -1,9 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Api } from "./Api";
 
-// Define your base API service:
 export const userApi = createApi({
-  reducerPath: "userApi", // unique key for this API slice
+  reducerPath: "userApi",
   baseQuery: fetchBaseQuery({
     baseUrl: Api,
     prepareHeaders: (headers) => {
@@ -13,8 +12,8 @@ export const userApi = createApi({
       }
       return headers;
     },
-  }), // your API base URL here
-  tagTypes: ["User"], // used for cache invalidation if needed
+  }),
+  tagTypes: ["User"],
   endpoints: (build) => ({
     getUser: build.query({
       query: () => "/user",
@@ -37,6 +36,10 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    authenticated: build.query({
+      query: () => "/user/authenticated",
+      providesTags: ["User"],
+    }),
     updateUserInformation: build.mutation({
       query: (formData) => ({
         url: "/user/update",
@@ -53,6 +56,7 @@ export const {
   useGetAnotherUserProfileQuery,
   useGetSuggestedUsersToFollowQuery,
   useGetUserQuery,
+  useAuthenticatedQuery, // <-- don't forget this one
   useUpdateUserInformationMutation,
   useUpdateUserImageMutation,
 } = userApi;

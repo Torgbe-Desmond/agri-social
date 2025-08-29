@@ -7,24 +7,14 @@ import {
   Divider,
   CircularProgress,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { useDeleteNotificationMutation } from "../../Features/notificationApi";
 import { removeDeletedNotification } from "../../Features/notificationSlice";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: { xs: "80%", sm: "70%", md: "500px" },
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  borderRadius: 2,
-  p: 3,
-};
-
 const DeleteNotificationModal = ({ notification_id }) => {
+  const theme = useTheme();
   const dispatch = useDispatch();
   const [deleteNotification, { isLoading }] = useDeleteNotificationMutation();
 
@@ -42,8 +32,20 @@ const DeleteNotificationModal = ({ notification_id }) => {
   };
 
   return (
-    <Modal open={true} onClose={() => dispatch(popComponent())}>
-      <Box sx={style}>
+    <Modal open onClose={() => dispatch(popComponent())}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: { xs: "80%", sm: "70%", md: 500 },
+          bgcolor: theme.palette.background.paper,
+          boxShadow: theme.shadows[5],
+          borderRadius: theme.shape.borderRadius * 2,
+          p: 3,
+        }}
+      >
         <Typography variant="h6" gutterBottom>
           Delete Notification
         </Typography>
@@ -57,7 +59,7 @@ const DeleteNotificationModal = ({ notification_id }) => {
             variant="outlined"
             color="secondary"
             onClick={() => dispatch(popComponent())}
-            sx={{ borderRadius: "32px !important" }}
+            sx={{ borderRadius: "32px" }}
             disabled={isLoading}
           >
             Cancel
@@ -65,9 +67,16 @@ const DeleteNotificationModal = ({ notification_id }) => {
 
           <Button
             onClick={handleDelete}
-            variant="outlined"
-            className="sidebar__tweet__contained"
+            variant="contained"
             disabled={isLoading}
+            sx={{
+              borderRadius: "32px",
+              bgcolor: theme.palette.error.main,
+              color: theme.palette.error.contrastText,
+              "&:hover": {
+                bgcolor: theme.palette.error.dark,
+              },
+            }}
           >
             {isLoading ? <CircularProgress size={24} /> : "Delete"}
           </Button>

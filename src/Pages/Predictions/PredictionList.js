@@ -4,7 +4,7 @@ import PredictionCard from "../../components/PredictionCard/PredictionCard";
 
 function PredictionList({ predictionStatus, filteredData, userDetails }) {
   return (
-    <Box className="scrolling-component" sx={{ height: "100%", overflowY: "auto" }}>
+    <Box className="" sx={{ height: "100%", overflowY: "auto" }}>
       <div className="predictions__holder">
         {filteredData?.length > 0 &&
           filteredData.map(

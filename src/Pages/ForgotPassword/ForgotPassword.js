@@ -1,105 +1,124 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
 import {
   TextField,
   Button,
   Container,
   Typography,
   Box,
-  Snackbar,
-  Alert,
-  LinearProgress,
-  useMediaQuery,
   CircularProgress,
+  useMediaQuery,
+  Paper,
+  useTheme,
 } from "@mui/material";
-import { verifyEmail } from "../../Features/AuthSlice";
-import "./ForgotPassword.css";
 import { Link } from "react-router-dom";
+import { useForgotPasswordMutation } from "../../Features/authApi";
 
-const ForgotPasswordPage = () => {
+const ForgotPassword = () => {
+  const theme = useTheme();
   const [email, setEmail] = useState("");
   const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-  const dispatch = useDispatch();
-  const status = useSelector((state) => state.auth.verifyEmailStatus);
+  const [forgotPassword, { isLoading, isSuccess, isError, error }] =
+    useForgotPasswordMutation();
 
   const handleChange = (e) => {
     setEmail(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email) {
-      return;
+    if (!email) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("email", email);
+      await forgotPassword({ formData }).unwrap();
+    } catch (err) {
+      console.error("Failed to send forgot password request:", err);
     }
-
-    dispatch(verifyEmail({ email }));
-  };
-
-  const darkMode = {
-    color: isDarkMode ? "#FFF" : "",
-    "& .MuiInputBase-input": {
-      color: isDarkMode ? "#FFF" : "",
-      background: isDarkMode ? "#555" : "",
-    },
-    "& .MuiInputBase-input::placeholder": {
-      color: isDarkMode ? "#FFF" : "",
-    },
   };
 
   return (
-    <div className="forgot-password-container">
-      <Container sx={{ width: "500px" }} maxWidth="sm">
-        <Box
-          mt={4}
-          p={4}
-          sx={{ background: "#FFF", backgroundColor: "transparent" }}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: theme.palette.background.default,
+        padding: 2,
+      }}
+    >
+      <Paper
+        elevation={8}
+        sx={{
+          padding: 4,
+          width: "100%",
+          maxWidth: 400,
+          borderRadius: 3,
+          boxShadow: theme.shadows[5],
+        }}
+      >
+        <Typography
+          variant="h5"
+          align="center"
+          sx={{ marginBottom: 3, fontWeight: 600 }}
         >
-          <Typography variant="h4" gutterBottom>
-            Forgot Password ?
-          </Typography>
+          Forgot Password ?
+        </Typography>
 
-          <form onSubmit={handleSubmit}>
-            <TextField
-              sx={darkMode}
-              placeholder="Enter email"
-              value={email}
-              onChange={handleChange}
-              fullWidth
-              disabled={status === 'loading'}
-              name="email"
-              margin="normal"
-            />
+        <form onSubmit={handleSubmit} autoComplete="off">
+          <TextField
+            placeholder="Enter your email"
+            value={email}
+            onChange={handleChange}
+            fullWidth
+            disabled={isLoading}
+            margin="normal"
+          />
 
-            <Button
-              sx={{ marginTop: 3, height: "50px" }}
-              type="submit"
-              variant="contained"
-              color="primary"
-              disabled={status === 'loading'}
-              fullWidth
-            >
-              {status === "loading" ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Verify Email"
-              )}
-            </Button>
-          </form>
-          <Typography align="center" sx={{ marginTop: 3 }}>
-            Go back{" "}
-            <Link
-              to="/"
-              variant="body2"
-              sx={{ ml: 2 }}
-              className={`${isDarkMode ? "switch" : ""}`}
-            >
-              Login here
-            </Link>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            disabled={isLoading}
+            sx={{ padding: 1.5, fontWeight: 600 }}
+          >
+            {isLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Send Reset Link"
+            )}
+          </Button>
+        </form>
+
+        {isSuccess && (
+          <Typography color="success.main" mt={2}>
+            Check your email for the password reset link.
           </Typography>
-        </Box>
-      </Container>
-    </div>
+        )}
+
+        {isError && (
+          <Typography color="error.main" mt={2}>
+            {error?.data?.message || "Something went wrong."}
+          </Typography>
+        )}
+
+        <Typography align="center" sx={{ mt: 3 }}>
+          Back to{" "}
+          <Link
+            to="/"
+            style={{
+              textDecoration: "none",
+              color: theme.palette.primary.main,
+            }}
+          >
+            Login
+          </Link>
+        </Typography>
+      </Paper>
+    </Box>
   );
 };
 
-export default ForgotPasswordPage;
+export default ForgotPassword;

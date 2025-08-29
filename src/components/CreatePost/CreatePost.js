@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Card,
@@ -11,273 +11,229 @@ import {
   Autocomplete,
   Modal,
   CircularProgress,
+  useTheme,
 } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import CloseIcon from "@mui/icons-material/Close";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { addNewPost } from "../../Features/PostSlice";
-import { useOutletContext } from "react-router-dom";
 import { useCreatePostMutation } from "../../Features/postApi";
 
 const CreatePost = () => {
   const [content, setContent] = useState("");
-  const [media, setMedia] = useState(null);
-  const [file, setFile] = useState(null);
-  const [mediaType, setMediaType] = useState(null);
+  const [mediaList, setMediaList] = useState([]); // array of { file, type, preview }
   const [selectedTags, setSelectedTags] = useState([]);
   const dispatch = useDispatch();
   const predefinedTags = [];
-  const [createPost, { isLoading }] = useCreatePostMutation();
+  const [createPost, { isLoading, error }] = useCreatePostMutation();
+
+  console.log("error", error);
+
+  const theme = useTheme();
 
   const handleMediaUpload = (event, type) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setMedia(reader.result);
-      };
-      reader.readAsDataURL(file);
-      setFile(file);
-      setMediaType(type);
-    }
+    const files = Array.from(event.target.files);
+    const newMedia = files.map((file) => {
+      const preview = URL.createObjectURL(file);
+      return { file, type, preview };
+    });
+    setMediaList((prev) => [...prev, ...newMedia]);
   };
 
-  const handleClearMedia = () => {
-    setMedia(null);
-    setMediaType(null);
+  const handleRemoveMedia = (index) => {
+    setMediaList((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handlePost = async () => {
-    if (!content && !media) return;
-
+    if (!content && mediaList.length === 0) return;
     const formData = new FormData();
-
     formData.append("content", content);
-    if (selectedTags) {
+    if (selectedTags.length) {
       formData.append("tags", selectedTags.join(","));
     }
-    if (file) {
-      formData.append("file", file);
-    }
-    if (mediaType === "video") {
-      formData.append("has_video", 1);
-    }
-    if (mediaType === "image") {
-      formData.append("has_video", 0);
-    }
+    mediaList.forEach((m, idx) => {
+      formData.append("files", m.file);
+    });
+
+    let has_video = 0;
+    mediaList.forEach((m) => {
+      if (m.type === "video") has_video = 1;
+    });
+
+    formData.append("has_video", has_video);
 
     const payload = await createPost({ formData }).unwrap();
     dispatch(addNewPost({ payload }));
 
     setContent("");
-    setMedia(null);
-    setMediaType(null);
+    setMediaList([]);
     setSelectedTags([]);
     dispatch(popComponent());
   };
 
-  const handleTagChange = (event, value) => {
-    if (event && (event.key === "Enter" || event.key === " ")) {
-    }
-    setSelectedTags(value);
-  };
-
-  const demsond = (
-    <Card
-      sx={{
-        maxWidth: { xs: 400, sm: 400, md: 400, lg: 400 },
-        margin: "auto",
-        mt: 4,
-        borderRadius: "12px",
-        p: 2,
-      }}
-    >
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Create a Post
-        </Typography>
-
-        <TextField
-          multiline
-          rows={4}
-          fullWidth
-          placeholder="What's on your mind?"
-          variant="outlined"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
-
-        <Box mt={2}>
-          <Autocomplete
-            multiple
-            freeSolo
-            options={predefinedTags}
-            value={selectedTags}
-            onChange={handleTagChange}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip
-                  variant="outlined"
-                  label={option}
-                  {...getTagProps({ index })}
-                  key={index}
-                />
-              ))
-            }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "transparent",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "transparent",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "transparent",
-                    },
-                  },
-                }}
-                variant="outlined"
-                label="Tags"
-                placeholder="Add Tags"
-              />
-            )}
-          />
-        </Box>
-
-        <Box mt={2} display="flex" gap={2} alignItems="center">
-          <input
-            accept="image/*"
-            style={{ display: "none" }}
-            id="image-upload"
-            type="file"
-            onChange={(e) => handleMediaUpload(e, "image")}
-          />
-          <label htmlFor="image-upload">
-            <IconButton component="span" color="primary">
-              <ImageIcon />
-            </IconButton>
-          </label>
-
-          <input
-            accept="video/*"
-            style={{ display: "none" }}
-            id="video-upload"
-            type="file"
-            onChange={(e) => handleMediaUpload(e, "video")}
-          />
-          <label htmlFor="video-upload">
-            <IconButton component="span" color="primary">
-              <VideoLibraryIcon />
-            </IconButton>
-          </label>
-        </Box>
-
-        {(mediaType === "image" && media) ||
-        (mediaType === "video" && media) ? (
-          <Box
-            mt={2}
-            position="relative"
-            justifyContent="center"
-            display="flex"
-            sx={{
-              position: "relative",
-              display: "inline-block",
-              width: 100,
-              height: 60,
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: 1,
-              overflow: "hidden",
-            }}
-          >
-            <IconButton
-              size="small"
-              color="inherit"
-              sx={{
-                position: "absolute",
-                top: 8,
-                right: 8,
-                zIndex: 1,
-              }}
-              onClick={handleClearMedia}
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton>
-
-            {mediaType === "image" ? (
-              <img
-                src={media}
-                style={{ width: "100%", height: "300px", borderRadius: 8 }}
-                alt="Preview"
-              />
-            ) : (
-              <video
-                controls
-                src={media}
-                style={{ width: "100%", height: "300px", borderRadius: 8 }}
-              />
-            )}
-          </Box>
-        ) : null}
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 1,
-          }}
-        >
-          <Button
-            variant="outlined"
-            color="primary"
-            sx={{
-              mt: 2,
-              borderRadius: "32px",
-              height: "50px",
-              marginTop: "20px",
-            }}
-            fullWidth
-            onClick={() => dispatch(popComponent())}
-            disabled={isLoading}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            className="sidebar__tweet"
-            sx={{ mt: 2 }}
-            fullWidth
-            onClick={handlePost}
-            disabled={(!content && !media) || isLoading}
-          >
-            {isLoading ? (
-              <CircularProgress fontSize="small" />
-            ) : (
-              <span>Post</span>
-            )}
-          </Button>
-        </Box>
-      </CardContent>
-    </Card>
-  );
+  const handleTagChange = (event, value) => setSelectedTags(value);
 
   return (
-    <div>
-      <Modal
-        open={true}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+    <Modal open={true} aria-labelledby="modal-modal-title">
+      <Card
+        sx={{
+          maxWidth: 500,
+          margin: "auto",
+          mt: 4,
+          borderRadius: 3,
+          p: 2,
+          backgroundColor: theme.palette.background.paper,
+          boxShadow: theme.shadows[5],
+          border: `1px solid ${theme.palette.divider}`,
+        }}
       >
-        {demsond}
-      </Modal>
-    </div>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Create a Post
+          </Typography>
+
+          <TextField
+            multiline
+            rows={4}
+            fullWidth
+            placeholder="What's on your mind?"
+            variant="outlined"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            sx={{
+              backgroundColor: theme.palette.background.default,
+              borderRadius: 2,
+            }}
+          />
+
+          <Box mt={2}>
+            <Autocomplete
+              multiple
+              freeSolo
+              options={predefinedTags}
+              value={selectedTags}
+              onChange={handleTagChange}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    key={index}
+                    label={option}
+                    {...getTagProps({ index })}
+                  />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField {...params} label="Tags" placeholder="Add Tags" />
+              )}
+            />
+          </Box>
+
+          <Box mt={2} display="flex" gap={2}>
+            <input
+              accept="image/*"
+              style={{ display: "none" }}
+              id="image-upload"
+              type="file"
+              multiple
+              onChange={(e) => handleMediaUpload(e, "image")}
+            />
+            <label htmlFor="image-upload">
+              <IconButton component="span" color="primary">
+                <ImageIcon />
+              </IconButton>
+            </label>
+
+            <input
+              accept="video/*"
+              style={{ display: "none" }}
+              id="video-upload"
+              type="file"
+              multiple
+              onChange={(e) => handleMediaUpload(e, "video")}
+            />
+            <label htmlFor="video-upload">
+              <IconButton component="span" color="primary">
+                <VideoLibraryIcon />
+              </IconButton>
+            </label>
+          </Box>
+
+          {/* Media Grid */}
+          {mediaList.length > 0 && (
+            <Box
+              mt={2}
+              display="grid"
+              gridTemplateColumns="repeat(auto-fill, minmax(70px, 1fr))"
+              gap={1}
+            >
+              {mediaList.map((m, idx) => (
+                <Box key={idx} position="relative">
+                  <IconButton
+                    size="small"
+                    sx={{
+                      position: "absolute",
+                      top: 20,
+                      right: 30,
+                      backgroundColor: theme.palette.background.paper,
+                      "&:hover": {
+                        backgroundColor: theme.palette.action.hover,
+                      },
+                      zIndex: 1,
+                    }}
+                    onClick={() => handleRemoveMedia(idx)}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                  {m.type === "image" ? (
+                    <img
+                      src={m.preview}
+                      alt="Preview"
+                      style={{
+                        width: "70px",
+                        height: 70,
+                        objectFit: "cover",
+                        borderRadius: 4,
+                      }}
+                    />
+                  ) : (
+                    <video
+                      src={m.preview}
+                      controls
+                      style={{
+                        width: 70,
+                        height: 70,
+                        objectFit: "cover",
+                        borderRadius: 4,
+                      }}
+                    />
+                  )}
+                </Box>
+              ))}
+            </Box>
+          )}
+
+          <Box display="flex" justifyContent="space-between" gap={1} mt={2}>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={() => dispatch(popComponent())}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handlePost}
+              disabled={(!content && mediaList.length === 0) || isLoading}
+            >
+              {isLoading ? <CircularProgress size={24} /> : "Post"}
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    </Modal>
   );
 };
 

@@ -8,21 +8,21 @@ import {
   Snackbar,
   Alert,
   Typography,
+  Paper,
+  useTheme,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import { useLoginMutation } from "../../Features/authApi"; // <-- keep only this
-import "./Login.css";
+import { useLoginMutation } from "../../Features/authApi";
 
 const Login = () => {
+  const theme = useTheme();
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const navigate = useNavigate();
 
-  // RTK Query mutation hook provides loading & error states
   const [login, { isLoading, error }] = useLoginMutation();
-
-  console.log(error);
+  console.log("error", error);
 
   const handleChange = (e) => {
     setCredentials((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -49,10 +49,9 @@ const Login = () => {
     login({ formData })
       .unwrap()
       .then((data) => {
-        console.log(data);
         if (data?.user?.reference_id) {
-          localStorage.setItem("reference_id", data?.user?.reference_id);
-          localStorage.setItem("access_token", data?.access_token);
+          localStorage.setItem("reference_id", data.user.reference_id);
+          localStorage.setItem("access_token", data.access_token);
           navigate(`/${data.user.reference_id}`);
           window.location.reload();
         }
@@ -65,69 +64,106 @@ const Login = () => {
     setOpenSnackbar(true);
   };
 
-  const textFieldStyles = {
-    "& .MuiOutlinedInput-root": {
-      // borderRadius: "40px",
-      height: "40px",
-    },
-  };
-
   return (
-    <div className="login-container">
-      <Container maxWidth="sm">
-        <Box mt={4} p={4}>
-          <form
-            className="login-form"
-            onSubmit={handleSubmit}
-            autoComplete="off"
-          >
-            <TextField
-              sx={textFieldStyles}
-              placeholder="Email"
-              name="email"
-              value={credentials.email}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              autoComplete="new-email"
-              disabled={isLoading}
-            />
-            <TextField
-              sx={textFieldStyles}
-              placeholder="Password"
-              name="password"
-              type="password"
-              value={credentials.password}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              autoComplete="new-password"
-              disabled={isLoading}
-            />
-
-            <Typography align="right" sx={{ margin: 2 }}>
-              <Link to="/forgot-password">Forgot Password?</Link>
-            </Typography>
-
-            <Button
-              type="submit"
-              variant="outlined"
-              fullWidth
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Login"
-              )}
-            </Button>
-          </form>
-        </Box>
-
-        <Typography align="center">
-          <Link to="/register">Register</Link>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: theme.palette.background.default,
+        padding: 2,
+      }}
+    >
+      <Paper
+        elevation={8}
+        sx={{
+          padding: 4,
+          width: "100%",
+          maxWidth: 400,
+          borderRadius: 3,
+          boxShadow: theme.shadows[0],
+        }}
+      >
+        <Typography
+          variant="h5"
+          align="center"
+          sx={{ marginBottom: 3, fontWeight: 600 }}
+        >
+          Login
         </Typography>
-      </Container>
+
+        <form onSubmit={handleSubmit} autoComplete="off">
+          <TextField
+            fullWidth
+            margin="normal"
+            placeholder="Email"
+            name="email"
+            value={credentials.email}
+            onChange={handleChange}
+            disabled={isLoading}
+            sx={{
+              "& .MuiOutlinedInput-root": {},
+            }}
+          />
+
+          <TextField
+            fullWidth
+            margin="normal"
+            placeholder="Password"
+            type="password"
+            name="password"
+            value={credentials.password}
+            onChange={handleChange}
+            disabled={isLoading}
+            sx={{
+              "& .MuiOutlinedInput-root": {},
+            }}
+          />
+
+          <Typography align="right" sx={{ mt: 1, mb: 2 }}>
+            <Link
+              disabled={isLoading}
+              to="/verify-email"
+              style={{
+                textDecoration: "none",
+                color: theme.palette.primary.main,
+              }}
+            >
+              Forgot Password?
+            </Link>
+          </Typography>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            disabled={isLoading}
+            sx={{ padding: 1.5, fontWeight: 600 }}
+          >
+            {isLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Login"
+            )}
+          </Button>
+        </form>
+
+        <Typography align="center" sx={{ mt: 3 }}>
+          Don't have an account?{" "}
+          <Link
+            disabled={isLoading}
+            to="/register"
+            style={{
+              textDecoration: "none",
+              color: theme.palette.primary.main,
+            }}
+          >
+            Register
+          </Link>
+        </Typography>
+      </Paper>
 
       <Snackbar
         open={openSnackbar}
@@ -143,8 +179,11 @@ const Login = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </div>
+    </Box>
   );
 };
 
 export default Login;
+
+
+

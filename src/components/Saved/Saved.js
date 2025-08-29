@@ -90,7 +90,7 @@ function Saved({ save }) {
   return (
     <Box
       sx={{ borderBottom: 1, borderColor: "divider" }}
-      className="post"
+      className="saved"
       id={`post-bookmarks-${save?.post_id}`}
       // ref={ref}
     >

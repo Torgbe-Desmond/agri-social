@@ -4,7 +4,7 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    border-radius: 40px;
+    /* border-radius: 40px; */
     /* width: 100px; */
 
 
@@ -13,6 +13,74 @@
     -webkit-backdrop-filter: blur(10px);
     border-radius: 15px; */
 
+}
+
+.css-1bt63vf-MuiButtonBase-root-MuiButton-root,
+.css-1wbjvmg-MuiButtonBase-root-MuiButton-root {
+    border-color: transparent !important;
+}
+
+
+
+.post-status-icon {
+    position: relative;
+    display: inline-block;
+}
+
+/* Pulse animation (loading) */
+.post-status-icon.loader::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 3px solid #03fcfe;
+    /* cyan for loading */
+    border-radius: 20px;
+    animation: pulse 1s ease-in-out infinite;
+    pointer-events: none;
+}
+
+
+/* Pulse animation (error) */
+.post-status-icon.error::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 3px solid #f3033f;
+    /* red for error */
+    border-radius: 20px;
+    animation: pulse 0.7s ease-in-out infinite;
+    /* faster heartbeat */
+    pointer-events: none;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.video-status-icon {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.169);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 15px;
+    width: 100%;
 }
 
 

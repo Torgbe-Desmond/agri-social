@@ -21,6 +21,8 @@ function VideoCard({
   username,
   handleToggleDialog,
 }) {
+
+  
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [isVideoBuffering, setIsVideoBuffering] = useState(false);
@@ -198,6 +200,7 @@ function VideoCard({
       <VideoHeader
         toggleMute={toggleMute}
         isMuted={isMuted}
+        user_id={user_id}
         username={username}
         user_image={user_image}
         handleToggleDialog={handleToggleDialog}

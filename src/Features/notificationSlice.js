@@ -1,5 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const mergeUnique = (existing, incoming, key = "notification_id") => {
+  const map = new Map();
+  [...existing, ...incoming].forEach((item) => {
+    map.set(item[key], item);
+  });
+  return Array.from(map.values());
+};
+
 const initialState = {
   notifications: [],
 };
@@ -10,20 +18,24 @@ const notificationSlice = createSlice({
   reducers: {
     updateNotificationList: (state, action) => {
       const { notifications } = action.payload;
-      state.notifications = [...state.notifications, ...notifications];
+      state.notifications = mergeUnique(
+        state.notifications,
+        notifications,
+        "id"
+      );
     },
     removeDeletedNotification: (state, action) => {
       const idToDelete = action.payload?.notification_id;
       if (!idToDelete) return;
 
       state.notifications = state.notifications?.filter(
-        (p) => p.id !== idToDelete
+        (p) => p.notification_id !== idToDelete
       );
     },
     updateReadNofitications: (state, action) => {
       const { read_notifications } = action.payload;
       state.notifications = state.notifications.map((n) => {
-        if (read_notifications.includes(n.id)) {
+        if (read_notifications.includes(n.notification_id)) {
           return {
             ...n,
             is_read: 1,
@@ -33,7 +45,6 @@ const notificationSlice = createSlice({
       });
     },
   },
-
   extraReducers: (builder) => {},
 });
 
@@ -42,4 +53,5 @@ export const {
   updateNotificationList,
   removeDeletedNotification,
 } = notificationSlice.actions;
+
 export default notificationSlice.reducer;

@@ -25,7 +25,7 @@ import {
 } from "../../Features/messageApi";
 
 function Chat() {
-  const { user } = useOutletContext();
+  const { userDetails: user } = useSelector((state) => state.auth);
   const [chatMessages, setChatMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState([]);
@@ -35,7 +35,10 @@ function Chat() {
   const dispatch = useDispatch();
   const { darkMode, systemPrefersDark } = useOutletContext();
   const { conversation_id, recipient_id } = useParams();
-  const [sendMessage, { error: sendMessageError, isLoading:sendMessageLoading }] = useSendMessageMutation();
+  const [
+    sendMessage,
+    { error: sendMessageError, isLoading: sendMessageLoading },
+  ] = useSendMessageMutation();
   const { currentlyConversingUser } = useSelector((state) => state.message);
   const [media, setMedia] = useState([]);
   const [v_media, setVMedia] = useState([]);
@@ -95,7 +98,7 @@ function Chat() {
     setChatMessages((prev) => [
       ...prev,
       {
-        sender_id: payload?.id,
+        sender_id: user?.id,
         conversation_id,
         images: payload?.vidoes || null,
         videos: payload?.images || null,

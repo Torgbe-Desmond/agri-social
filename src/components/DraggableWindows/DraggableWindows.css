@@ -1,0 +1,24 @@
+.tab-window {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  z-index: 999;
+}
+
+.tab-header {
+  background: #1976d2;
+  color: white;
+  padding: 6px 10px;
+  cursor: move;
+  font-weight: bold;
+}
+
+.tab-body {
+  flex: 1;
+  /* padding: 10px; */
+  overflow: auto;
+}

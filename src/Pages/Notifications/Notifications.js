@@ -18,6 +18,10 @@ import {
   useGetNotificationsQuery,
   useReadNotificationMutation,
 } from "../../Features/notificationApi";
+import ErrorInfoAndReload from "../../components/Errors/ErrorInfoAndReload";
+import Container from "../../components/Container/Container";
+import ContainerSearch from "../../components/Container/ContainerSearch";
+import ContainerTitle from "../../components/Container/ContainerTitle";
 
 function Notifications() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -29,15 +33,17 @@ function Notifications() {
   const socket = useSocket();
   const dispatch = useDispatch();
   const [scrolling, setScroll] = useState(0);
+  const [fetchError, setFetchError] = useState(false);
   const { systemPrefersDark } = useOutletContext();
   const { notifications: notificationData } = useSelector(
     (state) => state.notification
   );
 
-  const { data, isFetching, isSuccess, isLoading } = useGetNotificationsQuery({
-    offset,
-    limit: 10,
-  });
+  const { data, isFetching, isSuccess, isLoading, refetch, isError } =
+    useGetNotificationsQuery({
+      offset,
+      limit: 10,
+    });
 
   const [readNotification] = useReadNotificationMutation();
 
@@ -46,6 +52,10 @@ function Notifications() {
   }, [data]);
 
   const hasMore = notifications.length > 0;
+
+  useEffect(() => {
+    setFetchError(isError);
+  }, [isError]);
 
   useEffect(() => {
     if (notifications?.length > 0) {
@@ -170,34 +180,38 @@ function Notifications() {
   const grouped = groupByPost(notificationData);
 
   return (
-    <Header
-      feedRef={scrollRef}
-      setScroll={setScroll}
-      name={"Notifications"}
-      children={
-        <Box className="notifications">
-          {grouped.map((notification, index) => {
-            const isLast = index === grouped.length - 1;
-            return (
-              <div
-                key={index}
-                ref={(el) => {
-                  itemRefs.current[index] = el;
-                  if (isLast) lastPostRef(el);
-                }}
-              >
-                <Notification key={index} notification={notification} />
-              </div>
-            );
-          })}
-          {isLoading && (
-            <p className="circular__progress">
-              <CircularProgress size={20} />
-            </p>
-          )}
-        </Box>
-      }
-    />
+    <Box ref={scrollRef} className="container">
+      <Container>
+        <ContainerTitle title={"Notifications"} />
+      </Container>
+
+      <Box className="notifications">
+        {grouped?.map((notification, index) => {
+          const isLast = index === grouped.length - 1;
+          return (
+            <div
+              key={index}
+              ref={(el) => {
+                itemRefs.current[index] = el;
+                if (isLast) lastPostRef(el);
+              }}
+            >
+              <Notification key={index} notification={notification} />
+            </div>
+          );
+        })}
+      </Box>
+
+      {isError && (
+        <ErrorInfoAndReload
+          setFetchError={setFetchError}
+          isError={fetchError}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          refetch={refetch}
+        />
+      )}
+    </Box>
   );
 }
 

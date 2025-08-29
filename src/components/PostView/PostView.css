@@ -1,0 +1,67 @@
+/* Overlay */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    margin: auto;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    /* justify-content: center; */
+    /* align-items: center; */
+    z-index: 1200;
+    box-sizing: border-box;
+}
+
+/* Modal Box */
+.custom-modal-box {
+    width: 100%;
+    /* height: 100%; */
+    max-width: 500px;
+    border-radius: 16px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+    position: relative;
+    animation: modalFadeIn 0.25s ease;
+    border: 1px solid red;
+    display: flex;
+    align-items: center;
+
+}
+
+/* Modal Content */
+.custom-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Close Button */
+.custom-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    border: none;
+    background: transparent;
+    font-size: 22px;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.2s;
+}
+
+.custom-modal-close:hover {
+    color: #d32f2f;
+}
+
+/* Animation */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

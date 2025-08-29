@@ -32,10 +32,9 @@ const ProductCard = ({
     <Card
       onClick={handleNavigate}
       sx={{
-        width: 250,
+        width: "auto",
         borderRadius: 4,
-        boxShadow: 3,
-        padding: 2,
+        boxShadow: 1,
         cursor: "pointer",
         transition: "box-shadow 0.3s ease-in-out",
         "&:hover": {
@@ -80,13 +79,7 @@ const ProductCard = ({
           <Typography variant="h6" sx={{ color: "#2e7d32" }}>
             ${price}
           </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ textDecoration: "line-through" }}
-          >
-            ${oldPrice}
-          </Typography>
+
           <Typography variant="caption" color="text.secondary">
             for {unit}
           </Typography>

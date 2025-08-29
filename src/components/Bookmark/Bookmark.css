@@ -1,0 +1,110 @@
+/* Bookmark */
+.bookmark {
+    display: grid;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    margin-bottom: 0px;
+}
+
+.bookmark-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.bookmark-header-user {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.bookmark-header-user h3 {
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.bookmark-header-meta {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 12px;
+    color: gray;
+}
+
+.bookmark-header-username {
+    color: gray;
+}
+
+.bookmark-header-time {
+    color: gray;
+}
+
+.bookmark-header-action {
+    font-size: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.bookmark-body {
+    flex: 1;
+    display: grid;
+    padding: 10px;
+}
+
+.bookmark-body>img {
+    border-radius: 20px;
+}
+
+.bookmark-content {
+    font-size: 15px;
+    height: 20px;
+}
+
+.bookmark-media-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bookmark-media-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bookmark-media-wrapper img,
+.bookmark-media-wrapper video {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.bookmark-tags {
+    display: flex;
+    flex-wrap: wrap;
+    /* gap: 6px; */
+    /* height: 35px; */
+    /* border: 1px solid red; */
+}
+
+.bookmark-tag {
+    padding: 0px;
+}
+
+.bookmark-footer {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 1rem;
+    justify-content: flex-start;
+    padding: 5px 10px;
+}

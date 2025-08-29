@@ -53,13 +53,8 @@ function GroupMessages() {
     setTabIndex(newValue);
   };
 
-  useEffect(() => {
-    // dispatch(getGroupConversation());
-    // return () => dispatch(clearGroups());
-  }, []);
-
   const reloadAction = () => {
-    // dispatch(getGroupConversation());
+    refetch();
   };
 
   useEffect(() => {

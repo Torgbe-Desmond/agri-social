@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import FeedVideoCard from "../FeedVideoCard/FeedVideoCard";
 import { Typography } from "@mui/material";
 import FeedImageCard from "../FeedImageCard/FeedImageCard";
@@ -22,6 +22,28 @@ function CommentBody({ comment }) {
       );
     });
   };
+
+  const combinedMedia = useMemo(() => {
+    const mediaArray = [];
+    if (comment?.images) {
+      mediaArray.push(
+        ...comment.images.split(",").map((src) => ({
+          url: src.trim(),
+          type: "image",
+        }))
+      );
+    }
+    if (comment?.videos) {
+      mediaArray.push(
+        ...comment.videos.split(",").map((src) => ({
+          url: src.trim(),
+          type: "video",
+        }))
+      );
+    }
+    return mediaArray;
+  }, [comment]);
+
   return (
     <div>
       <div className="comment__body">
@@ -31,42 +53,25 @@ function CommentBody({ comment }) {
           </div>
         </div>
         <div className="comment__images">
-          <div className="post_media">
-            {comment?.images && (
-              <FeedImageCard images={comment.images.split(",")} />
-            )}
+          {comment?.tags && (
+            <div className="comment_tags"> {renderTags(comment?.tags)}</div>
+          )}
 
-            {/* {comment?.images && (
-              <img
-                style={{
-                  display: "none",
-                  width: "100%",
-                  objectFit: "contain",
-                  borderRadius: 12,
-                }}
-                src={comment?.images}
-                alt="Comment visual"
-              />
-            )} */}
-
-            {comment?.videos && (
-              <div
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  overflow: "hidden",
-                  borderRadius: 12,
-                }}
-              >
-                <FeedVideoCard url={comment.videos} />
-              </div>
-            )}
-          </div>
+          {comment?.videos && (
+            <div
+              style={{
+                width: "100%",
+                maxWidth: "100%",
+                overflow: "hidden",
+                borderRadius: 2,
+                border: 1,
+                borderColor: "divider",
+              }}
+            >
+              <FeedImageCard media={combinedMedia} />
+            </div>
+          )}
         </div>
-
-        {comment?.tags && (
-          <div className="comment_tags"> {renderTags(comment?.tags)}</div>
-        )}
       </div>
     </div>
   );

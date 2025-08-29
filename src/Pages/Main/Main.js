@@ -12,8 +12,8 @@ function Main() {
   const { systemPrefersDark } = useOutletContext();
 
   return (
-    <Box className="main">
-      <TopHeader systemPrefersDark={systemPrefersDark} />
+    <Box className="container">
+      <TopHeader />
       <Feed />
     </Box>
   );

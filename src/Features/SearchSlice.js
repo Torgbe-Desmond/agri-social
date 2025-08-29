@@ -1,6 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { SearchService } from "../Services/SearchService";
 
+const mergeUnique = (existing, incoming, key = "user_id") => {
+  const map = new Map();
+  [...existing, ...incoming].forEach((item) => {
+    map.set(item[key], item);
+  });
+  return Array.from(map.values());
+};
+
 const initialState = {
   searchedUserDetails: [],
   selectedSearchId: "",
@@ -20,7 +28,7 @@ export const searchUser = createAsyncThunk(
   }
 );
 
-const authSlice = createSlice({
+const searchSlice = createSlice({
   name: "search",
   initialState,
   reducers: {
@@ -33,30 +41,34 @@ const authSlice = createSlice({
     selectedItem: (state, action) => {
       state.selectedSearchId = action.payload;
     },
-    clearSelectedItem: (state, action) => {
+    clearSelectedItem: (state) => {
       state.selectedSearchId = "";
     },
   },
   extraReducers: (builder) => {
     builder
-
       .addCase(searchUser.pending, (state) => {
         state.searchedUserStatus = "loading";
       })
       .addCase(searchUser.fulfilled, (state, action) => {
         state.searchedUserStatus = "succeeded";
-        state.searchedUserDetails = [
-          ...state.searchedUserDetails,
-          ...action.payload,
-        ];
+        state.searchedUserDetails = mergeUnique(
+          state.searchedUserDetails,
+          action.payload,
+          "user_id"
+        );
       })
-      .addCase(searchUser.rejected, (state, action) => {
+      .addCase(searchUser.rejected, (state) => {
         state.searchedUserStatus = "failed";
       });
   },
 });
 
-export const { clearSearch, selectedItem, clearSelectedId, clearSelectedItem } =
-  authSlice.actions;
+export const {
+  clearSearch,
+  selectedItem,
+  clearSelectedId,
+  clearSelectedItem,
+} = searchSlice.actions;
 
-export default authSlice.reducer;
+export default searchSlice.reducer;

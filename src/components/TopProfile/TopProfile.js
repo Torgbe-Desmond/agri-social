@@ -12,19 +12,16 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { useDispatch, useSelector } from "react-redux";
 import ComponentStack from "../HandleStack/HandleStack";
-import { useOutletContext } from "react-router-dom";
 import { follow } from "../../Features/AuthSlice";
 
 const TwitterProfileUI = () => {
   const dispatch = useDispatch();
-  const { darkMode, systemPrefersDark, user } = useOutletContext();
+  const { userDetails: user } = useSelector((state) => state.auth);
 
   const handleEditProfile = () => {
     const stack = new ComponentStack(dispatch);
     stack.handleStack("Profile", {
       user,
-      systemPrefersDark,
-      darkMode,
     });
   };
 

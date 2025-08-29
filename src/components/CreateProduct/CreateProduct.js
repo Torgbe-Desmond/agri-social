@@ -15,21 +15,11 @@ import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { useCreateProductMutation } from "../../Features/productApi";
 import { addNewProduct } from "../../Features/ProductSlice";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  borderRadius: 2,
-  p: 4,
-};
+import { useTheme } from "@mui/material/styles";
 
 const CreateProduct = () => {
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -40,8 +30,7 @@ const CreateProduct = () => {
     unit: "",
   });
   const [imagePreviews, setImagePreviews] = useState([]);
-  const [createProduct, { isLoading, isSuccess, error }] =
-    useCreateProductMutation();
+  const [createProduct, { isLoading, error }] = useCreateProductMutation();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -103,8 +92,21 @@ const CreateProduct = () => {
   };
 
   return (
-    <Modal open>
-      <Box sx={style}>
+    <Modal open onClose={handleClose}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 400,
+          bgcolor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
+          boxShadow: 24,
+          borderRadius: 2,
+          p: 4,
+        }}
+      >
         <Typography variant="h6" gutterBottom>
           Create New Product
         </Typography>
@@ -156,7 +158,7 @@ const CreateProduct = () => {
                     height: 50,
                     borderRadius: 1,
                     overflow: "hidden",
-                    border: "1px solid #ccc",
+                    border: `1px solid ${theme.palette.divider}`,
                   }}
                 >
                   <img
@@ -175,7 +177,7 @@ const CreateProduct = () => {
                       position: "absolute",
                       top: 5,
                       right: 5,
-                      bgcolor: "#fff",
+                      bgcolor: theme.palette.background.paper,
                       boxShadow: 1,
                     }}
                     disabled={isLoading}
@@ -223,8 +225,7 @@ const CreateProduct = () => {
             </Button>
             <Button
               onClick={handleFormSubmit}
-              variant="outlined"
-              className="sidebar__tweet__contained"
+              variant="contained"
               disabled={isLoading}
             >
               {isLoading ? <CircularProgress size={20} /> : "Save"}

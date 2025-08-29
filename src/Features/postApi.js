@@ -16,6 +16,7 @@ export const postApi = createApi({
   }),
   tagTypes: ["Post", "Stream", "Comment", "UserPosts", "Saved"],
   endpoints: (builder) => ({
+    // =================== POST ENDPOINTS ===================
     getPosts: builder.query({
       query: ({ offset, limit }) => `/posts?offset=${offset}&limit=${limit}`,
       providesTags: (result) =>
@@ -37,15 +38,17 @@ export const postApi = createApi({
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: [{ type: "Post", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Post", id: "LIST" },
+        { type: "Comment", id: "LIST" }, // invalidate comments too
+      ],
     }),
     deletePost: builder.mutation({
-      query: (post_id) => ({ url: `/posts/${post_id}`, method: "DELETE" }),
+      query: ({ post_id }) => ({ url: `/posts/${post_id}`, method: "DELETE" }),
       invalidatesTags: (result, error, post_id) => [
         { type: "Post", id: post_id },
       ],
     }),
-
     likePost: builder.mutation({
       query: ({ post_id, formData }) => ({
         url: `/posts/${post_id}/like`,
@@ -56,19 +59,6 @@ export const postApi = createApi({
         { type: "Post", id: post_id },
       ],
     }),
-
-    // getComments: builder.query({
-    //   query: post_id => `/posts/${post_id}/comments`,
-    //   providesTags: (result) =>
-    //     result?.comments.map(c => ({ type: 'Comment', id: c.id })) || [],
-    // }),
-    // addComment: builder.mutation({
-    //   query: ({ post_id, formData }) => ({
-    //     url: `/posts/${post_id}/comments`, method: 'POST', body: formData,
-    //   }),
-    //   invalidatesTags: (result, error, { post_id }) => [{ type: 'Comment', id: post_id }],
-    // }),
-
     savePost: builder.mutation({
       query: ({ post_id }) => ({
         url: `/saves/${post_id}/save`,
@@ -87,7 +77,6 @@ export const postApi = createApi({
         { type: "Post", id: post_id },
       ],
     }),
-
     getSavedHistory: builder.query({
       query: ({ offset, limit }) =>
         `/saves/saved?offset=${offset}&limit=${limit}`,
@@ -106,6 +95,71 @@ export const postApi = createApi({
       providesTags: (result) =>
         result?.posts.map((p) => ({ type: "UserPosts", id: p.post_id })) || [],
     }),
+
+    // =================== COMMENT ENDPOINTS ===================
+    getComments: builder.query({
+      query: (post_id) => `/comments/${post_id}`,
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.comments.map(({ id }) => ({ type: "Comment", id })),
+              { type: "Comment", id: "LIST" },
+            ]
+          : [{ type: "Comment", id: "LIST" }],
+    }),
+    getComment: builder.query({
+      query: (comment_id) => `/comments/${comment_id}/comment`,
+      providesTags: (result, error, id) => [{ type: "Comment", id }],
+    }),
+    getReplies: builder.query({
+      query: (comment_id) => `/comments/${comment_id}/replies`,
+      providesTags: (result) =>
+        result
+          ? [...result.comments.map(({ id }) => ({ type: "Comment", id }))]
+          : [],
+    }),
+    getCommentParent: builder.query({
+      query: (parent_id) => `/comments/parent/${parent_id}`,
+    }),
+    addComment: builder.mutation({
+      query: ({ post_id, formData }) => ({
+        url: `/comments/${post_id}`,
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: [
+        { type: "Comment", id: "LIST" },
+        { type: "Post", id: "LIST" },
+      ],
+    }),
+    addReplyComment: builder.mutation({
+      query: ({ comment_id, formData }) => ({
+        url: `/comments/${comment_id}/replies`,
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: (result, error, { comment_id }) => [
+        { type: "Comment", id: comment_id },
+      ],
+    }),
+    likeComment: builder.mutation({
+      query: ({ comment_id, formData }) => ({
+        url: `/comments/${comment_id}/like`,
+        method: "POST",
+        body: formData,
+      }),
+      async onQueryStarted(
+        { comment_id, formData },
+        { dispatch, queryFulfilled }
+      ) {
+        try {
+          await queryFulfilled;
+          dispatch(
+            postApi.util.invalidateTags([{ type: "Comment", id: comment_id }])
+          );
+        } catch (err) {}
+      },
+    }),
   }),
 });
 
@@ -121,4 +175,13 @@ export const {
   useGetSavedHistoryQuery,
   useGetPostHistoryQuery,
   useGetUserPostHistoryQuery,
+
+  // comment hooks
+  useGetCommentsQuery,
+  useGetCommentQuery,
+  useGetRepliesQuery,
+  useGetCommentParentQuery,
+  useAddCommentMutation,
+  useAddReplyCommentMutation,
+  useLikeCommentMutation,
 } = postApi;

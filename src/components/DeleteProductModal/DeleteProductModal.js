@@ -12,28 +12,18 @@ import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { useDeleteProductMutation } from "../../Features/productApi";
 import { removeDeletedProduct } from "../../Features/ProductSlice";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: { xs: "80%", sm: "70%", md: "500px" },
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  borderRadius: 2,
-  p: 3,
-};
+import { useTheme } from "@mui/material/styles";
 
 const DeleteProductModal = ({ product_id }) => {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const [deleteProduct, { isLoading, isSuccess }] = useDeleteProductMutation();
 
   useEffect(() => {
     if (isSuccess) {
       dispatch(popComponent());
     }
-  }, [isSuccess]);
+  }, [isSuccess, dispatch]);
 
   const handleProductDelete = async () => {
     try {
@@ -46,8 +36,21 @@ const DeleteProductModal = ({ product_id }) => {
   };
 
   return (
-    <Modal open={true}>
-      <Box sx={style}>
+    <Modal open={true} onClose={() => dispatch(popComponent())}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: { xs: "80%", sm: "70%", md: "500px" },
+          bgcolor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
+          boxShadow: 24,
+          borderRadius: 2,
+          p: 3,
+        }}
+      >
         <Typography variant="h6" gutterBottom>
           Delete
         </Typography>
@@ -59,7 +62,7 @@ const DeleteProductModal = ({ product_id }) => {
         <Stack direction="row" spacing={2} justifyContent="flex-end">
           <Button
             color="secondary"
-            sx={{ borderRadius: "32px !important" }}
+            sx={{ borderRadius: "32px" }}
             variant="outlined"
             disabled={isLoading}
             onClick={() => dispatch(popComponent())}
@@ -70,9 +73,8 @@ const DeleteProductModal = ({ product_id }) => {
             <CircularProgress size={24} />
           ) : (
             <Button
-              className="sidebar__tweet__contained"
               onClick={handleProductDelete}
-              variant="outlined"
+              variant="contained"
               disabled={isLoading}
               color="error"
             >

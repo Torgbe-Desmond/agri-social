@@ -1,10 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const mergeUnique = (existing, incoming, key = "id") => {
+  const map = new Map();
+  [...existing, ...incoming].forEach((item) => {
+    map.set(item[key], item);
+  });
+  return Array.from(map.values());
+};
+
 const initialState = {
   messages: [],
   currentlyConversingUser: null,
   users: [],
   groups: [],
+
+  _messages: [],
+  _currentlyConversingUser: null,
+  _users: [],
+  _groups: [],
 };
 
 const messageSlice = createSlice({
@@ -13,7 +26,7 @@ const messageSlice = createSlice({
   reducers: {
     updateUsersList: (state, action) => {
       const { users } = action.payload;
-      state.users = [...state.users, ...users];
+      state.users = mergeUnique(state.users, users, "id");
     },
     setCurrentlyConversingUserInformation: (state, action) => {
       state.currentlyConversingUser = action.payload;
@@ -31,11 +44,9 @@ const messageSlice = createSlice({
         sender: "bot",
         text: action.payload.text,
         image: null,
-        // profilePicture: require("../../assets/icons8-farmer-64.png"),
       });
     },
-
-    clearConversationId: (state, action) => {
+    clearConversationId: (state) => {
       state.conversation_id = "";
     },
     clearMessages: (state) => {
@@ -53,9 +64,9 @@ export const {
   addBotMessage,
   clearMessages,
   clearGroups,
-  setConversaionId,
   clearConversationId,
   updateUsersList,
   setCurrentlyConversingUserInformation,
 } = messageSlice.actions;
+
 export default messageSlice.reducer;

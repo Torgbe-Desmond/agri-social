@@ -7,18 +7,21 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { useUpdateUserImageMutation } from "../../Features/userApi";
 
 const UpdateProfilePicModal = ({ user_image }) => {
   const dispatch = useDispatch();
+  const theme = useTheme();
+
   const [selectedImage, setSelectedImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  const [updateUserImage, { isLoading, isSuccess, isError }] =
+  const [updateUserImage, { isLoading }] =
     useUpdateUserImageMutation();
 
   const handleImageChange = (e) => {
@@ -55,8 +58,9 @@ const UpdateProfilePicModal = ({ user_image }) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: 350,
-          bgcolor: "background.paper",
-          borderRadius: 12,
+          bgcolor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
+          borderRadius: 4,
           boxShadow: 24,
           p: 4,
           outline: "none",
@@ -65,6 +69,7 @@ const UpdateProfilePicModal = ({ user_image }) => {
         <Typography variant="h6" gutterBottom align="center">
           Update Profile Picture
         </Typography>
+
         <Box sx={{ textAlign: "center" }}>
           <Avatar
             src={preview || user_image}
@@ -88,18 +93,18 @@ const UpdateProfilePicModal = ({ user_image }) => {
             </label>
           </Box>
         </Box>
+
         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
           <Button
             color="secondary"
             variant="outlined"
-            sx={{ borderRadius: "32px !important" }}
+            sx={{ borderRadius: "32px" }}
             onClick={handleClose}
           >
             Cancel
           </Button>
           <Button
-            variant="outlined"
-            className="sidebar__tweet__contained"
+            variant="contained"
             onClick={handleUpload}
             disabled={isLoading || !selectedImage}
           >

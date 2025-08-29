@@ -15,9 +15,12 @@ import { useGetPostsQuery } from "../../Features/postApi";
 import { setPostsOffset, updatePostList } from "../../Features/PostSlice";
 import ErrorInfoAndReload from "../Errors/ErrorInfoAndReload";
 import { useError } from "../Errors/Errors";
+import useWindowSize from "../useWindowSize/useWindowSize";
+import Container from "../Container/Container";
+import TopHeader from "../TopHeader/TopHeader";
 
 function Feed() {
-  const { user_id } = useOutletContext();
+  const { location } = useOutletContext();
   const dispatch = useDispatch();
   const feedRef = useRef(null);
   const observer = useRef();
@@ -26,7 +29,9 @@ function Feed() {
   const [scrolling, setScroll] = useState(0);
   const [offset, setLocalOffset] = useState(1);
   const [visiblePostId, setVisiblePostId] = useState(null);
+  const [fetchError, setFetchError] = useState(false);
   const { posts, postsOffset } = useSelector((state) => state.post);
+  const [viewedPosts, setViewedPosts] = useState([]);
 
   // Query posts with RTK Query
   const { data, isLoading, isFetching, isError, error, refetch } =
@@ -60,7 +65,6 @@ function Feed() {
       observer.current = new IntersectionObserver((entries) => {
         const entry = entries[0];
         if (entry.isIntersecting && hasMore && !isFetching) {
-          // setLocalOffset((prevOffset) => prevOffset + 1);
           dispatch(setPostsOffset());
         }
       });
@@ -85,15 +89,14 @@ function Feed() {
     return () => node.removeEventListener("scroll", handleScroll);
   }, [dispatch]);
 
-  // Your visibility and playback logic (unchanged)...
   useEffect(() => {
     itemRefs.current.forEach((el) => {
       el?.classList.remove("visible-post", "visible-post-next");
     });
     onVideoReach(itemRefs);
-    // onPostReach(itemRefs);
     onImageReach(itemRefs);
-  }, [scrolling, postData]);
+    onPostReach(itemRefs);
+  }, [scrolling, postData, itemRefs]);
 
   function onImageReach(itemRefs) {
     const visibleItems = itemRefs.current.filter((el) => {
@@ -118,67 +121,107 @@ function Feed() {
     });
   }
 
-  function onVideoReach(itemRefs) {
-    const visibleItem = itemRefs.current.find((el) => {
-      if (!el) return false;
-      const rect = el.getBoundingClientRect();
-      return (
-        rect.top >= window.innerHeight / 10 && rect.bottom <= window.innerHeight
-      );
-    });
-    if (!visibleItem) return;
-    const postId = visibleItem.querySelector(".post")?.id?.replace("post-", "");
-    if (!postId) return;
-    const isVideoPost = postData.find(
-      (p) => p.post_id === postId && p.has_video
+  const onVideoReach = useCallback(() => {
+    const itemsWithCoverage = itemRefs?.current
+      .map((el) => {
+        if (!el) return null;
+        const rect = el.getBoundingClientRect();
+
+        const visibleHeight =
+          Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+        const clampedHeight = Math.max(0, visibleHeight);
+
+        const percentOfViewport = (clampedHeight / window.innerHeight) * 100;
+
+        return { el, percentOfViewport };
+      })
+      .filter((item) => item && item.percentOfViewport > 0);
+
+    if (!itemsWithCoverage?.length) return;
+
+    const largestItem = itemsWithCoverage.reduce((max, item) =>
+      item.percentOfViewport > max.percentOfViewport ? item : max
     );
+
+    const postId = largestItem.el
+      .querySelector(".post")
+      ?.id?.replace("post-", "");
+
+    if (!postId) return;
+
+    const isVideoPost = posts.find((p) => p.post_id === postId && p.has_video);
+
     if (!isVideoPost) return;
 
     if (visiblePostId && visiblePostId !== postId) {
       const prev = document.querySelector(`#post-${visiblePostId} video`);
       if (prev) prev.pause();
     }
+
     const currentVideo = document.querySelector(`#post-${postId} video`);
+
     if (currentVideo) {
+      console.log(
+        `Playing video for post ${postId} (${largestItem.percentOfViewport.toFixed(
+          1
+        )}% visible)`
+      );
+      currentVideo.muted = true;
       currentVideo.play().catch((err) => console.warn("Autoplay failed:", err));
     }
 
     setVisiblePostId(postId);
-  }
+  }, [posts, visiblePostId, itemRefs]);
 
-  function onPostReach(itemRefs) {
-    const visibleItems = itemRefs.current.filter((el) => {
-      if (!el) return false;
+  function onPostReach(itemRefs) {}
+
+useEffect(() => {
+  const itemsWithCoverage = itemRefs?.current
+    .map((el) => {
+      if (!el) return null;
       const rect = el.getBoundingClientRect();
-      return (
-        rect.top >= window.innerHeight / 10 && rect.bottom <= window.innerHeight
-      );
-    });
+      const visibleHeight =
+        Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+      const clampedHeight = Math.max(0, visibleHeight);
+      const percentOfViewport = (clampedHeight / window.innerHeight) * 100;
+      return { el, percentOfViewport };
+    })
+    .filter((item) => item && item.percentOfViewport > 0);
 
-    const postIds = visibleItems
-      .map((el) =>
-        el.querySelector(".post")?.getAttribute("id")?.replace("post-", "")
-      )
-      .filter(Boolean);
+  if (!itemsWithCoverage?.length) return;
 
-    postIds.forEach((id) => {
-      const currentPost = document.querySelector(`#post-${id}`);
-      if (currentPost) {
-        currentPost.style.display = "flex";
-      }
-    });
-  }
+  const largestItem = itemsWithCoverage.reduce((max, item) =>
+    item.percentOfViewport > max.percentOfViewport ? item : max
+  );
+
+  const postId = largestItem.el
+    .querySelector(".post")
+    ?.id?.replace("post-", "");
+
+  if (!postId) return;
+
+  setViewedPosts((prev) => {
+    if (prev.includes(postId)) return prev; 
+    return [...prev, postId];
+  });
+// low medium high
+  const delayDebounce = setTimeout(() => {
+    console.log("viewedPosts updated:", viewedPosts);
+  }, 3000);
+
+  return () => clearTimeout(delayDebounce);
+}, [itemRefs, scrolling, viewedPosts]); 
 
   return (
     <Box
-      className="feed"
-      ref={feedRef}
       sx={{
         height: "90vh",
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
       }}
+      className="profile"
+      ref={feedRef}
     >
       {posts?.map((post, index) => {
         const isLast = index === postData.length - 1;
@@ -194,11 +237,15 @@ function Feed() {
           </div>
         );
       })}
-      <ErrorInfoAndReload
-        isLoading={isLoading}
-        isFetching={isFetching}
-        refetch={refetch}
-      />
+      {fetchError && (
+        <ErrorInfoAndReload
+          setFetchError={setFetchError}
+          isError={fetchError}
+          refetch={refetch}
+          isLoading={isLoading}
+          isFetching={isFetching}
+        />
+      )}
     </Box>
   );
 }

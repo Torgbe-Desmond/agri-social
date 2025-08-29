@@ -10,7 +10,9 @@ import axiosInstance from "../../Services/AxiosInstance";
 // Create context with shape { message, setMessage }
 const ErrorContext = createContext({
   message: null,
-  setMessage: () => {},
+  setMessage: (message) => {
+    this.message = message
+  },
 });
 
 // Custom hook for easy access

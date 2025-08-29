@@ -1,50 +1,65 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Box } from "@mui/material";
-import { addComment, clearPost, getPost } from "../../Features/PostSlice";
-import { clearComments } from "../../Features/CommentSlice";
+
+import { addNewComment, updatePost } from "../../Features/PostSlice";
 import { popComponent } from "../../Features/StackSlice";
-import "./PostComment.css";
-import Post from "../Post/Post";
-import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
+import { clearComments, updateCommentList } from "../../Features/CommentSlice";
+
+import {
+  useAddCommentMutation,
+  useGetCommentsQuery,
+  useGetPostQuery,
+} from "../../Features/postApi";
+
+import { useError } from "../Errors/Errors";
+import CommentSinglePost from "./CommentSinglePost";
 import CommentChat from "../Comment/commentChat";
 import CommentReplyList from "../Comment/CommentReplyList";
 import ReplyIndicator from "../Comment/ReplyIndicator";
 import Comment_Header from "../Comment/Comment_Header";
-import {
-  useAddCommentMutation,
-  useGetCommentsQuery,
-} from "../../Features/commentApi";
-import { useGetPostQuery } from "../../Features/postApi";
-import { useError } from "../Errors/Errors";
+import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
+
+import "./PostComment.css";
 
 function PostComment() {
   const { post_id } = useParams();
   const dispatch = useDispatch();
   const { darkMode, systemPrefersDark, user } = useOutletContext();
   const navigate = useNavigate();
+
+  // ---- State ----
   const [comment, setComment] = useState("");
   const [addLocalComment, setAddLocalComment] = useState([]);
   const [media, setMedia] = useState([]);
   const [file, setFile] = useState([]);
   const [mediaType, setMediaType] = useState(null);
   const [emojiAnchor, setEmojiAnchor] = useState(null);
-  const chatContainerRef = useRef(null);
   const [v_media, setVMedia] = useState([]);
-  const scrollAnchorRef = useRef(null);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [allComments, setAllComments] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const { message, setMessage } = useError();
+  const [post, setPost] = useState();
+  const [scrolling, setScrolling] = useState(0);
 
+  // ---- Refs ----
+  const postScrollRef = useRef();
+  const itemRef = useRef();
+  const chatContainerRef = useRef(null);
+  const scrollAnchorRef = useRef(null);
+  const lastScrollTop = useRef(0);
+
+  // ---- Mutations / Queries ----
   const [addCommentMutation, { isLoading: isAddingComment }] =
     useAddCommentMutation();
-  const { data: post, isLoading: singlePostStatus } = useGetPostQuery(post_id, {
-    skip: !post_id,
-  });
 
-  // Fetch comments using RTK Query
+  const { data: postData, isLoading: singlePostLoading } = useGetPostQuery(
+    post_id,
+    { skip: !post_id }
+  );
+
   const {
     data = {},
     isLoading: commentsLoading,
@@ -52,9 +67,18 @@ function PostComment() {
     isFetching: isFetchingReplies,
     refetch: refetchReplies,
     error: commentsError,
-  } = useGetCommentsQuery(post_id, {
-    skip: !post_id,
-  });
+  } = useGetCommentsQuery(post_id, { skip: !post_id });
+
+  // ---- Derived ----
+  const { comments = [] } = data;
+
+  // ---- Effects ----
+  useEffect(() => {
+    if (postData) {
+      dispatch(updatePost({ postData }));
+      setPost(postData);
+    }
+  }, [postData]);
 
   useEffect(() => {
     if (isError && commentsError?.data?.detail) {
@@ -62,141 +86,169 @@ function PostComment() {
     }
   }, [isError, commentsError, setMessage]);
 
-  const { comments = [], numb_found = 0 } = data;
-
-  // Combine server comments and local added comments
   useEffect(() => {
-    if (comments.length > 0) {
-      const togetherComments = [...comments, ...addLocalComment];
-      setAllComments((prev) => [...prev, ...togetherComments]);
+    const node = postScrollRef.current;
+    if (!node) return;
+
+    const handleScroll = () => {
+      lastScrollTop.current = node.scrollTop;
+      setScrolling((prev) => prev + 1);
+    };
+
+    node.addEventListener("scroll", handleScroll);
+    return () => {
+      node.removeEventListener("scroll", handleScroll);
+      dispatch(clearComments());
+    };
+  }, []);
+
+  // ---- Handlers ----
+  const onVideoReach = useCallback(() => {
+    if (!itemRef.current) return;
+
+    const postElement = itemRef.current;
+    const rect = postElement.getBoundingClientRect();
+
+    const visibleHeight =
+      Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+    const clampedHeight = Math.max(0, visibleHeight);
+    const percentOfViewport = (clampedHeight / window.innerHeight) * 100;
+
+    const postId = postElement.id?.replace("comment-single-post-", "");
+    const video = postElement.querySelector("video");
+    if (!video) return;
+
+    if (percentOfViewport >= 50 || scrolling > 1) {
+      console.log(`▶️ Playing video for post ${postId}`);
+      video.play().catch((err) => console.warn("Autoplay failed:", err));
+    } else {
+      console.log(`⏸️ Pausing video for post ${postId}`);
+      video.pause();
     }
+  }, [itemRef]);
+
+  useEffect(() => {
+    onVideoReach();
+  }, [post, scrolling, singlePostLoading]);
+
+  useEffect(() => {
+    setAllComments(comments.length > 0 ? [...comments] : addLocalComment);
+    dispatch(updateCommentList({ comments }));
   }, [comments, addLocalComment]);
 
-  // Scroll to bottom when new local comment added
-  useEffect(() => {
-    if (scrollAnchorRef.current) {
-      scrollAnchorRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [addLocalComment]);
+  const togetherComments = [...(comments ?? [])];
 
-  const onEmojiSelect = (emoji) => {
-    setComment((prev) => prev + emoji.native);
+  useEffect(() => {
+    // increment scrolling
+    setScrolling((prev) => prev + 2);
+
+    // wait 2 seconds before running onVideoReach
+    const timer = setTimeout(() => {
+      console.log("calling onVideoReach after delay...");
+      onVideoReach();
+    }, 2000);
+
+    // cleanup
+    return () => clearTimeout(timer);
+  }, [onVideoReach, post]);
+
+  // ---- Helpers ----
+  const buildCommentFormData = () => {
+    const formData = new FormData();
+    formData.append("content", comment);
+    formData.append("post_owner", post?.user_id ?? "");
+    file.forEach((f) => formData.append("files", f));
+    if (selectedTags.length) {
+      formData.append("tags", selectedTags.join(","));
+    }
+    formData.append("has_video", mediaType === "video" ? 1 : 0);
+    return formData;
   };
+
+  const createLocalComment = (payload) => ({
+    ...payload,
+    likes: payload.likes ?? 0,
+    comments: payload.comments ?? 0,
+    user_image: payload.user_image ?? user?.user_image,
+    username: payload.username ?? user?.username,
+  });
+
+  const resetCommentForm = () => {
+    setComment("");
+    setFile([]);
+    setMedia([]);
+    setVMedia([]);
+    setSelectedTags([]);
+  };
+
+  const onEmojiSelect = (emoji) => setComment((prev) => prev + emoji.native);
 
   const handleMediaUpload = (event, type) => {
     const selectedFiles = event.target.files;
-    if (selectedFiles.length) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (type === "image") {
-          setMedia((prev) => [...prev, reader.result]);
-        } else {
-          setVMedia((prev) => [...prev, reader.result]);
-        }
-      };
-      reader.readAsDataURL(selectedFiles[0]);
-      setFile((prev) => [...prev, selectedFiles[0]]);
-      setMediaType(type);
-    }
+    if (!selectedFiles.length) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (type === "image") {
+        setMedia((prev) => [...prev, reader.result]);
+      } else {
+        setVMedia((prev) => [...prev, reader.result]);
+      }
+    };
+    reader.readAsDataURL(selectedFiles[0]);
+
+    setFile((prev) => [...prev, selectedFiles[0]]);
+    setMediaType(type);
   };
 
   const handleAddComment = async () => {
     if (!comment.trim()) return;
 
-    const formData = new FormData();
-    formData.append("content", comment);
-    formData.append("post_owner", post?.user_id ?? "");
-    file.forEach((file) => formData.append("files", file));
-    if (selectedTags) {
-      formData.append("tags", selectedTags.join(","));
-    }
-    if (mediaType === "video") formData.append("has_video", 1);
-    if (mediaType === "image") formData.append("has_video", 0);
-
     try {
-      const payload = await addCommentMutation({ post_id, formData }).unwrap();
+      const payload = await addCommentMutation({
+        post_id,
+        formData: buildCommentFormData(),
+      }).unwrap();
 
-      const {
-        id,
-        post_id: payloadPostId,
-        user_id,
-        videos,
-        images,
-        content: payloadContent,
-        created_at,
-      } = payload;
+      const newComment = createLocalComment(payload);
 
-      const newComment = {
-        id,
-        post_id: payloadPostId,
-        user_id,
-        content: payloadContent,
-        images,
-        videos,
-        created_at,
-        likes: 0,
-        user_image: user?.user_image,
-        username: user?.username,
-      };
-
-      setAddLocalComment((prev) => [...new Set([...prev, newComment])]);
-      setComment("");
-      setFile([]);
-      setMedia([]);
-      setVMedia([]);
-      setSelectedTags([]);
-      // refetchReplies();
+      setAddLocalComment((prev) => [...prev, newComment]);
+      setPost((prev) =>
+        prev && post_id === payload?.post_id
+          ? { ...prev, comments: (prev.comments || 0) + 1 }
+          : prev
+      );
+      // dispatch(addNewComment(post_id));
+      resetCommentForm();
+      refetchReplies();
     } catch (error) {
       console.error("Failed to add comment:", error);
-      // Handle error UI if needed
+      setMessage(error?.data?.detail || "Failed to add comment");
     }
-  };
-
-  const openEmojiPicker = (e) => setEmojiAnchor(e.currentTarget);
-  const closeEmojiPicker = () => setEmojiAnchor(null);
-
-  const toggleDrawer = (value) => () => setOpenDrawer(value);
-
-  const handleClose = () => {
-    dispatch(popComponent());
-  };
-
-  const handleGoBack = () => {
-    navigate(-1);
   };
 
   // useEffect(() => {
-  //   if (scrollTo) {
-  //     const el = document.getElementById(`post-${scrollTo}`);
-  //     if (el) {
-  //       el.scrollIntoView({
-  //         behavior: "smooth",
-  //         block: "center",
-  //         inline: "nearest",
-  //       });
-  //       el.classList.add("highlight-blink");
-  //       const timeoutId = setTimeout(
-  //         () => el.classList.remove("highlight-blink"),
-  //         2000
-  //       );
-  //       return () => clearTimeout(timeoutId);
-  //     }
+  //   if (scrollAnchorRef.current) {
+  //     scrollAnchorRef.current.scrollIntoView({ behavior: "smooth" });
   //   }
-  // }, [togetherComments, scrollTo]);
+  // }, [togetherComments]);
 
+  // ---- UI ----
   return (
-    <Box className="post__comment">
+    <Box className="post__comment" ref={postScrollRef}>
       <Comment_Header
         name="Post"
         systemPrefersDark={systemPrefersDark}
-        handleGoBack={handleGoBack}
+        handleGoBack={() => navigate(-1)}
       />
 
-      <Post post={post} />
+      <CommentSinglePost ref={itemRef} post={post} />
 
       {allComments.length > 0 && <ReplyIndicator />}
 
       <CommentReplyList
+        scrolling={scrolling}
+        isError={isError}
         isFetchingReplies={isFetchingReplies}
         refetchReplies={refetchReplies}
         commentsLoading={commentsLoading}
@@ -210,6 +262,7 @@ function PostComment() {
         setFile={setFile}
         media={media}
         file={file}
+        isAddingComment={isAddingComment}
         setMedia={setMedia}
         v_media={v_media}
         setMessage={setComment}
@@ -221,17 +274,17 @@ function PostComment() {
         handleAddComment={handleAddComment}
         systemPrefersDark={systemPrefersDark}
         emojiAnchor={emojiAnchor}
-        closeEmojiPicker={closeEmojiPicker}
+        closeEmojiPicker={() => setEmojiAnchor(null)}
         onEmojiSelect={onEmojiSelect}
-        openEmojiPicker={openEmojiPicker}
-        toggleDrawer={toggleDrawer}
+        openEmojiPicker={(e) => setEmojiAnchor(e.currentTarget)}
+        toggleDrawer={(val) => () => setOpenDrawer(val)}
       />
 
-      <EmojiPickerPopover
+      {/* <EmojiPickerPopover
         anchorEl={emojiAnchor}
-        onClose={closeEmojiPicker}
+        onClose={() => setEmojiAnchor(null)}
         onEmojiSelect={onEmojiSelect}
-      />
+      /> */}
     </Box>
   );
 }

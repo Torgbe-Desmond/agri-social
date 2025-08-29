@@ -1,32 +1,48 @@
 import React, { useEffect, useState } from "react";
 import "./PostStatusIcons.css";
-import { useNavigate, useOutletContext } from "react-router-dom";
-import { Box, Button, CircularProgress, IconButton } from "@mui/material";
-import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Box, Button } from "@mui/material";
 
-function PostStatusIcons({ id, icon, count, to, action, location, status }) {
+function PostStatusIcons({
+  id,
+  icon,
+  count,
+  to,
+  action,
+  post_id,
+  status,
+  isLoadingSaved,
+  isLoadingLiked,
+}) {
+  const [disabled, setDisabled] = useState({
+    isDisabled: false,
+    id: "",
+  });
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    if (to) {
-      navigate(to);
-    }
-    if (action) {
-      action();
-    }
+  const handleFooterClick = () => {
+    setDisabled({
+      isDisabled: true,
+      id,
+    });
+
+    if (to) navigate(to);
+    if (action) action();
   };
 
-  const listOfStyles = {
-    post: "status-icon",
-    video: "video-action-style",
-  };
+  useEffect(() => {
+    return () => {
+      setTimeout(() => setDisabled({ isDisabled: false, id: "" }), 2000);
+    };
+  }, [isLoadingSaved, isLoadingLiked]);
 
   return (
-    <Box className="post-status-icon">
+    <Box className="post-status-icon" id={`${id}-${post_id}`}>
       <Button
-        onClick={() => handleClick()}
+        onClick={handleFooterClick}
         variant="outlined"
         color="primary"
+        disabled={disabled.id === id && disabled.isDisabled}
         startIcon={icon}
         sx={{
           textTransform: "none",

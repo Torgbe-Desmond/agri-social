@@ -8,32 +8,28 @@ import {
   List,
   ListItem,
   ListItemText,
-  useTheme,
   IconButton,
   CircularProgress,
+  useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
-import "./TopHeader.css";
-import ComponentStack from "../HandleStack/HandleStack";
+import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  clearSearch,
-  searchUser,
-  selectedItem,
-} from "../../Features/SearchSlice";
-import { popComponent } from "../../Features/StackSlice";
-import CloseIcon from "@mui/icons-material/Close";
+import { clearSearch, searchUser } from "../../Features/SearchSlice";
+import ComponentStack from "../HandleStack/HandleStack";
 
-function TopHeader({ systemPrefersDark }) {
+const TopHeader = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { searchedUserDetails, searchedUserStatus } = useSelector(
     (state) => state.search
   );
-  const reference_id = localStorage.getItem("reference_id");
+
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === "dark";
 
   useEffect(() => {
     if (!searchTerm) return;
@@ -54,6 +50,7 @@ function TopHeader({ systemPrefersDark }) {
   );
 
   const handleNavigateToProfile = (item) => {
+    const reference_id = localStorage.getItem("reference_id");
     if (item?.post_id) {
       navigate(`/${reference_id}/post/${item?.post_id}`);
     }
@@ -63,7 +60,6 @@ function TopHeader({ systemPrefersDark }) {
     if (item?.comment_id) {
       navigate(`/${reference_id}/replies/${item?.comment_id}`);
     }
-
     setSearchTerm("");
   };
 
@@ -75,7 +71,18 @@ function TopHeader({ systemPrefersDark }) {
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "40px",
-      height: "50px",
+      height: "45px",
+      backgroundColor: isDarkMode
+        ? theme.palette.background.paper
+        : theme.palette.grey[100],
+      color: isDarkMode
+        ? theme.palette.text.primary
+        : theme.palette.text.primary,
+      "& input": {
+        color: isDarkMode
+          ? theme.palette.text.primary
+          : theme.palette.text.primary,
+      },
     },
   };
 
@@ -84,13 +91,12 @@ function TopHeader({ systemPrefersDark }) {
       <AppBar
         position="static"
         sx={{
-          color: "#000",
-          px: 2,
-          py: 1,
+          color: theme.palette.text.primary,
+          // py: 1,
           boxShadow: 0,
           borderBottom: 1,
-          bgcolor: systemPrefersDark ? "#000" : "#FFF",
-          borderColor: "divider",
+          bgcolor: "transparent",
+          borderColor: theme.palette.divider,
         }}
       >
         <Toolbar sx={{ justifyContent: "space-evenly", gap: 2 }}>
@@ -109,9 +115,11 @@ function TopHeader({ systemPrefersDark }) {
             alignItems="center"
             sx={{
               p: 1,
-              bgcolor: systemPrefersDark ? "background.paper" : "#FFF",
+              bgcolor: isDarkMode
+                ? theme.palette.background.paper
+                : theme.palette.common.white,
               border: 1,
-              borderColor: "divider",
+              borderColor: theme.palette.divider,
               maxWidth: "100%",
               borderRadius: "30px",
             }}
@@ -120,7 +128,6 @@ function TopHeader({ systemPrefersDark }) {
             zIndex="100"
             gap={1}
             pt={1}
-            bgcolor="#FFF"
           >
             <TextField
               fullWidth
@@ -132,16 +139,22 @@ function TopHeader({ systemPrefersDark }) {
               InputProps={{
                 disableUnderline: true,
                 endAdornment: (
-                  <IconButton onClick={() => setSearchTerm("")}>
-                    {searchedUserStatus == "loading" ? (
-                      <CircularProgress size={20} />
+                  <IconButton
+                    sx={{ color: theme.palette.text.secondary }}
+                    onClick={() => setSearchTerm("")}
+                  >
+                    {searchedUserStatus === "loading" ? (
+                      <CircularProgress
+                        size={20}
+                        sx={{ color: theme.palette.primary.main }}
+                      />
                     ) : (
                       <CloseIcon />
                     )}
                   </IconButton>
                 ),
                 startAdornment: (
-                  <IconButton onClick={() => setSearchTerm("")}>
+                  <IconButton sx={{ color: theme.palette.text.secondary }}>
                     <SearchIcon />
                   </IconButton>
                 ),
@@ -153,16 +166,16 @@ function TopHeader({ systemPrefersDark }) {
           <Button
             onClick={handleOpenPostModal}
             variant="contained"
-            elevation="0"
+            elevation={0}
             sx={{
               textTransform: "none",
               borderRadius: 20,
               boxShadow: 0,
+              bgcolor: theme.palette.primary.main,
+              "&:hover": { bgcolor: theme.palette.primary.dark },
             }}
             startIcon={<AddIcon />}
-          >
-            {/* Create */}
-          </Button>
+          ></Button>
         </Toolbar>
       </AppBar>
 
@@ -171,12 +184,8 @@ function TopHeader({ systemPrefersDark }) {
         <Box
           sx={{
             position: "sticky",
-            // top: "70px",
-            // left: "50%",
-            // transform: "translateX(-50%)",
             width: "100%",
-            // maxWidth: 500,
-            bgcolor: "background.paper",
+            bgcolor: theme.palette.background.paper,
             boxShadow: 4,
             zIndex: 9999,
             maxHeight: "auto",
@@ -195,7 +204,7 @@ function TopHeader({ systemPrefersDark }) {
                   px: 2,
                   py: 1,
                   "&:hover": {
-                    backgroundColor: "action.hover",
+                    backgroundColor: theme.palette.action.hover,
                   },
                 }}
               >
@@ -216,7 +225,14 @@ function TopHeader({ systemPrefersDark }) {
                 <ListItemText
                   primary={item?.username}
                   secondary={item?.content}
-                  primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+                  primaryTypographyProps={{
+                    fontSize: 14,
+                    fontWeight: 500,
+                    color: theme.palette.text.primary,
+                  }}
+                  secondaryTypographyProps={{
+                    color: theme.palette.text.secondary,
+                  }}
                 />
               </ListItem>
             ))}
@@ -225,6 +241,6 @@ function TopHeader({ systemPrefersDark }) {
       )}
     </Box>
   );
-}
+};
 
 export default TopHeader;

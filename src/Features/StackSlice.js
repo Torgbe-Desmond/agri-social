@@ -5,6 +5,7 @@ const stackSlice = createSlice({
   initialState: {
     search: false,
     components: [],
+    draggableComponents: [],
     stackState: "",
     scrolling: false,
     index: 0,
@@ -12,10 +13,44 @@ const stackSlice = createSlice({
     onlineStatus: null,
   },
   reducers: {
+    // pushComponent: (state, action) => {
+    //   state.components.push(action.payload);
+    //   state.stackState = "mounted";
+
+    // },
     pushComponent: (state, action) => {
-      // state.components.shift();
-      state.components.push(action.payload);
-      state.stackState = "mounted";
+      state.components.push({
+        id: action.payload.id,
+        props: action.payload.props || {},
+        // position: action.payload.position || { x: 100, y: 400 },
+        // size: action.payload.size || { width: 450, height: 300 },
+      });
+    },
+    pushOnToDraggableComponent: (state, action) => {
+      state.draggableComponents.push({
+        id: action.payload.id,
+        props: action.payload.props || {},
+        position: action.payload.position || { x: 100, y: 400 },
+        size: action.payload.size || { width: 450, height: 300 },
+      });
+    },
+    removeComponentById: (state, action) => {
+      state.draggableComponents = state.components.filter(
+        (comp) => comp.id !== action.payload
+      );
+    },
+    updateWindowPosition: (state, action) => {
+      const { index, x, y } = action.payload;
+      state.draggableComponents[index].position = { x, y };
+    },
+    updateWindowSizeAndPosition: (state, action) => {
+      const { index, width, height, x, y } = action.payload;
+      state.draggableComponents[index].size = { width, height };
+      state.draggableComponents[index].position = { x, y };
+    },
+    bringToFront: (state, action) => {
+      const { index } = action.payload;
+      state.draggableComponents[index].zIndex = state.nextZIndex++;
     },
     setScrolling: (state, action) => {
       state.scrolling = action.payload;
@@ -54,5 +89,10 @@ export const {
   setScrolling,
   onlineStatus,
   clearOnLineStatus,
+  removeComponentById,
+  updateWindowPosition,
+  updateWindowSizeAndPosition,
+  bringToFront,
+  pushOnToDraggableComponent,
 } = stackSlice.actions;
 export default stackSlice.reducer;

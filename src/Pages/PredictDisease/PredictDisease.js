@@ -27,6 +27,8 @@ function PredictDisease() {
   const [predictImage, { isLoading, isError, error: predictionError }] =
     usePredictImageMutation();
 
+  console.log("predictionError", predictionError);
+
   useEffect(() => {
     if (isError && predictionError?.data?.detail) {
       setMessage(predictionError.data.detail);
@@ -71,6 +73,7 @@ function PredictDisease() {
 
     try {
       const result = await predictImage({ formData }).unwrap();
+      console.log("prediction result", result);
       setPrediction(result);
     } catch (error) {
       console.error("Prediction failed:", error);

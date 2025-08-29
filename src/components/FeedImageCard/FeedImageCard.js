@@ -1,61 +1,23 @@
 import * as React from "react";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import MediaSlider from "../MediaSlider/MediaSlider";
 
-function srcset(image, size, rows = 1, cols = 1) {
-  return {
-    src: `${image}?w=${size * cols}&h=${size * rows}&fit=crop&auto=format`,
-    srcSet: `${image}?w=${size * cols}&h=${
-      size * rows
-    }&fit=crop&auto=format&dpr=2 2x`,
+export default function FeedImageCard({ media }) {
+  if (!media || media.length === 0) return null;
+
+  const containerStyles = {
+    width: "100%",
+    height: "100%",
+    cursor: "pointer",
   };
-}
-
-export default function FeedImageCard({ images }) {
-  console.log("images", images);
-  const length = images?.length || 1;
 
   return (
-    <ImageList
-      sx={{
-        width: "100%",
-        height: "auto",
-        border: 1,
-        borderColor: "divider",
-        borderRadius: "8px",
-      }}
-      variant="quilted"
-      cols={length > 1 ? 2 : 1}
-      rowHeight={400}
-    >
-      {images.map((item, index) => (
-        <ImageListItem
-          key={index}
-          cols={length > 1 ? 1 : 2}
-          rows={1}
-          gap={1}
-          sx={{
-            border: 1,
-            borderColor: "divider",
-            overflow: "hidden",
-            borderRadius: 2,
-          }}
-        >
-          <img
-            {...srcset(item, 121, 1, 1)}
-            alt={`post-image-${index}`}
-            loading="lazy"
-            style={{
-              width: "100%",
-              height: "100%",
-              border: 1,
-              borderColor: "#ccc",
-              objectFit: `${length > 1 ? "contain" : "cover"}`,
-              borderRadius: "8px",
-            }}
-          />
-        </ImageListItem>
-      ))}
-    </ImageList>
+    <div style={containerStyles}>
+      <MediaSlider slides={media} />
+    </div>
   );
 }

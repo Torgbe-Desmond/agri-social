@@ -8,7 +8,10 @@ import "./UserProducts.css";
 import Header from "../Header/Header";
 import LocalProductCard from "../LocalProductCard/LocalProductCard";
 import ComponentStack from "../HandleStack/HandleStack";
-import { useGetProductsQuery } from "../../Features/productApi";
+import {
+  useGetProductsQuery,
+  useGetUserProductsQuery,
+} from "../../Features/productApi";
 import { updateLocalProductList } from "../../Features/ProductSlice";
 import { useDispatch } from "react-redux";
 import ErrorInfoAndReload from "../Errors/ErrorInfoAndReload";
@@ -23,9 +26,10 @@ function UserProducts() {
   const dispatch = useDispatch();
 
   // 🔍 Fetch user-specific products
-  const { data, isLoading, isFetching, refetch } = useGetProductsQuery({
-    user_id,
-  });
+  const { data, isLoading, isFetching, refetch, error } =
+    useGetUserProductsQuery();
+
+  console.log("error", error);
 
   const products = useMemo(() => {
     return Array.isArray(data?.products) ? data.products : [];
@@ -79,14 +83,11 @@ function UserProducts() {
       setSearchTerm={setSearchTerm}
       setScroll={setScroll}
     >
-      <Box sx={{ padding: 3 }} className="user__products">
-        {Array.isArray(filteredData) && filteredData.length > 0 ? (
+      <Box sx={{ padding: 1 }} className="user__products">
+        {Array.isArray(filteredData) &&
           filteredData.map((product, index) => (
             <LocalProductCard {...product} key={product.post_id || index} />
-          ))
-        ) : (
-          <p style={{ padding: "1rem", color: "#777" }}>No products found.</p>
-        )}
+          ))}
       </Box>
       <ErrorInfoAndReload
         isLoading={isLoading}

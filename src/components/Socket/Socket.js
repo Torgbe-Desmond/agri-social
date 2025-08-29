@@ -8,6 +8,7 @@ import React, {
 import { useDispatch } from "react-redux";
 import { io } from "socket.io-client";
 import { onlineStatus } from "../../Features/StackSlice";
+import { Api } from "../../Features/Api";
 
 // Create context
 const SocketContext = createContext(null);
@@ -26,7 +27,7 @@ export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    socketRef.current = io(url[0], {
+    socketRef.current = io(Api, {
       transports: ["websocket"],
       withCredentials: true,
     });

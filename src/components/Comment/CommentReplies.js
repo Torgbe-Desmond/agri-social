@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   useAddReplyCommentMutation,
@@ -14,6 +14,10 @@ import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
 import { Box, Button, Typography } from "@mui/material";
 import "./CommentReplies.css";
 import { useError } from "../Errors/Errors";
+import { clearComments, updateCommentList } from "../../Features/CommentSlice";
+import { useDispatch } from "react-redux";
+import CommentSinglePost from "../PostComment/CommentSinglePost";
+import ReplySingleComment from "./ReplySingleComment";
 
 function CommentReplies() {
   const { comment_id } = useParams();
@@ -29,6 +33,13 @@ function CommentReplies() {
   const [mediaType, setMediaType] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
   const { message, setMessage } = useError();
+  const [scrolling, setScrolling] = useState(0);
+  const dispatch = useDispatch();
+
+  // ---- Refs ----
+  const ReplyScrollRef = useRef();
+  const itemRef = useRef();
+  const lastScrollTop = useRef(0);
 
   // RTK Query hooks
   const {
@@ -41,8 +52,9 @@ function CommentReplies() {
 
   const {
     data: repliesData,
-    isLoading: loadingReplies,
+    isLoading: commentsLoading,
     refetch: refetchReplies,
+    isFetching: isFetchingReplies,
     isError,
     error: commentsError,
   } = useGetRepliesQuery(comment_id, {
@@ -58,16 +70,59 @@ function CommentReplies() {
   const [addReplyComment, { isLoading: isAddingReply, error }] =
     useAddReplyCommentMutation();
 
-  console.log("error", error);
+  useEffect(() => {
+    dispatch(
+      updateCommentList({ comments: [...(repliesData?.comments ?? [])] })
+    );
+    return () => dispatch(clearComments());
+  }, [repliesData]);
 
   // Combine server replies + local optimistic replies
-  const togetherComments = [
-    ...(repliesData?.comments ?? []),
-    ...addLocalComment,
-  ];
+  const togetherComments = [...(repliesData?.comments ?? [])];
   const openEmojiPicker = (e) => setEmojiAnchor(e.currentTarget);
   const closeEmojiPicker = () => setEmojiAnchor(null);
   const onEmojiSelect = (emoji) => setComment((prev) => prev + emoji.native);
+
+  // useEffect(() => {
+  //   const node = ReplyScrollRef.current;
+  //   if (!node) return;
+
+  //   const handleScroll = () => {
+  //     lastScrollTop.current = node.scrollTop;
+  //     setScrolling((prev) => prev + 1);
+  //   };
+
+  //   node.addEventListener("scroll", handleScroll);
+  //   return () => node.removeEventListener("scroll", handleScroll);
+  // }, []);
+
+  const onVideoReach = useCallback(() => {
+    if (!itemRef.current) return;
+
+    const postElement = itemRef.current;
+    const rect = postElement.getBoundingClientRect();
+
+    const visibleHeight =
+      Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+    const clampedHeight = Math.max(0, visibleHeight);
+    const percentOfViewport = (clampedHeight / window.innerHeight) * 100;
+
+    const postId = postElement.id?.replace("replies-single-comment-", "");
+    const video = postElement.querySelector("video");
+    if (!video) return;
+
+    if (percentOfViewport >= 50 || scrolling > 1) {
+      console.log(`▶️ Playing video for post ${postId}`);
+      video.play().catch((err) => console.warn("Autoplay failed:", err));
+    } else {
+      console.log(`⏸️ Pausing video for post ${postId}`);
+      video.pause();
+    }
+  }, [itemRef]);
+
+  useEffect(() => {
+    onVideoReach();
+  }, [scrolling, singleComment]);
 
   const handleMediaUpload = (event, type) => {
     const selectedFiles = event.target.files;
@@ -107,7 +162,6 @@ function CommentReplies() {
       }).unwrap();
 
       setAddLocalComment((prev) => [...prev, response]);
-
       setComment("");
       // Optionally refetch replies to sync with server
       refetchReplies();
@@ -121,6 +175,8 @@ function CommentReplies() {
     navigate(-1);
   };
 
+  console.log("scrolling", scrolling);
+
   useEffect(() => {
     if (scrollAnchorRef.current) {
       scrollAnchorRef.current.scrollIntoView({ behavior: "smooth" });
@@ -128,27 +184,22 @@ function CommentReplies() {
   }, [togetherComments]);
 
   return (
-    <Box className="post__comment">
+    <Box className="post__comment" ref={ReplyScrollRef}>
       <Comment_Header
         name="Replies"
         systemPrefersDark={false}
         handleGoBack={handleGoBack}
       />
 
-      {loadingComment ? (
-        <Typography>Loading comment...</Typography>
-      ) : (
-        <CommentComponent
-          comment={singleComment}
-          singleCommentStatus={loadingComment}
-        />
-      )}
-
-      {isError && <Button onClick={refetchComment}>Reload</Button>}
-      <ReplyIndicator />
+      <ReplySingleComment comment={singleComment} ref={itemRef} />
 
       <CommentReplyList
+        isError={isError}
+        scrolling={scrolling}
+        isFetchingReplies={isFetchingReplies}
+        refetchReplies={refetchComment}
         chatContainerRef={chatContainerRef}
+        commentsLoading={commentsLoading}
         commentReplies={togetherComments}
         scrollAnchorRef={scrollAnchorRef}
       />

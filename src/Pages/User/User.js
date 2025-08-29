@@ -37,7 +37,7 @@ function User() {
 
   return (
     <div className="posts">
-      <UserFeed _conversation_id={conversation_id} />
+      <UserFeed />
     </div>
   );
 }

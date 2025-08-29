@@ -14,7 +14,7 @@ export const productApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Product", "ProductList"],
+  tagTypes: ["Product", "ProductList", "Reviews"],
   endpoints: (builder) => ({
     getProducts: builder.query({
       query: ({ offset, limit }) => `/products?offset=${offset}&limit=${limit}`,
@@ -24,14 +24,28 @@ export const productApi = createApi({
           id: product_id,
         })) || [],
     }),
-
     getProduct: builder.query({
-      query: (product_id) => `/products/${product_id}`,
-      providesTags: (result, error, id) => [{ type: "Product", id }],
+      query: ({ product_id }) => `/products/${product_id}`,
+      providesTags: (result, error, id) => [{ type: "Reviews", id }],
+    }),
+
+    createReview: builder.mutation({
+      query: ({ product_id, formData }) => ({
+        url: `/products/reviews`,
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: ["Reviews"],
+    }),
+
+    getReviews: builder.query({
+      query: ({ offset, limit, product_id }) =>
+        `/products/reviews/${product_id}?offset=${offset}&limit=${limit}`,
+      providesTags: (result, error, id) => [{ type: "Reviews", id }],
     }),
 
     getUserProducts: builder.query({
-      query: () => `/products/user`,
+      query: () => `/user-products`,
       providesTags: ["ProductList"],
     }),
 
@@ -76,6 +90,7 @@ export const productApi = createApi({
 
 export const {
   useGetProductsQuery,
+  useGetReviewsQuery,
   useGetProductQuery,
   useGetUserProductsQuery,
   useSearchProductsQuery,

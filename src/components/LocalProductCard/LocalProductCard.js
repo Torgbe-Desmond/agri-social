@@ -18,14 +18,7 @@ const LocalProductCard = ({
   oldPrice,
   unit,
 }) => {
-  const { loading } = useSelector((state) => state.product);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (loading === "succeeded") {
-      dispatch(popComponent());
-    }
-  }, [loading]);
 
   const handleProductDelete = () => {
     const stack = new ComponentStack(dispatch);
@@ -45,8 +38,7 @@ const LocalProductCard = ({
       sx={{
         width: "auto",
         borderRadius: 4,
-        boxShadow: 3,
-        padding: 2,
+        boxShadow: 1,
         cursor: "pointer",
         transition: "box-shadow 0.3s ease-in-out",
         "&:hover": {
@@ -68,12 +60,6 @@ const LocalProductCard = ({
       </Box>
 
       <CardContent sx={{ textAlign: "center", paddingTop: 2 }}>
-        {/* <Box display="flex" justifyContent="center" mb={1}>
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} sx={{ color: "#fbc02d", fontSize: 18 }} />
-          ))}
-        </Box> */}
-
         <Typography variant="subtitle1" fontWeight={600} gutterBottom>
           {title}
         </Typography>

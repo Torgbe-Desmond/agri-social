@@ -9,11 +9,11 @@ import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import ComponentStack from "../HandleStack/HandleStack";
 import { useGetMessagedUsersQuery } from "../../Features/messageApi";
 import { updateUsersList } from "../../Features/MessageSlice";
+import ErrorInfoAndReload from "../Errors/ErrorInfoAndReload";
 
 function Messages() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  const { user_id, systemPrefersDark } = useOutletContext();
   const dispatch = useDispatch();
 
   // Call RTK Query hook
@@ -50,7 +50,16 @@ function Messages() {
       reloadAction={reloadAction}
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
-      children={<MessagedUsersList users={filteredData} />}
+      children={
+        <>
+          <MessagedUsersList users={filteredData} />
+          <ErrorInfoAndReload
+            isLoading={isLoading}
+            isFetching={isFetching}
+            refetch={refetch}
+          />
+        </>
+      }
     />
   );
 }

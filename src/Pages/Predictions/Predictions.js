@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./Predictions.css";
 import { useOutletContext } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
@@ -9,32 +9,53 @@ import { useDispatch, useSelector } from "react-redux";
 import { setScrolling } from "../../Features/StackSlice";
 import { useGetPredictionsQuery } from "../../Features/predictionApi";
 import ErrorInfoAndReload from "../../components/Errors/ErrorInfoAndReload";
+import Container from "../../components/Container/Container";
+import ContainerTitle from "../../components/Container/ContainerTitle";
+import ContainerSearch from "../../components/Container/ContainerSearch";
+import PredictionCard from "../../components/PredictionCard/PredictionCard";
+import { updatePredictionList } from "../../Features/PredictionSlice";
 
 function Predictions() {
-  const { user_id, systemPrefersDark, user } = useOutletContext();
+  const { userDetails } = useSelector((state) => state.auth);
+  const { prediction } = useSelector((state) => state.prediction);
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [scrolling, setScroll] = useState(0);
+  const [fetchError, setFetchError] = useState(false);
+
   const lastScrollTop = useRef(0);
+  const predictionRef = useRef(null);
 
   const { data, isLoading, isFetching, isError, refetch, error } =
     useGetPredictionsQuery();
 
+  const predictionData = useMemo(() => {
+    return Array.isArray(data?.predictions) ? data.predictions : [];
+  }, [data]);
+
+  console.log("error", error);
+
+
+  const hasMore = predictionData?.length > 0;
+
   useEffect(() => {
-    dispatch(setScrolling(true));
-    return () => dispatch(setScrolling(false));
-  }, []);
+    setFetchError(isError);
+  }, [isError]);
+
+  useEffect(() => {
+    if (predictionData?.length > 0) {
+      dispatch(updatePredictionList({ predictionData }));
+    }
+  }, [predictionData, dispatch]);
 
   // Scroll tracking (optional logic)
   useEffect(() => {
-    const scrollContainer = document.querySelector(".resuable");
+    const scrollContainer = predictionRef.current;
     if (!scrollContainer) return;
 
     const handleScroll = () => {
-      const scrollTop = scrollContainer.scrollTop;
       setScroll((prev) => prev + 1);
-      lastScrollTop.current = scrollTop;
     };
 
     scrollContainer.addEventListener("scroll", handleScroll);
@@ -43,28 +64,56 @@ function Predictions() {
 
   useEffect(() => {
     const searchedData = searchTerm
-      ? data?.predictions.filter((item) =>
+      ? prediction?.filter((item) =>
           item.prediction_label
             ?.toLowerCase()
             .includes(searchTerm.toLowerCase())
         )
-      : data?.predictions;
+      : prediction;
     setFilteredData(searchedData);
-  }, [searchTerm, data?.predictions]);
+  }, [searchTerm, prediction]);
 
   return (
-    <Box className="predictions">
-      <PredictionHeader
-        systemPrefersDark={systemPrefersDark}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-      />
-      <PredictionList
-        predictionStatus="succeeded"
-        filteredData={filteredData}
-        userDetails={user}
-      />
+    <Box className="container" ref={predictionRef}>
+      <Container>
+        <ContainerTitle title={"Predictions"} />
+        <ContainerSearch
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder="Search predictions"
+        />
+      </Container>
+
+      <Box sx={{ p: 1 }} className="scrolling-component">
+        {filteredData?.length > 0 &&
+          filteredData.map(
+            ({
+              created_at,
+              user_id,
+              generated_name,
+              confidence,
+              prediction_label,
+              image_url,
+              id,
+            }) => (
+              <PredictionCard
+                key={id}
+                userDetails={userDetails}
+                created_at={created_at}
+                user_id={user_id}
+                generated_name={generated_name}
+                confidence={confidence}
+                prediction_label={prediction_label}
+                image_url={image_url}
+                id={id}
+              />
+            )
+          )}
+      </Box>
+
       <ErrorInfoAndReload
+        setFetchError={setFetchError}
+        isError={fetchError}
         isLoading={isLoading}
         isFetching={isFetching}
         refetch={refetch}

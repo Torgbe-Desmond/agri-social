@@ -6,50 +6,43 @@ import {
   TextField,
   Typography,
   Modal,
-  Paper,
   IconButton,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
-import { createGroup } from "../../Features/MessageSlice";
 import ImageIcon from "@mui/icons-material/Image";
 import CloseIcon from "@mui/icons-material/Close";
 import { useCreateGroupMutation } from "../../Features/messageApi";
 
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  borderRadius: 2,
-  boxShadow: 24,
-  p: 4,
-};
-
 const CreateGroupModal = () => {
+  const theme = useTheme();
+  const dispatch = useDispatch();
+
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
   const [media, setMedia] = useState(null);
   const [file, setFile] = useState(null);
-  const dispatch = useDispatch();
-  const [createGroup, { isLoading, isError, error }] = useCreateGroupMutation();
 
-  const handleMediaUpload = (event, type) => {
-    const file = event.target.files[0];
-    if (file) {
+  const [createGroup, { isLoading, error }] = useCreateGroupMutation();
+
+  const handleMediaUpload = (event) => {
+    const uploadedFile = event.target.files[0];
+    if (uploadedFile) {
       const reader = new FileReader();
       reader.onload = () => {
         setMedia(reader.result);
       };
-      reader.readAsDataURL(file);
-      setFile(file);
+      reader.readAsDataURL(uploadedFile);
+      setFile(uploadedFile);
     }
   };
 
   const handleClearMedia = () => {
     setMedia(null);
+    setFile(null);
   };
 
   const handleCreate = async () => {
@@ -59,9 +52,16 @@ const CreateGroupModal = () => {
     formData.append("name", groupName.trim());
     formData.append("description", description.trim());
     formData.append("is_group", "1");
+    if (file) {
+      formData.append("file", file);
+    }
 
-    const payload = await createGroup({ formData });
-    dispatch(popComponent());
+    try {
+      await createGroup({ formData }).unwrap();
+      dispatch(popComponent());
+    } catch (err) {
+      console.error("Create group failed:", err);
+    }
   };
 
   const handleCancel = () => {
@@ -69,19 +69,38 @@ const CreateGroupModal = () => {
   };
 
   return (
-    <Modal open={true} onClose={handleCancel}>
-      <Box sx={modalStyle}>
+    <Modal open onClose={handleCancel}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 400,
+          bgcolor: theme.palette.background.paper,
+          borderRadius: 2,
+          boxShadow: 24,
+          p: 4,
+        }}
+      >
         <Typography variant="h6" mb={2}>
           Create Group
         </Typography>
 
-        <Box display="flex" flexDirection="column" gap={2}>
+        <Stack spacing={2}>
+          {error && (
+            <Alert severity="error">
+              {error?.data?.message || "Something went wrong while creating the group."}
+            </Alert>
+          )}
+
           <TextField
             label="Group Name"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
             fullWidth
             required
+            disabled={isLoading}
           />
           <TextField
             label="Description"
@@ -90,62 +109,89 @@ const CreateGroupModal = () => {
             multiline
             rows={3}
             fullWidth
+            disabled={isLoading}
           />
+
+          {/* Upload Image */}
           <input
             accept="image/*"
             style={{ display: "none" }}
             id="image-upload"
             type="file"
-            onChange={(e) => handleMediaUpload(e, "image")}
+            onChange={handleMediaUpload}
           />
           <label htmlFor="image-upload">
-            <IconButton component="span" color="primary">
-              <ImageIcon />
-            </IconButton>
+            <Button
+              component="span"
+              variant="outlined"
+              startIcon={<ImageIcon />}
+              disabled={isLoading}
+              sx={{ borderRadius: "32px" }}
+            >
+              Upload Image
+            </Button>
           </label>
-        </Box>
 
-        <Box mt={2} position="relative" justifyContent="center" display="flex">
-          <IconButton
-            size="small"
-            color="inherit"
-            sx={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              zIndex: 1,
-            }}
-            onClick={handleClearMedia}
-          >
-            <CloseIcon fontSize="small" />
-          </IconButton>
-          <img src={media} style={{ width: "300px" }} alt="Preview" />
-        </Box>
-        <Stack
-          direction="row"
-          spacing={2}
-          justifyContent="flex-end"
-          alignItems="flex-end"
-          mt={3}
-        >
-          <Button
-            onClick={handleCancel}
-            variant="outlined"
-            color="secondary"
-            className="sidebar__tweet__outlined"
-            sx={{ borderRadius: "32px" }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleCreate}
-            variant="contained"
-            className="sidebar__tweet"
-            disabled={!groupName.trim()}
-            sx={{ borderRadius: "32px" }}
-          >
-            Create
-          </Button>
+          {/* Image Preview */}
+          {media && (
+            <Box
+              mt={1}
+              position="relative"
+              display="flex"
+              justifyContent="center"
+              sx={{
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: 1,
+                overflow: "hidden",
+              }}
+            >
+              <IconButton
+                size="small"
+                color="inherit"
+                sx={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  bgcolor: theme.palette.background.paper,
+                  "&:hover": { bgcolor: theme.palette.grey[200] },
+                }}
+                onClick={handleClearMedia}
+                disabled={isLoading}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+              <img
+                src={media}
+                alt="Preview"
+                style={{
+                  width: "100%",
+                  maxHeight: "200px",
+                  objectFit: "cover",
+                }}
+              />
+            </Box>
+          )}
+
+          {/* Action Buttons */}
+          <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Button
+              onClick={handleCancel}
+              variant="outlined"
+              color="secondary"
+              sx={{ borderRadius: "32px" }}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreate}
+              variant="contained"
+              sx={{ borderRadius: "32px" }}
+              disabled={!groupName.trim() || isLoading}
+            >
+              {isLoading ? <CircularProgress size={20} /> : "Create"}
+            </Button>
+          </Stack>
         </Stack>
       </Box>
     </Modal>

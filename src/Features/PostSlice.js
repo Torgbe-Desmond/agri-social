@@ -2,6 +2,9 @@ import { AlignVerticalBottomSharp } from "@mui/icons-material";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const initialState = {
+  post: null,
+  currentVideo: null,
+
   // === Post Data ===
   posts: [],
   postsOffset: 1,
@@ -27,13 +30,61 @@ const initialState = {
   commentsOffset: 1,
 };
 
+const mergeUnique = (existing, incoming, key = "post_id") => {
+  const map = new Map();
+  [...existing, ...incoming].forEach((item) => {
+    map.set(item[key], item);
+  });
+  return Array.from(map.values());
+};
+
 const postSlice = createSlice({
   name: "post",
   initialState,
   reducers: {
     updatePostList: (state, action) => {
       const { postData } = action.payload;
-      state.posts = [...state.posts, ...postData];
+      state.posts = mergeUnique(state.posts, postData);
+    },
+    setCurrentVideo: (state, action) => {
+      state.currentVideo = action.payload;
+    },
+    updatePost: (state, action) => {
+      const { postData } = action.payload;
+      state.post = postData;
+    },
+    updateSavedPostList: (state, action) => {
+      const { postData } = action.payload;
+      state.savedHistory = mergeUnique(state.savedHistory, postData);
+    },
+    updateStreamList: (state, action) => {
+      const { streamData } = action.payload;
+      state.streamData = mergeUnique(state.streamData, streamData);
+    },
+    updatePostHistoryList: (state, action) => {
+      const { postData } = action.payload;
+      state.postHistory = mergeUnique(state.postHistory, postData);
+    },
+    updateUserPostHistoryList: (state, action) => {
+      const { userPostHistory } = action.payload;
+      state.userPostHistory = mergeUnique(
+        state.userPostHistory,
+        userPostHistory
+      );
+    },
+    addNewComment: (state, action) => {
+      if (action.payload) {
+        state.posts = (state.posts || []).map((p) => {
+          if (p.post_id === action.payload) {
+            return {
+              ...p,
+              comments: (p.comments || 0) + 1,
+              replies: (p.comments || 0) + 1,
+            };
+          }
+          return p;
+        });
+      }
     },
     emptyUserPostHistory: (state) => {
       state.userPostHistory = [];
@@ -42,22 +93,7 @@ const postSlice = createSlice({
       const { postData } = action.payload;
       state.posts.unshift(postData);
     },
-    updateSavedPostList: (state, action) => {
-      const { postData } = action.payload;
-      state.savedHistory = [...state.savedHistory, ...postData];
-    },
-    updateStreamList: (state, action) => {
-      const { streamData } = action.payload;
-      state.streamData = [...state.streamData, ...streamData];
-    },
-    updatePostHistoryList: (state, action) => {
-      const { postData } = action.payload;
-      state.postHistory = [...state.postHistory, ...postData];
-    },
-    updateUserPostHistoryList: (state, action) => {
-      const { userPostHistory } = action.payload;
-      state.userPostHistory = [...state.userPostHistory, ...userPostHistory];
-    },
+
     updateStreamLike: (state, action) => {
       const { post_id, liked } = action.payload;
       state.streamData = state.streamData?.map((p) => {
@@ -165,10 +201,12 @@ export const {
   updatePostSaved,
   updateSavedPostList,
   addNewPost,
+  updatePost,
   removeDeletedPost,
   updateUserPostHistoryList,
   emptyUserPostHistory,
-
+  addNewComment,
+  setCurrentVideo,
   setPostsOffset,
   setStreamDataOffset,
   setPostHistoryOffset,

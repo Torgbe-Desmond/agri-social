@@ -15,6 +15,7 @@ import ComponentStack from "../HandleStack/HandleStack";
 import { useGetProductsQuery } from "../../Features/productApi";
 import { updateProductList } from "../../Features/ProductSlice";
 import { useDispatch, useSelector } from "react-redux";
+import ErrorInfoAndReload from "../Errors/ErrorInfoAndReload";
 
 function MarketPlace() {
   const observer = useRef();
@@ -34,7 +35,7 @@ function MarketPlace() {
     return Array.isArray(data?.products) ? data.products : [];
   }, [data]);
 
-  const hasMore = products.length > 0;
+  const hasMore = products.length === 10 && products.length > 0;
 
   useEffect(() => {
     if (Array.isArray(data?.products)) {
@@ -79,34 +80,23 @@ function MarketPlace() {
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
       children={
-        <Box sx={{ padding: 3 }} className="market__place">
-          <Grid
-            container
-            sx={{ width: "100%", justifyContent: "center" }}
-            spacing={3}
-          >
-            {filteredData.map((product, index) => {
-              const isLast = index === productsData.length - 1;
-              return (
-                <Grid
-                  key={product.id || index}
-                  ref={isLast ? lastProductRef : null}
-                  item
-                  xs={12}
-                  sm={12}
-                  md={4}
-                  lg={3}
-                >
-                  <ProductCard {...product} />
-                </Grid>
-              );
-            })}
-          </Grid>
-          {isFetching && (
-            <p className="circular__progress">
-              <CircularProgress size={24} />
-            </p>
-          )}
+        <Box sx={{ padding: 1 }} className="market__place">
+          {filteredData.map((product, index) => {
+            const isLast = index === productsData.length - 1;
+            return (
+              <Box
+                key={product.id || index}
+                ref={isLast ? lastProductRef : null}
+              >
+                <ProductCard {...product} />
+              </Box>
+            );
+          })}
+          <ErrorInfoAndReload
+            isLoading={isLoading}
+            isFetching={isFetching}
+            refetch={refetch}
+          />
         </Box>
       }
     />

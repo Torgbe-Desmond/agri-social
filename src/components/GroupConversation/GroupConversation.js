@@ -2,20 +2,14 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import "./GroupConversation.css";
 import {
   Box,
-  CircularProgress,
   IconButton,
-  Tooltip,
   Avatar,
   TextField,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import InsertPhotoOutlinedIcon from "@mui/icons-material/InsertPhotoOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import { predictImage } from "../../Features/PredictionSlice";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import {
-    clearGroups,
-  getConversation,
   getdMessages,
   sendMessage,
 } from "../../Features/MessageSlice";
@@ -23,110 +17,46 @@ import { useSocket } from "../Socket/Socket";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 function GroupConversation() {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
   const [chatMessages, setChatMessages] = useState([]);
-  const { predictionStatus, prediction } = useSelector(
-    (state) => state.prediction
-  );
-  const { conversation_id } = useParams();
+  const [message, setMessage] = useState("");
+  const [files, setFiles] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const { conversation_id, recipient_id } = useParams();
+
   const { userDetails } = useSelector((state) => state.auth);
-  const { getConversationStatus, messages } = useSelector(
-    (state) => state.message
-  );
+  const { messages } = useSelector((state) => state.message);
+  const { systemPrefersDark } = useOutletContext();
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const socket = useSocket();
 
-  const fileInputRef = useRef();
-  const dispatch = useDispatch();
-  const { darkMode, systemPrefersDark } = useOutletContext();
-  const [message, setMessage] = useState("");
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [files, setFiles] = useState([]);
-  const { recipient_id } = useParams();
-
-  const chatContainerRef = useRef(null);
   const scrollAnchorRef = useRef(null);
 
   useEffect(() => {
     if (conversation_id) {
       dispatch(getdMessages({ conversation_id }));
     }
-  }, [conversation_id]);
+  }, [conversation_id, dispatch]);
 
   useEffect(() => {
     setChatMessages(messages);
   }, [messages]);
 
-  // Scroll to bottom when chatMessages change
+  // Scroll to bottom on messages update
   useEffect(() => {
     if (scrollAnchorRef.current) {
       scrollAnchorRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [chatMessages]);
 
-  const handleSend = () => {
-    if (!files || !message) return;
-
-    const userMessage = {
-      sender_id: "active",
-      conversation_id: conversation_id & conversation_id,
-      image: files,
-      profilePicture: userDetails?.user_image || "/user-avatar.png",
-      content: message,
-    };
-
-    setChatMessages((prev) => [...prev, userMessage]);
-
-    const formData = new FormData();
-    const member_ids = [recipient_id, userDetails?.id];
-    formData.append("member_ids", member_ids);
-    formData.append("content", message);
-
-    if (conversation_id) {
-      formData.append("conversation_id", conversation_id);
-    }
-    // formData.append("conversation")
-    dispatch(sendMessage({ formData }));
-
-    // Clear preview
-    setPreviewImage(null);
-    setSelectedFile(null);
-    setMessage("");
-  };
-
-  const handleAddFile = useCallback(() => {
-    const inputElement = document.createElement("input");
-    inputElement.type = "file";
-    inputElement.multiple = true;
-    inputElement.style.display = "none";
-
-    document.body.appendChild(inputElement);
-    inputElement.click();
-
-    inputElement.addEventListener("change", (event) => {
-      const newFiles = Array.from(event.target.files);
-      newFiles.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = () => setFiles((prev) => [...prev, reader.result]);
-        reader.readAsDataURL(file);
-      });
-
-      setUploadedFiles((prevFiles) => {
-        const updatedFiles = [...prevFiles, ...newFiles];
-        return updatedFiles;
-      });
-
-      document.body.removeChild(inputElement);
-    });
-  }, [uploadedFiles]);
-
+  // Listen for socket chat responses
   useEffect(() => {
     if (!socket || !socket.connected) return;
 
     const handleChatResponse = (data) => {
       const botMessage = {
-        sender: "receiver",
+        sender_id: "bot",
         image: null,
         profilePicture: require("../../assets/icons8-farmer-64.png"),
         content: data.content,
@@ -138,26 +68,78 @@ function GroupConversation() {
     socket.on("chat_response", handleChatResponse);
 
     return () => {
-      socket.off("chat_response", handleChatResponse); // Clean up listener
+      socket.off("chat_response", handleChatResponse);
     };
   }, [socket]);
 
+  // Cleanup chat messages on unmount
   useEffect(() => {
     return () => {
       setChatMessages([]);
     };
   }, []);
 
-  // const handleMediaUpload = (e, type) => {
-  //   const f = e.target.files[0];
-  //   if (f) {
-  //     const reader = new FileReader();
-  //     reader.onload = () => setMedia(reader.result);
-  //     reader.readAsDataURL(f);
-  //     setFile(f);
-  //     setMediaType(type);
-  //   }
-  // };
+  // Handle file upload via hidden input
+  const handleAddFile = useCallback(() => {
+    const inputElement = document.createElement("input");
+    inputElement.type = "file";
+    inputElement.multiple = true;
+    inputElement.style.display = "none";
+
+    document.body.appendChild(inputElement);
+    inputElement.click();
+
+    inputElement.addEventListener("change", (event) => {
+      const newFiles = Array.from(event.target.files);
+
+      newFiles.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = () => setFiles((prev) => [...prev, reader.result]);
+        reader.readAsDataURL(file);
+      });
+
+      setUploadedFiles((prevFiles) => [...prevFiles, ...newFiles]);
+
+      document.body.removeChild(inputElement);
+    });
+  }, []);
+
+  const handleSend = () => {
+    // Prevent sending if no message and no files
+    if (!message.trim() && files.length === 0) return;
+
+    const userMessage = {
+      sender_id: userDetails?.id || "active",
+      conversation_id,
+      image: files,
+      profilePicture: userDetails?.user_image || "/user-avatar.png",
+      content: message,
+    };
+
+    setChatMessages((prev) => [...prev, userMessage]);
+
+    const formData = new FormData();
+    const member_ids = [recipient_id, userDetails?.id];
+    formData.append("member_ids", member_ids);
+    formData.append("content", message);
+    formData.append("username", userDetails?.username || "");
+
+    if (conversation_id) {
+      formData.append("conversation_id", conversation_id);
+    }
+
+    // Append uploaded files to formData
+    uploadedFiles.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    dispatch(sendMessage({ formData }));
+
+    // Clear input and previews
+    setMessage("");
+    setFiles([]);
+    setUploadedFiles([]);
+  };
 
   const handleGoBack = () => {
     navigate(-1);
@@ -180,12 +162,7 @@ function GroupConversation() {
         <span>Desmond</span>
       </Box>
 
-      {/* Chat Area */}
-      <div
-        // ref={chatContainerRef}
-        style={{ overflowY: "auto" }}
-        className="group__chat-container"
-      >
+      <div style={{ overflowY: "auto" }} className="group__chat-container">
         {chatMessages.map((msg, index) => (
           <Box
             key={index}
@@ -199,18 +176,17 @@ function GroupConversation() {
             mb={2}
             className={`group__message ${msg.sender_id}`}
           >
-            {/* Avatar */}
             <Avatar
-              src={msg?.user_image}
+              src={msg?.profilePicture || msg?.user_image}
               alt={msg?.sender_id}
               sx={{ width: 40, height: 40 }}
             />
 
-            {/* User: show image only */}
-            {msg.sender_id === "active" &&
-              msg.image &&
-              msg.image.map((img) => {
+            {/* Render images if any */}
+            {msg.image &&
+              msg.image.map((img, i) => (
                 <img
+                  key={i}
                   src={img}
                   alt="user-upload"
                   style={{
@@ -219,35 +195,22 @@ function GroupConversation() {
                     borderRadius: 8,
                     objectFit: "cover",
                   }}
-                />;
-              })}
-            {/* User: show image only */}
+                />
+              ))}
 
-            {msg.sender_id === "active" && msg.content && (
+            {/* Text message */}
+            {msg.content && (
               <Box
                 sx={{
                   background: systemPrefersDark ? "#daf4ff" : "#daf4ff",
                   borderRadius: 2,
                   p: 1.5,
                   maxWidth: "70%",
-                  color: systemPrefersDark && "#000",
+                  color: systemPrefersDark ? "#000" : "inherit",
                 }}
-              >
-                {msg?.content}
-              </Box>
-            )}
-
-            {/* Bot: show text only */}
-            {msg.sender_id !== "active" && (
-              <Box
-                sx={{
-                  background: systemPrefersDark ? "#e8fef1" : "#e8fef1",
-                  borderRadius: 2,
-                  p: 1.5,
-                  maxWidth: "70%",
-                  color: systemPrefersDark && "#000",
+                dangerouslySetInnerHTML={{
+                  __html: msg.content,
                 }}
-                dangerouslySetInnerHTML={{ __html: msg.content }}
               />
             )}
           </Box>
@@ -255,8 +218,8 @@ function GroupConversation() {
         <div ref={scrollAnchorRef} />
       </div>
 
-      {/* Image Preview and Remove Button */}
-      {files?.map((img, idx) => (
+      {/* Image Preview with remove */}
+      {files.map((img, idx) => (
         <Box
           key={idx}
           sx={{ display: "inline-block", position: "relative", margin: "8px" }}
@@ -292,9 +255,8 @@ function GroupConversation() {
         </Box>
       ))}
 
-      {/* Input Section */}
       <Box
-        sx={{ bgcolor: systemPrefersDark && "background.color" }}
+        sx={{ bgcolor: systemPrefersDark ? "background.color" : "#FFF" }}
         display="flex"
         position="sticky"
         bottom="0"
@@ -302,12 +264,11 @@ function GroupConversation() {
         gap={1}
         alignItems="center"
         pt={1}
-        bgcolor="#FFF"
       >
         <Box
           sx={{
             p: 1,
-            bgcolor: systemPrefersDark && "background.paper",
+            bgcolor: systemPrefersDark ? "background.paper" : "inherit",
             width: "100%",
           }}
           display="flex"
@@ -319,7 +280,7 @@ function GroupConversation() {
           borderTop="1px solid #ddd"
         >
           <TextField
-            sx={{ bgcolor: systemPrefersDark && "background.paper" }}
+            sx={{ bgcolor: systemPrefersDark ? "background.paper" : "inherit" }}
             fullWidth
             placeholder="Write a chat..."
             value={message}
@@ -328,21 +289,11 @@ function GroupConversation() {
             multiline
             minRows={1}
             maxRows={3}
-            InputProps={
-              {
-                // endAdornment: (
-                //   <IconButton onClick={openEmojiPicker}>
-                //     <InsertEmoticonIcon />
-                //   </IconButton>
-                // ),
-                // startAdornment: (
-                //   <IconButton ref={fileInputRef} onClick={handleAddFile}>
-                //     <InsertPhotoOutlinedIcon />
-                //   </IconButton>
-                // ),
-              }
-            }
           />
+
+          <IconButton onClick={handleAddFile}>
+            <InsertPhotoOutlinedIcon />
+          </IconButton>
 
           <IconButton onClick={handleSend}>
             <SendIcon />
@@ -354,8 +305,3 @@ function GroupConversation() {
 }
 
 export default GroupConversation;
-
-// "Server error: 1 validation error for MessageOut
-// username
-//   Field required [type=missing, input_value={'id': UUID('d9af8dba-e7f...=datetime.timezone.utc)}, input_type=dict]
-//     For further information visit https://errors.pydantic.dev/2.11/v/missing"

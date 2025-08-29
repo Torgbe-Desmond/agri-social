@@ -145,17 +145,6 @@ const Widgets = () => {
           refetch={refetch}
         />
 
-        {/* {isFetching && userData.length > 0 && (
-          <Box sx={{ p: 2, textAlign: "center" }}>
-            <CircularProgress size={20} />
-          </Box>
-        )}
-
-        {isError && (
-          <Box sx={{ p: 2, textAlign: "center", color: "red" }}>
-            Failed to load suggestions.
-          </Box>
-        )} */}
       </Box>
     </Box>
   );

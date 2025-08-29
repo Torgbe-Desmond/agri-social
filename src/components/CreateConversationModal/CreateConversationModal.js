@@ -52,7 +52,7 @@ const CreateConversationModal = ({ conversee }) => {
         </Typography>
         <Divider sx={{ mb: 2 }} />
         <Typography sx={{ mb: 2 }}>
-          Create group with <strong>{conversee?.username}</strong>?
+          Create conversation with <strong>{conversee?.username}</strong>?
         </Typography>
 
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
@@ -66,9 +66,8 @@ const CreateConversationModal = ({ conversee }) => {
             Cancel
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
             onClick={handleCreateConversation}
-            className="sidebar__tweet__contained"
             disabled={isLoading}
           >
             {isLoading ? <CircularProgress size={20} /> : "Create"}

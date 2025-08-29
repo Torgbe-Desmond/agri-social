@@ -11,6 +11,9 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    addUser: (state, action) => {
+      state.userDetails = action.payload;
+    },
     updateUserList: (state, action) => {
       const { users } = action.payload;
       const existingIds = new Set(state.users.map((u) => u.id));
@@ -24,5 +27,6 @@ const authSlice = createSlice({
   extraReducers: (builder) => {},
 });
 
-export const { updateUserList, removeNewlyFollowed } = authSlice.actions;
+export const { updateUserList, removeNewlyFollowed, addUser } =
+  authSlice.actions;
 export default authSlice.reducer;
