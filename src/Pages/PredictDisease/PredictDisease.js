@@ -13,6 +13,9 @@ import { useSelector } from "react-redux";
 import { useOutletContext } from "react-router-dom";
 import { usePredictImageMutation } from "../../Features/predictionApi";
 import { useError } from "../../components/Errors/Errors";
+import Container from "../../components/Container/Container";
+import ContainerTitle from "../../components/Container/ContainerTitle";
+import ContainerDescription from "../../components/Container/ContainerDescription";
 
 function PredictDisease() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -112,15 +115,12 @@ function PredictDisease() {
 
   return (
     <Box className="predict">
-      <Box
-        sx={{ bgcolor: systemPrefersDark ? "background.paper" : "#FFF" }}
-        className="predict__header"
-      >
-        <h2>Predict Disease</h2>
-        <div className="message">
-          Chat will be saved and can be viewed in predictions
-        </div>
-      </Box>
+      <Container>
+        <ContainerTitle title={"Predict Disease"} />
+        <ContainerDescription
+          description={"Chat will be saved and can be viewed in predictions"}
+        />
+      </Container>
 
       {/* Chat Display */}
       <div

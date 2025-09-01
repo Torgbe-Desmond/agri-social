@@ -8,7 +8,14 @@ const ProductImageCarousel = ({
   handleNext,
   setSelectedIndex,
 }) => (
-  <Box sx={{ overflow: "hidden", fontFamily: "sans-serif" }}>
+  <Box
+    sx={{
+      overflow: "hidden",
+      fontFamily: "sans-serif",
+      borderBottom: 1,
+      borderColor: "divider",
+    }}
+  >
     {/* Image Carousel */}
     <Box position="relative">
       <img
@@ -17,7 +24,7 @@ const ProductImageCarousel = ({
           "https://via.placeholder.com/600x320?text=No+Image"
         }
         alt="product"
-        style={{ width: "100%", height: 320, objectFit: "cover" }}
+        style={{ width: "100%", height: 250, objectFit: "cover" }}
       />
 
       {imagesArray.length > 1 && (

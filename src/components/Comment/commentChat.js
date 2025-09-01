@@ -128,7 +128,7 @@ const CommentChat = ({
         display: "grid",
         position: "sticky",
         bottom: 0,
-        zIndex: 100,
+        zIndex: 1200,
         gap: 1,
         alignItems: "center",
         pt: 1,

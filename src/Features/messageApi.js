@@ -83,6 +83,7 @@ export const messageApi = createApi({
       }),
       invalidatesTags: (result, error, { conversation_id }) => [
         { type: "Message", id: conversation_id },
+        { type: "Conversation", id: conversation_id },
       ],
     }),
   }),

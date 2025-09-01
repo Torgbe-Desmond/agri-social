@@ -22,6 +22,7 @@ import Comment_Header from "../Comment/Comment_Header";
 import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
 
 import "./PostComment.css";
+import Success from "../Success/Success";
 
 function PostComment() {
   const { post_id } = useParams();
@@ -52,7 +53,7 @@ function PostComment() {
   const lastScrollTop = useRef(0);
 
   // ---- Mutations / Queries ----
-  const [addCommentMutation, { isLoading: isAddingComment }] =
+  const [addCommentMutation, { isLoading: isAddingComment, isSuccess }] =
     useAddCommentMutation();
 
   const { data: postData, isLoading: singlePostLoading } = useGetPostQuery(
@@ -227,15 +228,17 @@ function PostComment() {
     }
   };
 
-  // useEffect(() => {
-  //   if (scrollAnchorRef.current) {
-  //     scrollAnchorRef.current.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // }, [togetherComments]);
+  useEffect(() => {
+    if (scrollAnchorRef.current) {
+      scrollAnchorRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [isSuccess, addLocalComment]);
 
   // ---- UI ----
   return (
     <Box className="post__comment" ref={postScrollRef}>
+      <Success isSuccess={isSuccess} />
+
       <Comment_Header
         name="Post"
         systemPrefersDark={systemPrefersDark}

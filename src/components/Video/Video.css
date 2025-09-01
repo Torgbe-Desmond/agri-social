@@ -88,8 +88,7 @@
     width: 100%;
     gap: 1rem;
     justify-content: flex-start;
-    padding: 5px 10px;
-
+    padding: 0px;
 }
 
 .footer-wrapper {
@@ -107,7 +106,9 @@
 
 .footer-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
 .video-progress {

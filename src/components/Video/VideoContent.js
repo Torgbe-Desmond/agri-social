@@ -57,7 +57,6 @@ const VideoContent = ({
     <div className="video-container">
       <video
         ref={videoRef}
-        onClick={onVideoPress}
         type="video/mp4"
         className={
           fullScreen ? "video-player video-fit-screen" : "video-player"
@@ -69,12 +68,12 @@ const VideoContent = ({
         playsInline
         preload="metadata"
       />
-
+      {/* 
       {!isVideoPlaying && !isVideoBuffering && (
         <div className="video-overlay play-overlay">
           <PlayArrowIcon fontSize="large" style={{ color: "white" }} />
         </div>
-      )}
+      )} */}
 
       {isVideoLoading && (
         <div className="video-overlay loading-overlay">
@@ -88,20 +87,19 @@ const VideoContent = ({
         </div>
       )}
 
-      {!isVideoLoading && (
-        <VideoFooter
-          commentId={commentId}
-          postId={postId}
-          videoRef={videoRef}
-          toggleMute={toggleMute}
-          isVideoPlaying={isVideoPlaying}
-          isMuted={isMuted}
-          duration={duration}
-          isVideoBuffering={isVideoBuffering}
-          currentTime={currentTime}
-          onSeek={onSeek}
-        />
-      )}
+      <VideoFooter
+        onVideoPress={onVideoPress}
+        commentId={commentId}
+        postId={postId}
+        videoRef={videoRef}
+        toggleMute={toggleMute}
+        isVideoPlaying={isVideoPlaying}
+        isMuted={isMuted}
+        duration={duration}
+        isVideoBuffering={isVideoBuffering}
+        currentTime={currentTime}
+        onSeek={onSeek}
+      />
     </div>
   );
 };

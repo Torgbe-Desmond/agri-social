@@ -23,6 +23,39 @@ export const AppLightTheme = createTheme({
   ...commonTypography,
 });
 
+export const AppSilverTheme = createTheme({
+ palette: {
+    mode: "dark",
+    background: {
+      default: "#000000ff", // deep dark gray (overall app background)
+      paper: "#2C2C2C",   // slightly lighter for surfaces
+    },
+    primary: {
+      main: "#9E9E9E", // silver/gray tone for primary elements
+    },
+    secondary: {
+      main: "#B0BEC5", // lighter silver-blue for accents
+    },
+    text: {
+      primary: "#E0E0E0", // light text for readability
+      secondary: "#B0B0B0",
+    },
+    divider: "#424242",
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: "none", // remove default MUI overlay
+        },
+      },
+    },
+  },
+  ...commonTypography,
+});
+
+
+
 export const AppDarkTheme = createTheme({
   palette: {
     mode: "dark",

@@ -16,6 +16,9 @@ import { useGetProductsQuery } from "../../Features/productApi";
 import { updateProductList } from "../../Features/ProductSlice";
 import { useDispatch, useSelector } from "react-redux";
 import ErrorInfoAndReload from "../Errors/ErrorInfoAndReload";
+import Container from "../Container/Container";
+import ContainerTitle from "../Container/ContainerTitle";
+import ContainerSearch from "../Container/ContainerSearch";
 
 function MarketPlace() {
   const observer = useRef();
@@ -23,13 +26,16 @@ function MarketPlace() {
   const { darkMode, systemPrefersDark } = useOutletContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const [fetchError, setFetchError] = useState(false);
   const { products: productsData } = useSelector((state) => state.product);
   const dispatch = useDispatch();
 
-  const { data, isFetching, isLoading, refetch } = useGetProductsQuery({
-    offset: pageNumber,
-    limit: 10,
-  });
+  const { data, isFetching, isLoading, refetch, isError } = useGetProductsQuery(
+    {
+      offset: pageNumber,
+      limit: 10,
+    }
+  );
 
   const products = useMemo(() => {
     return Array.isArray(data?.products) ? data.products : [];
@@ -72,34 +78,35 @@ function MarketPlace() {
   };
 
   return (
-    <Header
-      status={isLoading}
-      allowedSearch={true}
-      reloadAction={reloadAction}
-      name={"Market Place"}
-      searchTerm={searchTerm}
-      setSearchTerm={setSearchTerm}
-      children={
-        <Box sx={{ padding: 1 }} className="market__place">
-          {filteredData.map((product, index) => {
-            const isLast = index === productsData.length - 1;
-            return (
-              <Box
-                key={product.id || index}
-                ref={isLast ? lastProductRef : null}
-              >
-                <ProductCard {...product} />
-              </Box>
-            );
-          })}
-          <ErrorInfoAndReload
-            isLoading={isLoading}
-            isFetching={isFetching}
-            refetch={refetch}
-          />
-        </Box>
-      }
-    />
+    <Box className="container">
+      <Container>
+        <ContainerTitle title={"Market Place"} />
+        <ContainerSearch
+          setSearchTerm={setSearchTerm}
+          searchTerm={searchTerm}
+          placeholder={"Search products"}
+        />
+      </Container>
+      <Box sx={{ padding: 1 }} className="market-place">
+        {filteredData.map((product, index) => {
+          const isLast = index === productsData.length - 1;
+          return (
+            <Box key={product.id || index} ref={isLast ? lastProductRef : null}>
+              <ProductCard {...product} />
+            </Box>
+          );
+        })}
+      </Box>
+      {isError && (
+        <ErrorInfoAndReload
+          setFetchError={setFetchError}
+          isError={fetchError}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          refetch={refetch}
+        />
+      )}
+    </Box>
   );
 }
 

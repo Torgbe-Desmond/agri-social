@@ -1,0 +1,7 @@
+.product-header h2 {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+}

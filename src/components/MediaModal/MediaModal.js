@@ -23,8 +23,6 @@ const MediaModal = ({ postId, commentId, initialIndex = 0, videoStatus }) => {
     }
   }, [videoStatus]);
 
-  console.log("videoInformation", videoInformation);
-
   useEffect(() => {
     if (posts?.length > 0 && postId) {
       const post = posts.find((p) => p.post_id === postId);

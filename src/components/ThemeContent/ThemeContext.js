@@ -11,7 +11,8 @@ import {
   AppPalenightTheme,
   AppMonokaiTheme,
   AppNordTheme,
-  AppGruvboxDarkTheme
+  AppGruvboxDarkTheme,
+  AppSilverTheme
 } from "./themes";
 import { ThemeContext } from "./context";
 import { updateBodyClassesAndMeta } from "./utils";
@@ -24,9 +25,9 @@ export const ThemeProviderWrapper = ({ children }) => {
   const [themeMode, setThemeMode] = useState(ThemeMode.SYSTEM);
 
   const selectedTheme = useMemo(() => {
-    if (themeMode === ThemeMode.LIGHT) return AppLightTheme;
-    if (themeMode === ThemeMode.DARK) return AppSolarizedTheme;
-    return prefersDark ? AppSolarizedTheme : AppLightTheme;
+    if (themeMode === ThemeMode.LIGHT) return AppSolarizedTheme;
+    if (themeMode === ThemeMode.DARK) return AppDarkTheme;
+    return prefersDark ? AppDarkTheme : AppSolarizedTheme;
   }, [themeMode, prefersDark]);
 
   useEffect(() => {

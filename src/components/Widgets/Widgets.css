@@ -6,6 +6,11 @@
 
 }
 
+
+.widgets::-webkit-scrollbar {
+  display: none;
+}
+
 .widgets__input {
   display: flex;
   align-items: center;

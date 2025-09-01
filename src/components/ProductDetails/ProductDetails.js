@@ -7,102 +7,117 @@ import React, {
 } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import {
+  useCreateReviewMutation,
   useGetProductQuery,
   useGetReviewsQuery,
 } from "../../Features/productApi";
-import { useDispatch } from "react-redux";
 import ProductPage from "../../Pages/ProductPage/ProductPage";
 
 function ProductDetails() {
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const { product_id } = useParams();
   const navigate = useNavigate();
   const { systemPrefersDark } = useOutletContext();
-  const [review, setReview] = useState("");
-  const [offset, setLocalOffset] = useState(1);
-  const reviewRef = useRef();
-  const dispatch = useDispatch();
-  const lastScrollTop = useRef(0);
-  const observer = useRef();
 
-  const [scrolling, setScroll] = useState(0);
-
+  // Product state
   const {
     data: product,
     isLoading,
     isFetching,
   } = useGetProductQuery({ product_id }, { skip: !product_id });
 
+  // Review pagination state
+  const [offset, setOffset] = useState(0);
+  const limit = 10;
+
+  // Fetch reviews with RTK Query
   const {
-    data: reviews,
+    data: reviewsData,
     isLoading: reviewsLoading,
     isFetching: reviewsFetching,
-  } = useGetReviewsQuery(
-    { offset, limit: 10, product_id },
-    { skip: !product_id }
+    refetch: reviewRefetch,
+    isError: reviewIsError,
+    error: reviewError,
+  } = useGetReviewsQuery({ offset, limit, product_id });
+
+  // Mutation for creating review
+  const [
+    createReview,
+    { isLoading: sendReviewLoading, error: sendReviewError },
+  ] = useCreateReviewMutation();
+
+  // Local review input state
+  const [review, setReview] = useState("");
+
+  // Infinite scroll observer
+  const observer = useRef();
+
+  // Flattened reviews array
+  const reviewsArray = useMemo(
+    () => (Array.isArray(reviewsData?.reviews) ? reviewsData.reviews : []),
+    [reviewsData]
   );
 
-  const reviewsData = useMemo(() => {
-    return Array.isArray(reviews?.reviews) ? reviews.reviews : [];
-  }, [reviews]);
+  // Determine if more reviews exist
+  const hasMore = reviewsArray.length < (reviewsData?.numb_found || 0);
 
-  const hasMore = reviewsData?.length > 0;
-
-  useEffect(() => {
-    const node = reviewRef.current;
-    if (!node) return;
-
-    const handleScroll = () => {
-      const scrollTop = node.scrollTop;
-      lastScrollTop.current = scrollTop;
-      setScroll((prev) => prev + 1);
-    };
-
-    node.addEventListener("scroll", handleScroll);
-    return () => node.removeEventListener("scroll", handleScroll);
-  }, [dispatch]);
-
+  // Intersection observer for infinite scroll
   const lastReviewRef = useCallback(
     (node) => {
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting && hasMore && !isFetching) {
-          // dispatch(setPostsOffset());
+        if (entry.isIntersecting && hasMore && !reviewsFetching) {
+          setOffset((prev) => prev + 1);
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [hasMore, isFetching, dispatch]
+    [hasMore, reviewsFetching]
   );
 
-  const handleGoBack = () => {
-    navigate(-1);
+  // Handle creating a new review
+  const handleCreateReview = async () => {
+    if (!review) return;
+
+    const formData = new FormData();
+    formData.append("content", review);
+    formData.append("product_id", product_id);
+    formData.append("hav_video", 0);
+
+    try {
+      await createReview({ formData }).unwrap();
+      setReview("");
+      reviewRefetch();
+    } catch (err) {
+      console.error("Failed to create review:", err);
+    }
   };
+
+  // Image carousel state
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const renderImages = (images) =>
+    typeof images === "string"
+      ? images.split(",").map((img) => img.trim())
+      : [];
+  const imagesArray = renderImages(product?.product_images);
 
   const handlePrev = () => {
     setSelectedIndex((prev) =>
-      prev === 0
-        ? (renderImages(product?.product_images)?.length || 1) - 1
-        : prev - 1
+      prev === 0 ? imagesArray.length - 1 : prev - 1
     );
   };
 
   const handleNext = () => {
-    const length = renderImages(product?.product_images)?.length || 1;
-    setSelectedIndex((prev) => (prev === length - 1 ? 0 : prev + 1));
+    setSelectedIndex((prev) =>
+      prev === imagesArray.length - 1 ? 0 : prev + 1
+    );
   };
 
-  const renderImages = (images) => {
-    return typeof images === "string"
-      ? images.split(",").map((img) => img.trim())
-      : [];
-  };
+  const handleGoBack = () => navigate(-1);
 
-  const imagesArray = renderImages(product?.product_images);
-
+  // Pass props to ProductPage
   const productProps = {
     handleGoBack,
     isLoading,
@@ -115,6 +130,15 @@ function ProductDetails() {
     product,
     setReview,
     systemPrefersDark,
+    reviewMessages: reviewsArray,
+    handleCreateReview,
+    reviewsLoading,
+    reviewsFetching,
+    reviewRefetch,
+    reviewIsError,
+    reviewError,
+    lastReviewRef,
+    sendReviewLoading,
   };
 
   return <ProductPage {...productProps} />;

@@ -39,9 +39,11 @@ export const productApi = createApi({
     }),
 
     getReviews: builder.query({
-      query: ({ offset, limit, product_id }) =>
+      query: ({ offset = 0, limit = 10, product_id }) =>
         `/products/reviews/${product_id}?offset=${offset}&limit=${limit}`,
-      providesTags: (result, error, id) => [{ type: "Reviews", id }],
+      providesTags: (result, error, { product_id }) => [
+        { type: "Reviews", id: product_id },
+      ],
     }),
 
     getUserProducts: builder.query({
@@ -94,6 +96,7 @@ export const {
   useGetProductQuery,
   useGetUserProductsQuery,
   useSearchProductsQuery,
+  useCreateReviewMutation,
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,

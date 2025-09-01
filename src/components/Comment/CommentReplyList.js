@@ -16,6 +16,7 @@ const CommentReplyList = ({
 }) => {
   const commentRef = useRef([]);
   const [visiblePostId, setVisiblePostId] = useState(null);
+  const [fetchError, setFetchError] = useState(false);
 
   const onVideoReach = useCallback(() => {
     const itemsWithCoverage = commentRef.current
@@ -45,9 +46,7 @@ const CommentReplyList = ({
 
     console.log("commentReplies", commentReplies);
 
-    const isVideoPost = commentReplies.find(
-      (p) => p.id === postId && p.videos
-    );
+    const isVideoPost = commentReplies.find((p) => p.id === postId && p.videos);
 
     if (!isVideoPost) return;
 
@@ -95,14 +94,9 @@ const CommentReplyList = ({
         />
       ))}
 
-      <ErrorInfoAndReload
-        isError={isError}
-        isLoading={commentsLoading}
-        isFetching={isFetchingReplies}
-        refetch={refetchReplies}
-      />
+     
 
-      {/* <div ref={scrollAnchorRef} /> */}
+      <div ref={scrollAnchorRef} />
     </Box>
   );
 };

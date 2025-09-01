@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
-import { IconButton, Slider } from "@mui/material";
+import { Box, IconButton, Slider } from "@mui/material";
 import "./Video.css";
 import { useDispatch, useSelector } from "react-redux";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
@@ -9,6 +9,8 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
 import {
   useLikePostMutation,
   useSavePostMutation,
@@ -28,6 +30,7 @@ const VideoFooter = ({
   isVideoPlaying,
   onSeek,
   postId,
+  onVideoPress,
 }) => {
   const dispatch = useDispatch();
   const { userDetails: user } = useSelector((state) => state.auth);
@@ -106,7 +109,7 @@ const VideoFooter = ({
         location: "post",
         to: `/${reference_id}/post/${postId}`,
         icon: <ChatBubbleOutlineIcon fontSize="small" />,
-        count: media?.replies ?? media?.comments ?? 0, 
+        count: media?.replies ?? media?.comments ?? 0,
       },
       {
         id: "like",
@@ -116,7 +119,7 @@ const VideoFooter = ({
         ) : (
           <FavoriteBorderIcon fontSize="small" />
         ),
-        count: media?.likes ?? 0, 
+        count: media?.likes ?? 0,
         action: handleLikePost,
       },
       {
@@ -127,7 +130,7 @@ const VideoFooter = ({
         ) : (
           <BookmarkBorderIcon fontSize="small" />
         ),
-        count: media?.saves ?? 0, 
+        count: media?.saves ?? 0,
         action: handleSavePost,
       },
     ];
@@ -142,6 +145,7 @@ const VideoFooter = ({
   const iconStyle = {
     filter: "drop-shadow(5px 5px 10px rgba(9, 8, 8, 0.5))",
     color: "white",
+    cursor: "pointer",
   };
 
   return (
@@ -151,7 +155,15 @@ const VideoFooter = ({
         {
           <>
             <div className="footer-actions">
-              <IconButton className="footer-volume-button" onClick={toggleMute}>
+              <IconButton onClick={onVideoPress} sx={{ p: 0 }}>
+                {!isVideoPlaying && !isVideoBuffering ? (
+                  <PlayArrowIcon style={iconStyle} />
+                ) : (
+                  <PauseIcon style={iconStyle} />
+                )}
+              </IconButton>
+
+              <IconButton sx={{ p: 0 }} onClick={toggleMute}>
                 {isMuted ? (
                   <VolumeOffIcon style={iconStyle} />
                 ) : (

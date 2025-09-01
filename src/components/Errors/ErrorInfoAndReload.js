@@ -16,9 +16,8 @@ function ErrorInfoAndReload({
 
   return (
     <div>
-
       {(isLoading || isFetching) && (
-        <p className="circular__progress">
+        <p className="circular-progress">
           <CircularProgress size={20} />
         </p>
       )}

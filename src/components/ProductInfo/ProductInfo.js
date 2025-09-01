@@ -5,7 +5,7 @@ import {
 } from "@mui/icons-material";
 
 const ProductInfo = ({ product }) => (
-  <Box px={2} pb={2}>
+  <Box px={2} pb={2} sx={{ borderBottom: 1, borderColor: "divider" }}>
     {product?.contact && (
       <Stack direction="row" alignItems="center" spacing={1} mt={1}>
         <PhoneIcon fontSize="small" />

@@ -28,8 +28,8 @@ function Conversations() {
 
   return (
     <Box className="conversations">
-      <Container>
-        <Box sx={{ width: "100%", p: 0 }}>
+      <Box sx={{ width: "100%", p: 0 }}>
+        <Container>
           <Tabs
             sx={{
               backgroundColor: theme.palette.background.paper,
@@ -56,14 +56,14 @@ function Conversations() {
               />
             ))}
           </Tabs>
+        </Container>
 
-          {tabData.map((tab, index) => (
-            <CustomTabPanel key={index} value={tabIndex} index={index}>
-              {tab.content}
-            </CustomTabPanel>
-          ))}
-        </Box>
-      </Container>
+        {tabData.map((tab, index) => (
+          <CustomTabPanel key={index} value={tabIndex} index={index}>
+            {tab.content}
+          </CustomTabPanel>
+        ))}
+      </Box>
     </Box>
   );
 }

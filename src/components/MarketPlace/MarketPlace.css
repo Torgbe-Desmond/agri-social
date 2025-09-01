@@ -1,11 +1,16 @@
+.market-place {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
 
-.market__place__header {
+.market-place-header {
     position: sticky;
     top: 0;
     z-index: 100;
 }
 
-.market__place__header>h2 {
+.market-place-header>h2 {
     font-size: 20px;
     font-weight: 800;
 }
@@ -15,7 +20,7 @@
     border-left: 1px solid var(--twitter-background);
 }
 
-.market_place__input {
+.market-place-input {
     display: flex;
     align-items: center;
     padding-left: 10px;
@@ -27,15 +32,15 @@
     box-sizing: border-box;
 }
 
-.market_place__input>input {
+.market-place-input>input {
     border: none;
 }
 
-.market_place__searchIcon {
+.market-place-searchIcon {
     color: gray;
 }
 
-.market_place__widgetContainer {
+.market-place-widgetContainer {
     margin-top: 15px;
     margin-left: 20px;
     padding: 20px;
@@ -43,7 +48,7 @@
     border-radius: 20px;
 }
 
-.market_place__widgetContainer>h2 {
+.market-place-widgetContainer>h2 {
     font-size: 18px;
     font-weight: 800;
 }
