@@ -7,12 +7,85 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import NotificationFooter from "./NotificationFooter";
 import ComponentStack from "../HandleStack/HandleStack";
 import FeedImageCard from "../FeedImageCard/FeedImageCard";
+import JoinLeftIcon from "@mui/icons-material/JoinLeft";
 
 function Notification({ notification }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const referenceId = localStorage.getItem("reference_id");
   const { systemPrefersDark } = useOutletContext();
+
+  const handleAcceptGroupRequestModal = () => {
+    const stack = new ComponentStack(dispatch);
+    stack.handleStack("AcceptJoinGroupRequest", {
+      groups: notification?.groups,
+      mentions: notification?.mentions,
+    });
+  };
+
+  console.log("notification", notification);
+
+  function things(post) {
+    if (!post.message) return null;
+
+    const mentionMap = new Map(
+      (post.mentions || []).map((m) => [m.id.toString(), m.username])
+    );
+    const groupMap = new Map(
+      (post.groups || []).map((g) => [g.id.toString(), g.name])
+    );
+
+    const urlRegex = /^https?:\/\/[^\s]+$/;
+    const tokens = post.message.split(" ");
+
+    return tokens.map((token, idx) => {
+      if (mentionMap.has(token)) {
+        const username = mentionMap.get(token);
+        return (
+          <a
+            key={idx}
+            href={`/${referenceId}/user/${token}`}
+            style={{ color: "#1976d2", fontWeight: 600, cursor: "pointer" }}
+          >
+            @{username}
+          </a>
+        );
+      }
+      if (groupMap.has(token)) {
+        const groupName = groupMap.get(token);
+        return (
+          <a
+            key={idx}
+            onClick={(e) => {
+              e.preventDefault();
+            }}
+            style={{
+              textDecoration: "none",
+              color: "#1976d2",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            ${groupName}
+          </a>
+        );
+      }
+      if (urlRegex.test(token)) {
+        return (
+          <a
+            key={idx}
+            href={token}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#1976d2", fontWeight: 600, cursor: "pointer" }}
+          >
+            {token}
+          </a>
+        );
+      }
+      return <span key={idx}> {token} </span>;
+    });
+  }
 
   // Navigate to post or comment
   const handleNavigate = (type, entity_type) => {
@@ -100,6 +173,13 @@ function Notification({ notification }) {
     },
   ];
 
+  if (notification.entity_type === "group") {
+    actions.push({
+      icon: <JoinLeftIcon fontSize="small" />,
+      action: handleAcceptGroupRequestModal,
+    });
+  }
+
   return (
     <Box
       sx={{
@@ -134,10 +214,8 @@ function Notification({ notification }) {
             </Box>
           ))}
         </Box>
-
         {/* Notification Text */}
         {renderType(notification?.type)} your post.
-
         {/* Media Section */}
         <Box
           sx={{
@@ -152,7 +230,7 @@ function Notification({ notification }) {
             handleNavigate(notification?.type, notification?.entity_type)
           }
         >
-          <p className="message">{notification?.message}</p>
+          <p className="message">{things(notification)}</p>
 
           {combinedMedia.length > 0 && (
             <Box
@@ -170,7 +248,6 @@ function Notification({ notification }) {
             </Box>
           )}
         </Box>
-
         {/* Time */}
         <span className="time">{timeAgo(notification?.created_at)}</span>
       </Box>

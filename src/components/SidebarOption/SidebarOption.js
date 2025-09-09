@@ -30,7 +30,7 @@ function SidebarOption({
       className={`sidebarOption ${active ? "sidebarOption--active" : ""}`}
       onClick={() => navigate(to)}
     >
-      <Typography variant="h2">
+      <Typography variant="h4">
         <Icon color="inherit" />
         {!unShowIcons && <>{text}</>}
       </Typography>

@@ -90,8 +90,8 @@ const postSlice = createSlice({
       state.userPostHistory = [];
     },
     addNewPost: (state, action) => {
-      const { postData } = action.payload;
-      state.posts.unshift(postData);
+      const { payload } = action.payload;
+      state.posts.unshift(payload);
     },
 
     updateStreamLike: (state, action) => {
@@ -120,6 +120,51 @@ const postSlice = createSlice({
         return p;
       });
     },
+    updatePostLikeInHistory: (state, action) => {
+      const { post_id, liked } = action.payload;
+      state.postHistory = (state.postHistory || []).map((p) => {
+        if (p.post_id === post_id) {
+          const currentLikes = Number(p.likes ?? 0);
+          return {
+            ...p,
+            likes: liked ? currentLikes + 1 : Math.max(currentLikes - 1, 0),
+            liked: liked,
+          };
+        }
+        return p;
+      });
+    },
+    updatePostLikeInBookmark: (state, action) => {
+      const { post_id, liked } = action.payload;
+      state.savedHistory = (state.savedHistory || []).map((p) => {
+        if (p.post_id === post_id) {
+          const currentLikes = Number(p.likes ?? 0);
+          return {
+            ...p,
+            likes: liked ? currentLikes + 1 : Math.max(currentLikes - 1, 0),
+            liked: liked,
+          };
+        }
+        return p;
+      });
+    },
+    updatePostSavedInBookmark: (state, action) => {
+      const { post_id, saved } = action.payload;
+      state.savedHistory = state.savedHistory.filter(
+        (sp) => sp.post_id !== post_id
+      );
+      // state.savedHistory = (state.savedHistory || []).map((p) => {
+      //   if (p.post_id === post_id) {
+      //     const currentSaves = Number(p.saves ?? 0);
+      //     return {
+      //       ...p,
+      //       saves: saved ? currentSaves + 1 : Math.max(currentSaves - 1, 0),
+      //       saved: saved,
+      //     };
+      //   }
+      //   return p;
+      // });
+    },
     updatePostSaved: (state, action) => {
       const { post_id, saved } = action.payload;
       state.posts = (state.posts || []).map((p) => {
@@ -134,9 +179,37 @@ const postSlice = createSlice({
         return p;
       });
     },
+    updatePostSaved: (state, action) => {
+      const { post_id, saved } = action.payload;
+      state.posts = (state.posts || []).map((p) => {
+        if (p.post_id === post_id) {
+          const currentSaves = Number(p.saves ?? 0);
+          return {
+            ...p,
+            saves: saved ? currentSaves + 1 : Math.max(currentSaves - 1, 0),
+            saved: saved,
+          };
+        }
+        return p;
+      });
+    },
+    updatePostSavedInHistory: (state, action) => {
+      const { post_id, saved } = action.payload;
+      state.userPostHistory = (state.userPostHistory || []).map((p) => {
+        if (p.post_id === post_id) {
+          const currentSaves = Number(p.saves ?? 0);
+          return {
+            ...p,
+            saves: saved ? currentSaves + 1 : Math.max(currentSaves - 1, 0),
+            saved: saved,
+          };
+        }
+        return p;
+      });
+    },
     removeDeletedPost: (state, action) => {
-      const { post_id } = action.payload;
-      state.posts = (state.posts || []).filter((p) => p.post_id !== post_id);
+      const { post_id } = action.payload; 
+      state.postHistory = (state.postHistory || []).filter((p) => p.post_id !== post_id);
     },
     updateStreamSaved: (state, action) => {
       const { post_id, saved } = action.payload;
@@ -203,10 +276,14 @@ export const {
   addNewPost,
   updatePost,
   removeDeletedPost,
+  updatePostLikeInHistory,
   updateUserPostHistoryList,
+  updatePostLikeInBookmark,
+  updatePostSavedInBookmark,
   emptyUserPostHistory,
   addNewComment,
   setCurrentVideo,
+  updatePostSavedInHistory,
   setPostsOffset,
   setStreamDataOffset,
   setPostHistoryOffset,

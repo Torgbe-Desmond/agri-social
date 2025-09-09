@@ -15,7 +15,7 @@ import { useDeletePostMutation } from "../../Features/postApi";
 
 const DeletePostModal = ({ post_id }) => {
   const dispatch = useDispatch();
-  const theme = useTheme(); // 🔹 Access current theme (light/dark)
+  const theme = useTheme(); 
   const [deletePost, { isLoading }] = useDeletePostMutation();
 
   const handlePostDelete = async () => {
@@ -56,8 +56,6 @@ const DeletePostModal = ({ post_id }) => {
             variant="outlined"
             sx={{
               borderRadius: "32px",
-              borderColor: theme.palette.divider,
-              color: theme.palette.text.primary,
             }}
             disabled={isLoading}
             onClick={() => dispatch(popComponent())}

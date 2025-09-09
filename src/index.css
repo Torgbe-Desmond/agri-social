@@ -1,8 +1,9 @@
 * {
   margin: 0;
+  /* outline:1px solid red */
 }
 
-.circular__progress{
+.circular__progress {
   display: flex;
   width: 100%;
   justify-content: center;
@@ -24,4 +25,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
-

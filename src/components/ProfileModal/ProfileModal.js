@@ -197,6 +197,7 @@ const ProfileModal = ({ user }) => {
             <Button
               variant="outlined"
               sx={{
+                borderRadius: "32px",
                 borderColor: theme.palette.divider,
                 color: theme.palette.text.primary,
               }}
@@ -207,6 +208,7 @@ const ProfileModal = ({ user }) => {
             <Button
               variant="contained"
               sx={{
+                borderRadius: "32px",
                 bgcolor: theme.palette.primary.main,
                 color: theme.palette.primary.contrastText,
                 "&:hover": {

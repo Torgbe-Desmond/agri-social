@@ -3,7 +3,7 @@ import {
   pushComponent,
   pushOnToDraggableComponent,
 } from "../../Features/StackSlice";
-import { _componentMap } from "./ComponentMap"; // Adjust path as needed
+import { _componentMap } from "./ComponentMap";
 
 // class ComponentStack {
 //   constructor(dispatch) {

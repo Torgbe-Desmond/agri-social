@@ -6,7 +6,13 @@ import { Socket } from "socket.io-client";
 import { useGetAnotherUserProfileQuery } from "../../Features/userApi";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
-const ChatHeader = ({ userImage, onlineStatus, name, userId }) => {
+const ChatHeader = ({
+  userImage,
+  onlineStatus,
+  name,
+  userId,
+  handleGotBack,
+}) => {
   const navigate = useNavigate();
   const reference_id = localStorage.getItem("reference_id");
   localStorage.setItem("recipient_id", userId);
@@ -24,12 +30,13 @@ const ChatHeader = ({ userImage, onlineStatus, name, userId }) => {
   const handleGoToUserProfile = () => {
     navigate(`/${reference_id}/user/${userDetails?.id}`);
   };
+
   return (
     <Box
       sx={{ borderBottom: 1, borderColor: "divider" }}
       className="chat__header"
     >
-      <ArrowBackIcon cursor="pointer" onClick={() => navigate(-1)} />
+      <ArrowBackIcon cursor="pointer" onClick={() => handleGotBack()} />
 
       <h2>
         {!isUserLoading ? (

@@ -66,6 +66,8 @@ export const postApi = createApi({
       }),
       invalidatesTags: (result, error, { post_id }) => [
         { type: "Post", id: post_id },
+        { type: "Post", id: "LIST" }, // invalidate posts feed
+        { type: "Saved", id: "LIST" }, // invalidate saved list
       ],
     }),
     unSavePost: builder.mutation({
@@ -75,13 +77,23 @@ export const postApi = createApi({
       }),
       invalidatesTags: (result, error, post_id) => [
         { type: "Post", id: post_id },
+        { type: "Post", id: "LIST" },
+        { type: "Saved", id: "LIST" },
       ],
     }),
     getSavedHistory: builder.query({
       query: ({ offset, limit }) =>
         `/saves/saved?offset=${offset}&limit=${limit}`,
       providesTags: (result) =>
-        result?.posts.map((p) => ({ type: "Saved", id: p.post_id })) || [],
+        result
+          ? [
+              ...result.posts.map(({ post_id }) => ({
+                type: "Saved",
+                id: post_id,
+              })),
+              { type: "Saved", id: "LIST" },
+            ]
+          : [{ type: "Saved", id: "LIST" }],
     }),
     getPostHistory: builder.query({
       query: ({ offset, limit }) =>

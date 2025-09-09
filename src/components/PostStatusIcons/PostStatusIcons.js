@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./PostStatusIcons.css";
 import { useNavigate } from "react-router-dom";
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
 
 function PostStatusIcons({
   id,
@@ -38,20 +38,26 @@ function PostStatusIcons({
 
   return (
     <Box className="post-status-icon" id={`${id}-${post_id}`}>
-      <Button
-        onClick={handleFooterClick}
-        variant="outlined"
-        color="primary"
-        disabled={disabled.id === id && disabled.isDisabled}
-        startIcon={icon}
-        sx={{
-          textTransform: "none",
-          borderRadius: 20,
-          borderColor: "divider",
-        }}
-      >
-        {count}
-      </Button>
+      {id === "deletePost" || id === "comment" ? (
+        <IconButton
+          onClick={handleFooterClick}
+          color="primary"
+          sx={{ gap: 1, fontSize: "small" }}
+        >
+          {icon}
+          <span>{count}</span>
+        </IconButton>
+      ) : (
+        <IconButton
+          onClick={handleFooterClick}
+          color="primary"
+          disabled={disabled.id === id && disabled.isDisabled}
+          sx={{ gap: 1, fontSize: "small", }}
+        >
+          {icon}
+          <span>{count}</span>
+        </IconButton>
+      )}
     </Box>
   );
 }

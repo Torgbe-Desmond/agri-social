@@ -11,27 +11,10 @@ import { useAuthenticatedQuery } from "./Features/userApi";
 import Validated from "./components/Validated/Validated";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState();
   const { message, setMessage } = useError();
-  const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
-  const isMobile = useMediaQuery("(max-width:640px)");
-  const { components } = useSelector((state) => state.stack);
   const [errorMessage, setErrorMessage] = useState(null);
+  const { components } = useSelector((state) => state.stack);
   const dispatch = useDispatch();
-
-  // Query user authentication with RTK Query
-  const { data, error } = useAuthenticatedQuery(undefined, {
-    skip: isAuthenticated,
-  });
-
-  useEffect(() => {
-    if (error?.status === 401) {
-      setIsAuthenticated(false);
-      localStorage.removeItem("access_token");
-    } else if (data?.status) {
-      setIsAuthenticated(data?.status);
-    }
-  }, [error, data]);
 
   const handleSnackbarClose = () => {
     setMessage(null);

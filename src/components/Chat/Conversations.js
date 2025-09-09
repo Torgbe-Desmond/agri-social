@@ -6,6 +6,8 @@ import Messages from "../Messages/Messages";
 import GroupMessages from "../Messages/GroupMessages";
 import Header from "../Header/Header";
 import Container from "../Container/Container";
+import { updateUsersInfo } from "../../Features/MessageSlice";
+import ContainerTitle from "../Container/ContainerTitle";
 
 function CustomTabPanel({ children, value, index }) {
   return value === index && <Box sx={{ p: 2 }}>{children}</Box>;
@@ -21,48 +23,10 @@ function Conversations() {
     setTabIndex(newValue);
   };
 
-  const tabData = [
-    { label: "Messages", content: <Messages /> },
-    // { label: "Group Messages", content: <GroupMessages /> },
-  ];
-
   return (
     <Box className="conversations">
       <Box sx={{ width: "100%", p: 0 }}>
-        <Container>
-          <Tabs
-            sx={{
-              backgroundColor: theme.palette.background.paper,
-              borderBottom: `1px solid ${theme.palette.divider}`,
-            }}
-            TabIndicatorProps={{
-              style: { backgroundColor: theme.palette.primary.main },
-            }}
-            value={tabIndex}
-            onChange={handleTabChange}
-            aria-label="conversations tabs"
-          >
-            {tabData.map((tab, index) => (
-              <Tab
-                sx={{
-                  color:
-                    tabIndex === index
-                      ? theme.palette.primary.main
-                      : theme.palette.text.secondary,
-                  fontWeight: tabIndex === index ? "bold" : "normal",
-                }}
-                key={index}
-                label={tab.label}
-              />
-            ))}
-          </Tabs>
-        </Container>
-
-        {tabData.map((tab, index) => (
-          <CustomTabPanel key={index} value={tabIndex} index={index}>
-            {tab.content}
-          </CustomTabPanel>
-        ))}
+        <Messages />
       </Box>
     </Box>
   );

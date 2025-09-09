@@ -11,6 +11,10 @@ const mergeUnique = (existing, incoming, key = "user_id") => {
 
 const initialState = {
   searchedUserDetails: [],
+  mentionedUSers: [],
+  mentionedGroups: [],
+  searchMentionedUsersStatus: "idle",
+  searchMentionedUGroupStatus: "idle",
   selectedSearchId: "",
   searchedUserStatus: "idle",
 };
@@ -22,6 +26,33 @@ export const searchUser = createAsyncThunk(
       const response = await SearchService.searchUser(username, offset, limit);
       return response;
     } catch (error) {
+      const message = error?.response?.data;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+export const searchMentionedUsers = createAsyncThunk(
+  "search/mentioned",
+  async ({ formData }, thunkAPI) => {
+    try {
+      const response = await SearchService.searchMentionedUsers(formData);
+      return response;
+    } catch (error) {
+      console.log("error", error);
+      const message = error?.response?.data;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const searchMentionedGroups = createAsyncThunk(
+  "search/group",
+  async ({ formData }, thunkAPI) => {
+    try {
+      const response = await SearchService.searchMentionedUGroups(formData);
+      return response;
+    } catch (error) {
+      console.log("error", error);
       const message = error?.response?.data;
       return thunkAPI.rejectWithValue(message);
     }
@@ -60,15 +91,39 @@ const searchSlice = createSlice({
       })
       .addCase(searchUser.rejected, (state) => {
         state.searchedUserStatus = "failed";
+      })
+      .addCase(searchMentionedGroups.pending, (state) => {
+        state.searchMentionedUGroupStatus = "loading";
+      })
+      .addCase(searchMentionedGroups.fulfilled, (state, action) => {
+        state.searchMentionedUGroupStatus = "succeeded";
+        state.mentionedGroups = mergeUnique(
+          state.mentionedGroups,
+          action.payload.results,
+          "group_id"
+        );
+      })
+      .addCase(searchMentionedGroups.rejected, (state) => {
+        state.searchMentionedUGroupStatus = "failed";
+      })
+      .addCase(searchMentionedUsers.pending, (state) => {
+        state.searchMentionedUsersStatus = "loading";
+      })
+      .addCase(searchMentionedUsers.fulfilled, (state, action) => {
+        state.searchMentionedUsersStatus = "succeeded";
+        state.mentionedUSers = mergeUnique(
+          state.mentionedUSers,
+          action.payload.results,
+          "user_id"
+        );
+      })
+      .addCase(searchMentionedUsers.rejected, (state) => {
+        state.searchMentionedUsersStatus = "failed";
       });
   },
 });
 
-export const {
-  clearSearch,
-  selectedItem,
-  clearSelectedId,
-  clearSelectedItem,
-} = searchSlice.actions;
+export const { clearSearch, selectedItem, clearSelectedId, clearSelectedItem } =
+  searchSlice.actions;
 
 export default searchSlice.reducer;

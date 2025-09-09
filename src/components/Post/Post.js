@@ -39,7 +39,7 @@ const Post = forwardRef(({ post }, ref) => {
     useLikePostMutation();
   const [savePost, { isLoading: isLoadingSaved, isError: isErrorSaved }] =
     useSavePostMutation();
-
+  const [flipped, setFlipped] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
@@ -59,12 +59,16 @@ const Post = forwardRef(({ post }, ref) => {
   const handleLikePost = async () => {
     const formData = new FormData();
     formData.append("post_owner", post?.user_id);
-
     try {
       const payload = await likePost({
         post_id: post?.post_id,
         formData,
       }).unwrap();
+
+      setFlipped(true);
+
+      setTimeout(() => setFlipped(false), 600);
+
       dispatch(updatePostLike(payload));
     } catch (error) {
       console.error("Error liking post:", error);
@@ -76,8 +80,11 @@ const Post = forwardRef(({ post }, ref) => {
     formData.append("user_id", user?.id);
     const payload = await savePost({
       post_id: post?.post_id,
-      formData,
     }).unwrap();
+
+    setFlipped(true);
+
+    setTimeout(() => setFlipped(false), 600);
     dispatch(updatePostSaved(payload));
   }
 
@@ -145,7 +152,13 @@ const Post = forwardRef(({ post }, ref) => {
 
   return (
     <Box
-      sx={{ borderBottom: 1, borderColor: "divider" }}
+      sx={{
+        border: 1,
+        borderColor: "divider",
+        // margin: 1,
+        // borderRadius: 2,
+        // boxShadow: 1,
+      }}
       className="post"
       id={`post-${post?.post_id}`}
       ref={ref}
@@ -157,6 +170,7 @@ const Post = forwardRef(({ post }, ref) => {
         isLoadingSaved={isLoadingSaved}
         isLoadingLiked={isLoadingLiked}
         post_id={post?.post_id}
+        flipped={flipped}
       />
     </Box>
   );

@@ -93,9 +93,6 @@ const CommentReplyList = ({
           }}
         />
       ))}
-
-     
-
       <div ref={scrollAnchorRef} />
     </Box>
   );

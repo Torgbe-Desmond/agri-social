@@ -28,6 +28,8 @@ const UserInfo = ({ _userDetails, _userDetailsStatus, _conversation_id }) => {
   const [follow, { isLoading: isFollowingLoading }] = useFollowMutation();
   const { data: followData } = useFollowingQuery({ user_id: _userDetails?.id });
 
+  console.log("_userDetails", _userDetails);
+
   useEffect(() => {
     if (followData?.isFollowing !== undefined) {
       setIsFollowingUser(followData.isFollowing);

@@ -58,12 +58,6 @@ const ContainerHeader = () => {
                 color: "text.secondary",
               }}
             >
-              {user?.city && (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <LocationOnIcon sx={{ fontSize: 18 }} />
-                  <Typography variant="body2">{user.city}</Typography>
-                </Box>
-              )}
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                 <CalendarTodayIcon sx={{ fontSize: 18 }} />
                 <Typography variant="body2">
@@ -74,10 +68,25 @@ const ContainerHeader = () => {
                   {new Date(user?.created_at).getFullYear()}
                 </Typography>
               </Box>
+              {user?.city && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    gap: 0.5,
+                  }}
+                >
+                  <LocationOnIcon sx={{ fontSize: 18 }} />
+                  <Typography variant="body2">{user.city}</Typography>
+                </Box>
+              )}
             </Box>
 
             {/* Followers / Following */}
-            <Box sx={{ display: "flex", gap: 3, mt: 1 }}>
+            <Box
+              sx={{ display: "flex", gap: 3, mt: 1, color: "text.secondary" }}
+            >
               <Typography variant="body2">
                 <strong>{user?.following}</strong> Following
               </Typography>

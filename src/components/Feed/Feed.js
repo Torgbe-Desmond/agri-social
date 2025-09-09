@@ -15,9 +15,6 @@ import { useGetPostsQuery } from "../../Features/postApi";
 import { setPostsOffset, updatePostList } from "../../Features/PostSlice";
 import ErrorInfoAndReload from "../Errors/ErrorInfoAndReload";
 import { useError } from "../Errors/Errors";
-import useWindowSize from "../useWindowSize/useWindowSize";
-import Container from "../Container/Container";
-import TopHeader from "../TopHeader/TopHeader";
 
 function Feed() {
   const { location } = useOutletContext();
@@ -37,6 +34,8 @@ function Feed() {
   const { data, isLoading, isFetching, isError, error, refetch } =
     useGetPostsQuery({ offset: postsOffset, limit: 10 });
 
+  console.log("error", error);
+
   const { message, setMessage } = useError();
 
   useEffect(() => {
@@ -44,6 +43,10 @@ function Feed() {
       setMessage(error.data.detail);
     }
   }, [isError, error, setMessage]);
+
+  useEffect(() => {
+    setFetchError(isError);
+  }, [isError]);
 
   const postData = useMemo(() => {
     return Array.isArray(data?.posts) ? data.posts : [];
@@ -175,42 +178,41 @@ function Feed() {
 
   function onPostReach(itemRefs) {}
 
-useEffect(() => {
-  const itemsWithCoverage = itemRefs?.current
-    .map((el) => {
-      if (!el) return null;
-      const rect = el.getBoundingClientRect();
-      const visibleHeight =
-        Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
-      const clampedHeight = Math.max(0, visibleHeight);
-      const percentOfViewport = (clampedHeight / window.innerHeight) * 100;
-      return { el, percentOfViewport };
-    })
-    .filter((item) => item && item.percentOfViewport > 0);
+  useEffect(() => {
+    const itemsWithCoverage = itemRefs?.current
+      .map((el) => {
+        if (!el) return null;
+        const rect = el.getBoundingClientRect();
+        const visibleHeight =
+          Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+        const clampedHeight = Math.max(0, visibleHeight);
+        const percentOfViewport = (clampedHeight / window.innerHeight) * 100;
+        return { el, percentOfViewport };
+      })
+      .filter((item) => item && item.percentOfViewport > 0);
 
-  if (!itemsWithCoverage?.length) return;
+    if (!itemsWithCoverage?.length) return;
 
-  const largestItem = itemsWithCoverage.reduce((max, item) =>
-    item.percentOfViewport > max.percentOfViewport ? item : max
-  );
+    const largestItem = itemsWithCoverage.reduce((max, item) =>
+      item.percentOfViewport > max.percentOfViewport ? item : max
+    );
 
-  const postId = largestItem.el
-    .querySelector(".post")
-    ?.id?.replace("post-", "");
+    const postId = largestItem.el
+      .querySelector(".post")
+      ?.id?.replace("post-", "");
 
-  if (!postId) return;
+    if (!postId) return;
 
-  setViewedPosts((prev) => {
-    if (prev.includes(postId)) return prev; 
-    return [...prev, postId];
-  });
-// low medium high
-  const delayDebounce = setTimeout(() => {
-    console.log("viewedPosts updated:", viewedPosts);
-  }, 3000);
+    setViewedPosts((prev) => {
+      if (prev.includes(postId)) return prev;
+      return [...prev, postId];
+    });
+    const delayDebounce = setTimeout(() => {
+      console.log("viewedPosts updated:", viewedPosts);
+    }, 3000);
 
-  return () => clearTimeout(delayDebounce);
-}, [itemRefs, scrolling, viewedPosts]); 
+    return () => clearTimeout(delayDebounce);
+  }, [itemRefs, scrolling, viewedPosts]);
 
   return (
     <Box
@@ -219,6 +221,10 @@ useEffect(() => {
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
+        // padding: 1,
+        // gap: 1,
+        borderBottom: 1,
+        borderColor: "divider",
       }}
       className="profile"
       ref={feedRef}
@@ -227,7 +233,7 @@ useEffect(() => {
         const isLast = index === postData.length - 1;
         return (
           <div
-            key={post.post_id ?? index}
+            key={index}
             ref={(el) => {
               itemRefs.current[index] = el;
               if (isLast) lastPostRef(el);
@@ -237,15 +243,17 @@ useEffect(() => {
           </div>
         );
       })}
-      {fetchError && (
-        <ErrorInfoAndReload
-          setFetchError={setFetchError}
-          isError={fetchError}
-          refetch={refetch}
-          isLoading={isLoading}
-          isFetching={isFetching}
-        />
-      )}
+
+      {fetchError ||
+        (isLoading && (
+          <ErrorInfoAndReload
+            setFetchError={setFetchError}
+            isError={fetchError}
+            refetch={refetch}
+            isLoading={isLoading}
+            isFetching={isFetching}
+          />
+        ))}
     </Box>
   );
 }

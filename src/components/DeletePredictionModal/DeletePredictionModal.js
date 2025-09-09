@@ -57,7 +57,6 @@ const DeletePredictionModal = ({ predictionId }) => {
           <Button
             variant="outlined"
             sx={{ borderRadius: "32px" }}
-            color="secondary"
             disabled={isLoading}
             onClick={() => dispatch(popComponent())}
           >
@@ -66,7 +65,18 @@ const DeletePredictionModal = ({ predictionId }) => {
           {isLoading ? (
             <CircularProgress size={24} />
           ) : (
-            <Button onClick={handlePredictionDelete} variant="contained">
+            <Button
+              sx={{
+                borderRadius: "32px",
+                bgcolor: theme.palette.error.main,
+                color: theme.palette.error.contrastText,
+                "&:hover": {
+                  bgcolor: theme.palette.error.dark,
+                },
+              }}
+              onClick={handlePredictionDelete}
+              variant="contained"
+            >
               Delete
             </Button>
           )}

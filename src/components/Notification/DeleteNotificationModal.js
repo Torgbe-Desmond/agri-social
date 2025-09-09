@@ -42,7 +42,7 @@ const DeleteNotificationModal = ({ notification_id }) => {
           width: { xs: "80%", sm: "70%", md: 500 },
           bgcolor: theme.palette.background.paper,
           boxShadow: theme.shadows[5],
-          borderRadius: theme.shape.borderRadius * 2,
+          borderRadius: 2,
           p: 3,
         }}
       >

@@ -7,12 +7,14 @@ import {
   useSavePostMutation,
 } from "../../Features/postApi";
 import { useDispatch } from "react-redux";
-import { updatePostLike, updatePostSaved } from "../../Features/PostSlice";
+import { updatePostLike, updatePostLikeInBookmark, updatePostSaved, updatePostSavedInBookmark } from "../../Features/PostSlice";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkHeader from "./BookmarkHeader";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+
 
 const Bookmark = forwardRef(({ bookmark }, ref) => {
   const dispatch = useDispatch();
@@ -28,7 +30,7 @@ const Bookmark = forwardRef(({ bookmark }, ref) => {
         post_id: bookmark?.post_id,
         formData,
       }).unwrap();  
-      dispatch(updatePostLike(payload));
+      dispatch(updatePostLikeInBookmark(payload));
     } catch (error) {
       console.error("Error liking post:", error);
     }
@@ -36,7 +38,7 @@ const Bookmark = forwardRef(({ bookmark }, ref) => {
 
   async function handleUnsaved() {
     const payload = await savePost({ post_id: bookmark?.post_id }).unwrap();
-    dispatch(updatePostSaved(payload));
+    dispatch(updatePostSavedInBookmark(payload));
   }
 
   const actions = [
@@ -53,7 +55,7 @@ const Bookmark = forwardRef(({ bookmark }, ref) => {
       icon: bookmark?.liked ? (
         <FavoriteIcon fontSize="small" />
       ) : (
-        <ChatBubbleOutlineIcon fontSize="small" />
+        <FavoriteBorderIcon fontSize="small" />
       ),
       count: bookmark?.likes,
       action: handleLikePost,

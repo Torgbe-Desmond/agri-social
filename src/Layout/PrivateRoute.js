@@ -13,7 +13,6 @@ function PrivateRoute({
   isMobile,
   isAuthenticated,
   scrolling,
-  setLearnLocation,
 }) {
   const user_id = localStorage.getItem("access_token");
   const reference_id = localStorage.getItem("reference_id");
@@ -24,12 +23,6 @@ function PrivateRoute({
   const { data: user, isError } = useGetUserQuery(undefined, {
     skip: !user_id,
   });
-
-  console.log("location", location);
-
-  useEffect(() => {
-    setLearnLocation(location)
-  }, []);
 
   useEffect(() => {
     dispatch(addUser(user));
@@ -44,7 +37,6 @@ function PrivateRoute({
   };
 
   if (!isAuthenticated) {
-    // Could redirect here or return null if you handle auth elsewhere
     return null;
   }
 

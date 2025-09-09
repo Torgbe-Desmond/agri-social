@@ -8,24 +8,28 @@ import {
 import CommentChat from "./commentChat";
 import CommentReplyList from "./CommentReplyList";
 import ReplyIndicator from "./ReplyIndicator";
-import CommentComponent from "./Comment";
 import Comment_Header from "./Comment_Header";
 import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
-import { Box, Button, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import "./CommentReplies.css";
 import { useError } from "../Errors/Errors";
-import { clearComments, updateCommentList } from "../../Features/CommentSlice";
-import { useDispatch } from "react-redux";
-import CommentSinglePost from "../PostComment/CommentSinglePost";
+import {
+  clearComments,
+  updateCommentList,
+  updateReplyList,
+} from "../../Features/CommentSlice";
+import { useDispatch, useSelector } from "react-redux";
 import ReplySingleComment from "./ReplySingleComment";
+import ErrorInfoAndReload from "../Errors/ErrorInfoAndReload";
 
 function CommentReplies() {
   const { comment_id } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // ---- Local state ----
   const [comment, setComment] = useState("");
   const [addLocalComment, setAddLocalComment] = useState([]);
-  const chatContainerRef = useRef(null);
-  const scrollAnchorRef = useRef(null);
-  const navigate = useNavigate();
   const [emojiAnchor, setEmojiAnchor] = useState(null);
   const [media, setMedia] = useState([]);
   const [v_media, setVMedia] = useState([]);
@@ -34,21 +38,32 @@ function CommentReplies() {
   const [selectedTags, setSelectedTags] = useState([]);
   const { message, setMessage } = useError();
   const [scrolling, setScrolling] = useState(0);
-  const dispatch = useDispatch();
+  const [repliesFetchError, setRepliesFetchError] = useState(false);
+  const [singleReplyComment, setSingleReplyComment] = useState();
+  const [togetherComments, setTogetherComments] = useState([]);
 
   // ---- Refs ----
+  const chatContainerRef = useRef(null);
+  const scrollAnchorRef = useRef(null);
   const ReplyScrollRef = useRef();
   const itemRef = useRef();
   const lastScrollTop = useRef(0);
 
-  // RTK Query hooks
+  // ---- Redux ----
+  const { replies: replyComments } = useSelector((state) => state.comment);
+
+  // ---- Queries ----
   const {
-    data: singleComment,
+    data,
     isLoading: loadingComment,
     refetch: refetchComment,
+    error:singleCommentError
   } = useGetCommentQuery(comment_id, {
     skip: !comment_id,
   });
+
+  console.log("replyComments", replyComments);
+  console.log("singleCommentError",singleCommentError)
 
   const {
     data: repliesData,
@@ -61,41 +76,59 @@ function CommentReplies() {
     skip: !comment_id,
   });
 
+  // Handle API errors
   useEffect(() => {
     if (isError && commentsError?.data?.detail) {
       setMessage(commentsError.data.detail);
     }
   }, [isError, commentsError, setMessage]);
 
+  // Handle API errors
+  useEffect(() => {
+    setSingleReplyComment(data);
+    return () => setSingleReplyComment();
+  }, [data, loadingComment, comment_id]);
+
+  console.log("repliesData", repliesData);
+
+  // useEffect(() => {
+  //   dispatch(updateCommentList({ comments: repliesData }));
+  // }, [repliesData]);
+
+  // RTK Mutation
   const [addReplyComment, { isLoading: isAddingReply, error }] =
     useAddReplyCommentMutation();
 
+  // Update redux with replies
   useEffect(() => {
     dispatch(
-      updateCommentList({ comments: [...(repliesData?.comments ?? [])] })
+      updateReplyList({
+        replies: [...(repliesData?.comments ?? [])],
+        singleReply: data,
+        parent: comment_id,
+      })
     );
-    return () => dispatch(clearComments());
-  }, [repliesData]);
+  }, [repliesData, dispatch]);
 
-  // Combine server replies + local optimistic replies
-  const togetherComments = [...(repliesData?.comments ?? [])];
+  // Combine server replies + optimistic local replies
+  useEffect(() => {
+    // Find the group of replies for the current parent
+    const currentGroup = replyComments.find((r) => r.parent === comment_id);
+
+    const all = [...(currentGroup?.replies ?? []), ...(addLocalComment ?? [])];
+
+    // Deduplicate by "id"
+    const unique = Array.from(new Map(all.map((c) => [c.id, c])).values());
+
+    setTogetherComments(unique);
+  }, [replyComments, addLocalComment, comment_id]);
+
+  // ---- Emoji picker ----
   const openEmojiPicker = (e) => setEmojiAnchor(e.currentTarget);
   const closeEmojiPicker = () => setEmojiAnchor(null);
   const onEmojiSelect = (emoji) => setComment((prev) => prev + emoji.native);
 
-  // useEffect(() => {
-  //   const node = ReplyScrollRef.current;
-  //   if (!node) return;
-
-  //   const handleScroll = () => {
-  //     lastScrollTop.current = node.scrollTop;
-  //     setScrolling((prev) => prev + 1);
-  //   };
-
-  //   node.addEventListener("scroll", handleScroll);
-  //   return () => node.removeEventListener("scroll", handleScroll);
-  // }, []);
-
+  // ---- Video autoplay logic ----
   const onVideoReach = useCallback(() => {
     if (!itemRef.current) return;
 
@@ -118,12 +151,13 @@ function CommentReplies() {
       console.log(`⏸️ Pausing video for post ${postId}`);
       video.pause();
     }
-  }, [itemRef]);
+  }, [scrolling]);
 
   useEffect(() => {
     onVideoReach();
-  }, [scrolling, singleComment]);
+  }, [scrolling, data, onVideoReach]);
 
+  // ---- Media upload ----
   const handleMediaUpload = (event, type) => {
     const selectedFiles = event.target.files;
     if (selectedFiles.length) {
@@ -141,33 +175,32 @@ function CommentReplies() {
     }
   };
 
+  // ---- Add reply ----
   const handleAddComment = async () => {
-    if (!comment.trim() || !singleComment) return;
+    if (!comment.trim() || !data) return;
 
     const formData = new FormData();
     formData.append("content", comment.trim());
-    formData.append("post_owner", singleComment.user_id);
-    formData.append("post_id", singleComment.post_id);
+    formData.append("post_owner", data.user_id);
+    formData.append("post_id", data.post_id);
     if (selectedTags) {
       formData.append("tags", selectedTags.join(","));
     }
-    file.forEach((file) => formData.append("files", file));
+    file.forEach((f) => formData.append("files", f));
     if (mediaType === "video") formData.append("has_video", 1);
     if (mediaType === "image") formData.append("has_video", 0);
 
     try {
       const response = await addReplyComment({
-        comment_id: singleComment.id,
+        comment_id: data.id,
         formData,
       }).unwrap();
 
       setAddLocalComment((prev) => [...prev, response]);
       setComment("");
-      // Optionally refetch replies to sync with server
       refetchReplies();
     } catch (error) {
       console.error("Failed to add reply:", error);
-      // Optionally rollback optimistic UI here
     }
   };
 
@@ -175,8 +208,7 @@ function CommentReplies() {
     navigate(-1);
   };
 
-  console.log("scrolling", scrolling);
-
+  // Scroll to bottom when replies update
   useEffect(() => {
     if (scrollAnchorRef.current) {
       scrollAnchorRef.current.scrollIntoView({ behavior: "smooth" });
@@ -191,8 +223,13 @@ function CommentReplies() {
         handleGoBack={handleGoBack}
       />
 
-      <ReplySingleComment comment={singleComment} ref={itemRef} />
+      {/* Main comment */}
+      <ReplySingleComment comment={data} ref={itemRef} />
 
+      {/* Indicator if replies exist */}
+      {replyComments.length > 0 && <ReplyIndicator />}
+
+      {/* Replies list */}
       <CommentReplyList
         isError={isError}
         scrolling={scrolling}
@@ -204,12 +241,26 @@ function CommentReplies() {
         scrollAnchorRef={scrollAnchorRef}
       />
 
+      {/* Error handling */}
+      {repliesFetchError ||
+        (commentsLoading && (
+          <ErrorInfoAndReload
+            setFetchError={setRepliesFetchError}
+            isError={repliesFetchError}
+            isLoading={commentsLoading}
+            isFetching={isFetchingReplies}
+            refetch={refetchReplies}
+          />
+        ))}
+
+      {/* Reply input */}
       <CommentChat
         setFile={setFile}
         media={media}
         file={file}
         setVMedia={setVMedia}
         mediaType={mediaType}
+        isAddingComment={isAddingReply}
         setMedia={setMedia}
         message={comment}
         setSelectedTags={setSelectedTags}
@@ -222,12 +273,6 @@ function CommentReplies() {
         closeEmojiPicker={closeEmojiPicker}
         onEmojiSelect={onEmojiSelect}
         openEmojiPicker={openEmojiPicker}
-      />
-
-      <EmojiPickerPopover
-        anchorEl={emojiAnchor}
-        onClose={closeEmojiPicker}
-        onEmojiSelect={onEmojiSelect}
       />
     </Box>
   );

@@ -19,6 +19,11 @@ export const userApi = createApi({
       query: () => "/user",
       providesTags: ["User"],
     }),
+    getMentionedUsers: build.query({
+      query: ({ offset, limit }) =>
+        `/user/search?offset=${offset}&limit=${limit}`,
+      providesTags: ["User"],
+    }),
     getAnotherUserProfile: build.query({
       query: (user_id) => `/profile/${user_id}`,
       providesTags: ["User"],
@@ -55,6 +60,7 @@ export const userApi = createApi({
 export const {
   useGetAnotherUserProfileQuery,
   useGetSuggestedUsersToFollowQuery,
+  useGetMentionedUsersQuery,
   useGetUserQuery,
   useAuthenticatedQuery, // <-- don't forget this one
   useUpdateUserInformationMutation,

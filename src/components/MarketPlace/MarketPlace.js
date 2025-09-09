@@ -97,15 +97,16 @@ function MarketPlace() {
           );
         })}
       </Box>
-      {isError && (
-        <ErrorInfoAndReload
-          setFetchError={setFetchError}
-          isError={fetchError}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          refetch={refetch}
-        />
-      )}
+      {isError ||
+        (isLoading && (
+          <ErrorInfoAndReload
+            setFetchError={setFetchError}
+            isError={fetchError}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            refetch={refetch}
+          />
+        ))}
     </Box>
   );
 }

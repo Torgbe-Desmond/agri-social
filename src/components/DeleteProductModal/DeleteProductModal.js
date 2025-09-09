@@ -73,6 +73,14 @@ const DeleteProductModal = ({ product_id }) => {
             <CircularProgress size={24} />
           ) : (
             <Button
+              sx={{
+                borderRadius: "32px",
+                bgcolor: theme.palette.error.main,
+                color: theme.palette.error.contrastText,
+                "&:hover": {
+                  bgcolor: theme.palette.error.dark,
+                },
+              }}
               onClick={handleProductDelete}
               variant="contained"
               disabled={isLoading}

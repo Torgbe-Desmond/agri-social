@@ -30,12 +30,14 @@ export const productApi = createApi({
     }),
 
     createReview: builder.mutation({
-      query: ({ product_id, formData }) => ({
-        url: `/products/reviews`,
+      query: ({ formData }) => ({
+        url: "/reviews",
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ["Reviews"],
+      invalidatesTags: (result, error, { product_id }) => [
+        { type: "Reviews", id: product_id },
+      ],
     }),
 
     getReviews: builder.query({

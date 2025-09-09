@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, useMediaQuery } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-
+import EditIcon from "@mui/icons-material/Edit";
 import "./UserProducts.css";
 
 import Header from "../Header/Header";
@@ -15,6 +15,9 @@ import {
 import { updateLocalProductList } from "../../Features/ProductSlice";
 import { useDispatch } from "react-redux";
 import ErrorInfoAndReload from "../Errors/ErrorInfoAndReload";
+import Container from "../Container/Container";
+import ContainerTitle from "../Container/ContainerTitle";
+import ContainerActions from "../Container/ContainerActions";
 
 function UserProducts() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,10 +26,11 @@ function UserProducts() {
   const { user_id } = useOutletContext();
   const isMobile = useMediaQuery("(max-width:1000px)");
   const observer = useRef();
+  const [fetchError, setFetchError] = useState(false);
   const dispatch = useDispatch();
 
   // 🔍 Fetch user-specific products
-  const { data, isLoading, isFetching, refetch, error } =
+  const { data, isLoading, isFetching, refetch, error, isError } =
     useGetUserProductsQuery();
 
   console.log("error", error);
@@ -41,10 +45,9 @@ function UserProducts() {
     }
   }, [dispatch, products]);
 
-  // 🔍 Log to verify structure (remove in production)
   useEffect(() => {
-    console.log("User products API response:", data);
-  }, [data]);
+    setFetchError(isError);
+  }, [isError]);
 
   // 🔍 Search logic (safe)
   useEffect(() => {
@@ -58,43 +61,53 @@ function UserProducts() {
 
   // ➕ Handle "Create Product" click
   const handleCreateProduct = () => {
-    const stack = new ComponentStack();
+    const stack = new ComponentStack(dispatch);
     stack.handleStack("CreateProduct", {});
   };
 
+  const handleEditUserProductInfo = () => {
+    const stack = new ComponentStack(dispatch);
+    stack.handleStack("SellerInfo", {});
+  };
   // 🔁 Refresh handler
   const reloadAction = () => {
     refetch();
   };
 
   return (
-    <Header
-      icons={[
-        {
-          icon: <AddOutlinedIcon key="product" />,
-          action: handleCreateProduct,
-        },
-      ]}
-      status={isLoading || isFetching}
-      allowedSearch
-      name="Products"
-      reloadAction={reloadAction}
-      searchTerm={searchTerm}
-      setSearchTerm={setSearchTerm}
-      setScroll={setScroll}
-    >
+    <Box>
+      <Container>
+        <ContainerTitle title="Products" />
+        <ContainerActions
+          icons={[
+            {
+              icon: <AddOutlinedIcon key="product" />,
+              action: handleCreateProduct,
+            },
+            {
+              icon: <EditIcon key="edit-product" />,
+              action: handleEditUserProductInfo,
+            },
+          ]}
+        />
+      </Container>
       <Box sx={{ padding: 1 }} className="user__products">
         {Array.isArray(filteredData) &&
           filteredData.map((product, index) => (
             <LocalProductCard {...product} key={product.post_id || index} />
           ))}
       </Box>
-      <ErrorInfoAndReload
-        isLoading={isLoading}
-        isFetching={isFetching}
-        refetch={refetch}
-      />
-    </Header>
+      {fetchError ||
+        (isLoading && (
+          <ErrorInfoAndReload
+            isError={fetchError}
+            setFetchError={setFetchError}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            refetch={refetch}
+          />
+        ))}
+    </Box>
   );
 }
 

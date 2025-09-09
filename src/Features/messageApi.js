@@ -17,7 +17,7 @@ export const messageApi = createApi({
   tagTypes: ["Conversation", "Group", "User", "Message"],
   endpoints: (builder) => ({
     getConversation: builder.query({
-      query: (formData) => ({
+      query: ({ formData }) => ({
         url: `/conversation`,
         method: "POST",
         body: formData,
@@ -25,11 +25,11 @@ export const messageApi = createApi({
       providesTags: ["Conversation"],
     }),
     getGroupConversation: builder.query({
-      query: () => `/conversation/groups`,
+      query: () => `/conversation/group`,
       providesTags: ["Group"],
     }),
     createConversation: builder.mutation({
-      query: (formData) => ({
+      query: ({ formData }) => ({
         url: `/conversation/create`,
         method: "POST",
         body: formData,
@@ -54,7 +54,7 @@ export const messageApi = createApi({
     }),
     getMessagedUsers: builder.query({
       query: () => `/conversation/users`,
-      providesTags: ["User"],
+      providesTags: ["User", "Conversation", "Message"],
     }),
     getMessages: builder.query({
       query: (conversation_id) => `/conversation/${conversation_id}/messages`,
@@ -86,6 +86,28 @@ export const messageApi = createApi({
         { type: "Conversation", id: conversation_id },
       ],
     }),
+    requestJoinGroup: builder.mutation({
+      query: ({ formData }) => ({
+        url: `/request-join-group-conversation`,
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: (result, error, { conversation_id }) => [
+        { type: "Message", id: conversation_id },
+        { type: "Conversation", id: conversation_id },
+      ],
+    }),
+    joinGroup: builder.mutation({
+      query: ({ formData }) => ({
+        url: `/join-group-conversation`,
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: (result, error, { conversation_id }) => [
+        { type: "Message", id: conversation_id },
+        { type: "Conversation", id: conversation_id },
+      ],
+    }),
   }),
 });
 
@@ -100,4 +122,6 @@ export const {
   useGetMessagesQuery,
   useFollowingQuery,
   useSendMessageMutation,
+  useJoinGroupMutation,
+  useRequestJoinGroupMutation
 } = messageApi;

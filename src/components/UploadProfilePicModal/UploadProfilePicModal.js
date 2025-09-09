@@ -21,8 +21,7 @@ const UpdateProfilePicModal = ({ user_image }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  const [updateUserImage, { isLoading }] =
-    useUpdateUserImageMutation();
+  const [updateUserImage, { isLoading }] = useUpdateUserImageMutation();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -104,6 +103,7 @@ const UpdateProfilePicModal = ({ user_image }) => {
             Cancel
           </Button>
           <Button
+            sx={{ borderRadius: "32px" }}
             variant="contained"
             onClick={handleUpload}
             disabled={isLoading || !selectedImage}

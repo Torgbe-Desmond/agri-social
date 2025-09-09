@@ -11,6 +11,7 @@ const mergeUnique = (existing, incoming, key = "id") => {
 const initialState = {
   messages: [],
   currentlyConversingUser: null,
+  currentlyConversingGroup: null,
   users: [],
   groups: [],
 
@@ -31,12 +32,27 @@ const messageSlice = createSlice({
     setCurrentlyConversingUserInformation: (state, action) => {
       state.currentlyConversingUser = action.payload;
     },
+    setCurrentlyConversingGroupInformation: (state, action) => {
+      state.currentlyConversingGroup = action.payload;
+    },
     addUserMessage: (state, action) => {
       state.messages.push({
         sender: "user",
         text: action.payload.text,
         image: action.payload.image || [],
         profilePicture: action.payload.profilePicture || "/user-avatar.png",
+      });
+    },
+    updateUsersInfo: (state, action) => {
+      const { message } = action.payload;
+      state.users = state.users?.map((u) => {
+        if (u.conversation_id === message?.conversation_id) {
+          return {
+            ...u,
+            last_message: message?.last_message,
+          };
+        }
+        return u;
       });
     },
     addBotMessage: (state, action) => {
@@ -65,8 +81,10 @@ export const {
   clearMessages,
   clearGroups,
   clearConversationId,
+  updateUsersInfo,
   updateUsersList,
   setCurrentlyConversingUserInformation,
+  setCurrentlyConversingGroupInformation,
 } = messageSlice.actions;
 
 export default messageSlice.reducer;

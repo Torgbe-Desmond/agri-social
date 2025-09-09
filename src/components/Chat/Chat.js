@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, useOutletContext } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import {
   clearMessages,
   getConversation,
@@ -23,16 +23,21 @@ import {
   useGetMessagesQuery,
   useSendMessageMutation,
 } from "../../Features/messageApi";
+import ErrorInfoAndReload from "../Errors/ErrorInfoAndReload";
 
 function Chat() {
   const { userDetails: user } = useSelector((state) => state.auth);
   const [chatMessages, setChatMessages] = useState([]);
   const [message, setMessage] = useState("");
+  const { refernce_id } = useParams();
   const [files, setFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const scrollAnchorRef = useRef(null);
   const socket = useSocket();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [fetchError, setFetchError] = useState(false);
+  const [lengthOfLoadedMessage, setLengthOfLoadedMessage] = useState(0);
   const { darkMode, systemPrefersDark } = useOutletContext();
   const { conversation_id, recipient_id } = useParams();
   const [
@@ -44,12 +49,13 @@ function Chat() {
   const [v_media, setVMedia] = useState([]);
   const [file, setFile] = useState([]);
   const [mediaType, setMediaType] = useState(null);
+  const { users } = useSelector((state) => state.message);
 
   useEffect(() => {
     return () => dispatch(clearMessages());
   }, []);
 
-  const { data, isFetching, isSuccess, isLoading, error } =
+  const { data, isFetching, isSuccess, isLoading, error, refetch, isError } =
     useGetMessagesQuery(conversation_id);
 
   const messages = useMemo(() => {
@@ -57,7 +63,12 @@ function Chat() {
   }, [data]);
 
   useEffect(() => {
+    setFetchError(isError);
+  }, [isError]);
+
+  useEffect(() => {
     setChatMessages(messages);
+    setLengthOfLoadedMessage(messages?.length ?? 0);
   }, [messages]);
 
   useEffect(() => {
@@ -93,7 +104,11 @@ function Chat() {
     file.forEach((file) => formData.append("files", file));
     if (conversation_id) formData.append("conversation_id", conversation_id);
 
-    const payload = await sendMessage({ formData }).unwrap();
+    const payload = await sendMessage({
+      formData,
+      conversation_id, // 👈 pass conversation_id
+      receiver_id: recipient_id, // 👈 pass receiver_id
+    }).unwrap();
 
     setChatMessages((prev) => [
       ...prev,
@@ -150,9 +165,23 @@ function Chat() {
     });
   }, []);
 
+  const handleGotBack = () => {
+    const exist = users?.find((m) => m?.conversation_id === conversation_id);
+    const lastMessage = messages[messages?.length - 1];
+    if (lastMessage?.content !== exist?.last_message) {
+      console.log("not equal");
+      console.log(lastMessage?.content);
+      console.log(exist?.last_message);
+      navigate(`/${refernce_id}/messages`);
+    } else {
+      navigate(-1);
+    }
+  };
+
   return (
     <Box className="chat">
       <ChatHeader
+        handleGotBack={handleGotBack}
         userImage={currentlyConversingUser?.user_image}
         userId={currentlyConversingUser?.user_id}
         name={currentlyConversingUser?.username}
@@ -164,6 +193,17 @@ function Chat() {
         systemPrefersDark={systemPrefersDark}
         scrollRef={scrollAnchorRef}
       />
+
+      {fetchError ||
+        (isLoading && (
+          <ErrorInfoAndReload
+            setFetchError={setFetchError}
+            isError={fetchError}
+            refetch={refetch}
+            isLoading={isLoading}
+            isFetching={isFetching}
+          />
+        ))}
       {/* <ImagePreview
         files={file}
       /> */}

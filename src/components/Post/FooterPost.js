@@ -4,7 +4,13 @@ import { Box } from "@mui/material";
 import { useSocket } from "../Socket/Socket";
 import { useSelector } from "react-redux";
 
-function FooterPost({ actions, post_id, isLoadingSaved, isLoadingLiked }) {
+function FooterPost({
+  actions,
+  post_id,
+  isLoadingSaved,
+  isLoadingLiked,
+  flipped,
+}) {
   const [updatedActions, setUpdatedActions] = useState([]);
   const { userDetails } = useSelector((state) => state.auth);
   const socket = useSocket();
@@ -52,7 +58,7 @@ function FooterPost({ actions, post_id, isLoadingSaved, isLoadingLiked }) {
   }, [socket, post_id, userDetails?.id]);
 
   return (
-    <Box className="post__footer">
+    <Box className={`post__footer ${flipped ? "is-flipped" : ""}`}>
       {updatedActions.map((action, index) => (
         <PostStatusIcons
           id={action?.id}

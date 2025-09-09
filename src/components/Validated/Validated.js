@@ -34,37 +34,36 @@ import Chat from "../Chat/Chat";
 import Streams from "../Streams/Streams";
 import Authenticated from "../../Pages/Authenticated/Authenticated";
 import Login from "../../Pages/Login/Login";
+import GroupConversation from "../GroupConversation/GroupConversation";
+import ConversationGroup from "../ConversationGroup/ConversationGroup";
+import ComponentStack from "../HandleStack/HandleStack";
 
 function Validated() {
   const [isAuthenticated, setIsAuthenticated] = useState();
-  const [learnLocation, setLearnLocation] = useState();
   const navigate = useNavigate();
   const { message, setMessage } = useError();
   const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
   const isMobile = useMediaQuery("(max-width:640px)");
-  const { components, scrolling, onlineStatus, draggableComponents } =
-    useSelector((state) => state.stack);
+  const { scrolling } = useSelector((state) => state.stack);
   const [errorMessage, setErrorMessage] = useState(null);
   const dispatch = useDispatch();
+  const { data, error } = useAuthenticatedQuery(undefined, {});
 
-  const { data, isLoading, isFetching, isError, error, refetch } =
-    useAuthenticatedQuery(undefined, {});
+  const handleSessionExpired = () => {
+    const stack = new ComponentStack(dispatch);
+    stack.handleStack("SessionExpired", {});
+  };
 
   useEffect(() => {
     if (error?.status === 401) {
       setIsAuthenticated(false);
+      handleSessionExpired();
     } else if (data?.status) {
       const reference_id = localStorage.getItem("reference_id");
       setIsAuthenticated(data?.status);
-      navigate(`/${reference_id}`);
     }
   }, [error, data, localStorage.getItem("access_token")]);
 
-  const handleSnackbarClose = () => {
-    setMessage(null);
-    dispatch(clearOnLineStatus());
-    setErrorMessage(null);
-  };
   return (
     <div>
       <Routes>
@@ -80,13 +79,11 @@ function Validated() {
           />
         )}
 
-        {isAuthenticated ? (
+        {isAuthenticated && (
           <Route
             element={
               <PrivateRoute
                 isAuthenticated={isAuthenticated}
-                darkMode={{}}
-                setLearnLocation={setLearnLocation}
                 scrolling={scrolling}
                 systemPrefersDark={systemPrefersDark}
                 isMobile={isMobile}
@@ -136,17 +133,16 @@ function Validated() {
               path="/:reference_id/chat/:conversation_id/c/:recipient_id"
               element={<Chat />}
             />
-            {/* <Route
-                        path="/:reference_id/group-chat/:conversation_id"
-                        element={<GroupConversation />}
-                      /> */}
+            <Route
+              path="/:reference_id/group-chat/"
+              element={<ConversationGroup />}
+            />
+            <Route
+              path="/:reference_id/group-chat/:conversation_id"
+              element={<GroupConversation />}
+            />
             <Route path="/:reference_id/streams" element={<Streams />} />
           </Route>
-        ) : (
-          <Route
-            path="*"
-            element={<Authenticated isAuthenticated={isAuthenticated} />}
-          />
         )}
       </Routes>
     </div>

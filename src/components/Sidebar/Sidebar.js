@@ -11,14 +11,15 @@ import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
+import GroupsIcon from "@mui/icons-material/Groups";
 import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useSocket } from "../Socket/Socket";
 import ComponentStack from "../HandleStack/HandleStack";
 
 function Sidebar() {
-  const theme = useTheme(); // 👈 Access theme colors here
+  const theme = useTheme();
   const isMobile = useMediaQuery("(max-width:640px)");
   const unShowIcons = useMediaQuery("(max-width:1020px)");
   const [currentPage, setCurrentPage] = useState("");
@@ -27,6 +28,7 @@ function Sidebar() {
   const socket = useSocket();
   const [notifyCounts, setNotifyCount] = useState(0);
   const reference_id = localStorage.getItem("reference_id");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const page = location.pathname.split("/")[2];
@@ -37,6 +39,7 @@ function Sidebar() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("reference_id");
     window.location.reload();
+    navigate("/");
   };
 
   const handleDynamicView = () => {
@@ -100,6 +103,14 @@ function Sidebar() {
         text="Messages"
         active={currentPage === "messages"}
         to={`/${reference_id}/messages`}
+      />
+      <SidebarOption
+        unShowIcons={unShowIcons}
+        isMobile={isMobile}
+        Icon={GroupsIcon}
+        text="Group Chat"
+        active={currentPage === "group-chat"}
+        to={`/${reference_id}/group-chat`}
       />
       <SidebarOption
         unShowIcons={unShowIcons}

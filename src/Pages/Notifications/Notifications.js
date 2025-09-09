@@ -39,13 +39,15 @@ function Notifications() {
     (state) => state.notification
   );
 
-  const { data, isFetching, isSuccess, isLoading, refetch, isError } =
+  const { data, isFetching, isSuccess, isLoading, refetch, isError, error } =
     useGetNotificationsQuery({
       offset,
       limit: 10,
     });
 
   const [readNotification] = useReadNotificationMutation();
+
+  console.log("error", error);
 
   const notifications = useMemo(() => {
     return Array.isArray(data?.notifications) ? data.notifications : [];
@@ -142,7 +144,7 @@ function Notifications() {
     const groupedMap = {};
 
     notifications.forEach((notif) => {
-      if (notif.entity_type === "post") {
+      if (notif.entity_type === "post" || notif.entity_type === "group") {
         if (!groupedMap[notif.entity_id]) {
           groupedMap[notif.entity_id] = [];
         }
@@ -167,6 +169,8 @@ function Notifications() {
         id,
         actors: Array.from(uniqueActorsMap.values()),
         message: notifs[0]?.message,
+        mentions: notifs[0]?.mentions,
+        groups: notifs[0]?.groups,
         images: notifs[0]?.images,
         videos: notifs[0]?.videos,
         type: notifs[0]?.type,
@@ -202,15 +206,16 @@ function Notifications() {
         })}
       </Box>
 
-      {isError && (
-        <ErrorInfoAndReload
-          setFetchError={setFetchError}
-          isError={fetchError}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          refetch={refetch}
-        />
-      )}
+      {isError ||
+        (isLoading && (
+          <ErrorInfoAndReload
+            setFetchError={setFetchError}
+            isError={fetchError}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            refetch={refetch}
+          />
+        ))}
     </Box>
   );
 }

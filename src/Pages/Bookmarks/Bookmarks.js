@@ -186,38 +186,33 @@ const Bookmarks = () => {
       </Container>
 
       {/* Content */}
-      {isLoading ? (
-        <Box className="circular__progress">
-          <CircularProgress size={20} />
-        </Box>
-      ) : (
-        <Box className="scrolling-component">
-          {filteredData?.map((saved, index) => {
-            const isLast = index === filteredData.length - 1;
-            return (
-              <div
-                key={saved.post_id || index}
-                ref={(el) => {
-                  itemRefs.current[index] = el;
-                  if (isLast) lastPostRef(el);
-                }}
-                className="bookmark-media-wrapper"
-              >
-                <Bookmark bookmark={saved} />
-              </div>
-            );
-          })}
-        </Box>
-      )}
-      {fetchError && (
-        <ErrorInfoAndReload
-          setFetchError={setFetchError}
-          isError={fetchError}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          refetch={refetch}
-        />
-      )}
+      <Box className="scrolling-component">
+        {filteredData?.map((saved, index) => {
+          const isLast = index === filteredData.length - 1;
+          return (
+            <div
+              key={saved.post_id || index}
+              ref={(el) => {
+                itemRefs.current[index] = el;
+                if (isLast) lastPostRef(el);
+              }}
+              className="bookmark-media-wrapper"
+            >
+              <Bookmark bookmark={saved} />
+            </div>
+          );
+        })}
+      </Box>
+      {fetchError ||
+        (isLoading && (
+          <ErrorInfoAndReload
+            setFetchError={setFetchError}
+            isError={fetchError}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            refetch={refetch}
+          />
+        ))}
     </Box>
   );
 };

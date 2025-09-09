@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Modal,
@@ -10,6 +10,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { useCreateConversationMutation } from "../../Features/messageApi";
+import { useError } from "../Errors/Errors";
 
 const style = {
   position: "absolute",
@@ -26,22 +27,30 @@ const style = {
 const CreateConversationModal = ({ conversee }) => {
   const dispatch = useDispatch();
   const { userDetails } = useSelector((state) => state.auth);
+  const { message, setMessage } = useError();
+  const [createConversation, { isLoading, error }] =
+    useCreateConversationMutation();
 
-  const [createConversation, { isLoading }] = useCreateConversationMutation();
+  console.log("error", error);
+;
+
+  useEffect(() => {
+    if (error) {
+      const errMsg =
+        error?.data?.detail ||
+        error?.error ||
+        "Something went wrong while creating the conversation.";
+      setMessage(errMsg);
+    }
+  }, [error, setMessage]);
 
   const handleCreateConversation = async () => {
     const formData = new FormData();
     const member_ids = [conversee?.id, userDetails?.id];
     member_ids.forEach((id) => formData.append("member_ids", id));
-
-    try {
-      const response = await createConversation({ formData }).unwrap();
-      alert(response.message || "Conversation created");
-      dispatch(popComponent());
-    } catch (err) {
-      console.error("Failed to create conversation", err);
-      alert("Failed to create conversation");
-    }
+    const response = await createConversation({ formData }).unwrap();
+    alert(response.message || "Conversation created");
+    dispatch(popComponent());
   };
 
   return (

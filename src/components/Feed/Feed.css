@@ -9,7 +9,7 @@
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .feed::-webkit-scrollbar {
-  display: none;
+  /* display: none; */
 }
 
 .highlight-visible {

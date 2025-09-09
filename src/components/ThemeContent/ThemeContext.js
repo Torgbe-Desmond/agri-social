@@ -25,9 +25,9 @@ export const ThemeProviderWrapper = ({ children }) => {
   const [themeMode, setThemeMode] = useState(ThemeMode.SYSTEM);
 
   const selectedTheme = useMemo(() => {
-    if (themeMode === ThemeMode.LIGHT) return AppSolarizedTheme;
+    if (themeMode === ThemeMode.LIGHT) return AppLightTheme;
     if (themeMode === ThemeMode.DARK) return AppDarkTheme;
-    return prefersDark ? AppDarkTheme : AppSolarizedTheme;
+    return prefersDark ? AppDarkTheme : AppLightTheme;
   }, [themeMode, prefersDark]);
 
   useEffect(() => {

@@ -75,7 +75,7 @@ const ReviewChat = ({ msg, systemPrefersDark }) => {
         )}
 
         {/* Reactions */}
-        <Box display="flex" alignItems="center" gap={1}>
+        {/* <Box display="flex" alignItems="center" gap={1}>
           <IconButton size="small" onClick={toggleLike}>
             <ThumbUpIcon
               color={liked ? "primary" : "disabled"}
@@ -89,7 +89,7 @@ const ReviewChat = ({ msg, systemPrefersDark }) => {
           <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
             <MenuItem onClick={handleMenuClose}>Report</MenuItem>
           </Menu>
-        </Box>
+        </Box> */}
 
         {/* Options menu */}
       </Box>

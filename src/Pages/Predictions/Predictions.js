@@ -36,7 +36,6 @@ function Predictions() {
 
   console.log("error", error);
 
-
   const hasMore = predictionData?.length > 0;
 
   useEffect(() => {
@@ -111,13 +110,16 @@ function Predictions() {
           )}
       </Box>
 
-      <ErrorInfoAndReload
-        setFetchError={setFetchError}
-        isError={fetchError}
-        isLoading={isLoading}
-        isFetching={isFetching}
-        refetch={refetch}
-      />
+      {fetchError ||
+        (isLoading && (
+          <ErrorInfoAndReload
+            setFetchError={setFetchError}
+            isError={fetchError}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            refetch={refetch}
+          />
+        ))}
     </Box>
   );
 }

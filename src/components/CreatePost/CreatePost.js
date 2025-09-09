@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -12,26 +12,125 @@ import {
   Modal,
   CircularProgress,
   useTheme,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import CloseIcon from "@mui/icons-material/Close";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { popComponent } from "../../Features/StackSlice";
 import { addNewPost } from "../../Features/PostSlice";
 import { useCreatePostMutation } from "../../Features/postApi";
+import { useError } from "../Errors/Errors";
+import { useGetMentionedUsersQuery } from "../../Features/userApi";
+import {
+  searchMentionedGroups,
+  searchMentionedUsers,
+} from "../../Features/SearchSlice";
+import PostTextArea from "../PostTextArea/PostTextArea";
+import MentionedUsersList from "../MentionedUsersList/MentionedUsersList";
+import MentionedGroupsList from "../MentionedGroupsList/MentionedGroupsList";
+import LinksPreview from "../LinksPreview/LinksPreview";
+import TagsInput from "../TagsInput/TagsInput";
+import MediaUploader from "../GroupConversation/MediaUploader/MediaUploader";
+import MediaPreviewGrid from "../MediaPreviewGrid/MediaPreviewGrid";
+import PostActions from "../PostActions/PostActions";
 
 const CreatePost = () => {
   const [content, setContent] = useState("");
-  const [mediaList, setMediaList] = useState([]); // array of { file, type, preview }
+  const [mediaList, setMediaList] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const dispatch = useDispatch();
   const predefinedTags = [];
+  const { message, setMessage } = useError();
   const [createPost, { isLoading, error }] = useCreatePostMutation();
+  const [mentions, setMentions] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [links, setLinks] = useState([]);
+  // const { mentionedUSers } = useSelector((state) => state.search);
+  const [mentionedUSers, setMentionedUSers] = useState([]);
+  const [mentionedGroups, setMentionedGroups] = useState([]);
 
-  console.log("error", error);
-
+  // const { data, refetch } = useGetMentionedUsersQuery({
+  //   offset: 0,
+  //   limit: 10,
+  // });
   const theme = useTheme();
+
+  useEffect(() => {
+    if (content == "") {
+      setMentionedUSers([]);
+    }
+  }, [content]);
+
+  useEffect(() => {
+    if (!mentions) return;
+    const delayDebounce = setTimeout(() => {
+      const formData = new FormData();
+      mentions.forEach((m) => formData.append("usernames", m));
+      dispatch(searchMentionedUsers({ formData }))
+        .unwrap()
+        .then((payload) => {
+          setMentionedUSers(payload.results);
+        });
+    }, 500);
+    return () => {
+      clearTimeout(delayDebounce);
+    };
+  }, [mentions, dispatch]);
+
+  useEffect(() => {
+    if (!groups) return;
+    const delayDebounce = setTimeout(() => {
+      const formData = new FormData();
+      groups.forEach((m) => formData.append("name", m));
+      dispatch(searchMentionedGroups({ formData }))
+        .unwrap()
+        .then((payload) => {
+          setMentionedGroups(payload.results);
+        });
+    }, 500);
+    return () => {
+      clearTimeout(delayDebounce);
+    };
+  }, [groups, dispatch]);
+
+  const handleRemoveMedia = (index) => {
+    setMediaList((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleContentChange = (e) => {
+    const text = e.target.value;
+    setContent(text);
+
+    // Mentions: @username (letters, numbers, underscores allowed)
+    const foundMentions = text.match(/@\w+/g) || [];
+
+    // Groups: #groupname (example, adjust to your format)
+    const foundGroups = text.match(/#\w+/g) || [];
+
+    // Links: simple URL regex (http/https)
+    const foundLinks = text.match(/https?:\/\/[^\s]+/g) || [];
+
+    // Remove @ symbol if you just want names
+    const cleanedMentions = foundMentions.map((m) => m.slice(1));
+
+    setMentions(cleanedMentions);
+    setGroups(foundGroups.map((g) => g.slice(1)));
+    setLinks(foundLinks);
+  };
+
+  useEffect(() => {
+    if (error) {
+      const errMsg =
+        error?.data?.detail ||
+        error?.error ||
+        "Something went wrong while creating the post.";
+      setMessage(errMsg);
+    }
+  }, [error, setMessage]);
 
   const handleMediaUpload = (event, type) => {
     const files = Array.from(event.target.files);
@@ -40,10 +139,6 @@ const CreatePost = () => {
       return { file, type, preview };
     });
     setMediaList((prev) => [...prev, ...newMedia]);
-  };
-
-  const handleRemoveMedia = (index) => {
-    setMediaList((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handlePost = async () => {
@@ -65,6 +160,7 @@ const CreatePost = () => {
     formData.append("has_video", has_video);
 
     const payload = await createPost({ formData }).unwrap();
+    console.log("payload", payload);
     dispatch(addNewPost({ payload }));
 
     setContent("");
@@ -94,143 +190,37 @@ const CreatePost = () => {
             Create a Post
           </Typography>
 
-          <TextField
-            multiline
-            rows={4}
-            fullWidth
-            placeholder="What's on your mind?"
-            variant="outlined"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            sx={{
-              backgroundColor: theme.palette.background.default,
-              borderRadius: 2,
-            }}
+          <PostTextArea
+            content={content}
+            setContent={setContent}
+            setMentions={setMentions}
+            setGroups={setGroups}
+            setLinks={setLinks}
+            isLoading={isLoading}
+          />
+          <MentionedUsersList users={mentionedUSers} />
+          <MentionedGroupsList groups={mentionedGroups} />
+          <LinksPreview links={links} />
+
+          <TagsInput
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+            isLoading={isLoading}
           />
 
-          <Box mt={2}>
-            <Autocomplete
-              multiple
-              freeSolo
-              options={predefinedTags}
-              value={selectedTags}
-              onChange={handleTagChange}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    key={index}
-                    label={option}
-                    {...getTagProps({ index })}
-                  />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField {...params} label="Tags" placeholder="Add Tags" />
-              )}
-            />
-          </Box>
+          <MediaUploader setMediaList={setMediaList} isLoading={isLoading} />
+          <MediaPreviewGrid
+            mediaList={mediaList}
+            handleRemoveMedia={handleRemoveMedia}
+            isLoading={isLoading}
+          />
 
-          <Box mt={2} display="flex" gap={2}>
-            <input
-              accept="image/*"
-              style={{ display: "none" }}
-              id="image-upload"
-              type="file"
-              multiple
-              onChange={(e) => handleMediaUpload(e, "image")}
-            />
-            <label htmlFor="image-upload">
-              <IconButton component="span" color="primary">
-                <ImageIcon />
-              </IconButton>
-            </label>
-
-            <input
-              accept="video/*"
-              style={{ display: "none" }}
-              id="video-upload"
-              type="file"
-              multiple
-              onChange={(e) => handleMediaUpload(e, "video")}
-            />
-            <label htmlFor="video-upload">
-              <IconButton component="span" color="primary">
-                <VideoLibraryIcon />
-              </IconButton>
-            </label>
-          </Box>
-
-          {/* Media Grid */}
-          {mediaList.length > 0 && (
-            <Box
-              mt={2}
-              display="grid"
-              gridTemplateColumns="repeat(auto-fill, minmax(70px, 1fr))"
-              gap={1}
-            >
-              {mediaList.map((m, idx) => (
-                <Box key={idx} position="relative">
-                  <IconButton
-                    size="small"
-                    sx={{
-                      position: "absolute",
-                      top: 20,
-                      right: 30,
-                      backgroundColor: theme.palette.background.paper,
-                      "&:hover": {
-                        backgroundColor: theme.palette.action.hover,
-                      },
-                      zIndex: 1,
-                    }}
-                    onClick={() => handleRemoveMedia(idx)}
-                  >
-                    <CloseIcon fontSize="small" />
-                  </IconButton>
-                  {m.type === "image" ? (
-                    <img
-                      src={m.preview}
-                      alt="Preview"
-                      style={{
-                        width: "70px",
-                        height: 70,
-                        objectFit: "cover",
-                        borderRadius: 4,
-                      }}
-                    />
-                  ) : (
-                    <video
-                      src={m.preview}
-                      controls
-                      style={{
-                        width: 70,
-                        height: 70,
-                        objectFit: "cover",
-                        borderRadius: 4,
-                      }}
-                    />
-                  )}
-                </Box>
-              ))}
-            </Box>
-          )}
-
-          <Box display="flex" justifyContent="space-between" gap={1} mt={2}>
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={() => dispatch(popComponent())}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={handlePost}
-              disabled={(!content && mediaList.length === 0) || isLoading}
-            >
-              {isLoading ? <CircularProgress size={24} /> : "Post"}
-            </Button>
-          </Box>
+          <PostActions
+            onCancel={() => dispatch(popComponent())}
+            onPost={handlePost}
+            disabled={(!content && mediaList.length === 0) || isLoading}
+            isLoading={isLoading}
+          />
         </CardContent>
       </Card>
     </Modal>

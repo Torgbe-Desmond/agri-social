@@ -17,8 +17,10 @@ function MediaSlider({ slides }) {
     setToggleMuteFn(() => cb); // store the function
   };
 
-  const goToPrevious = () => setCurrentIndex(prev => (prev === 0 ? slides.length - 1 : prev - 1));
-  const goToNext = () => setCurrentIndex(prev => (prev === slides.length - 1 ? 0 : prev + 1));
+  const goToPrevious = () =>
+    setCurrentIndex((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  const goToNext = () =>
+    setCurrentIndex((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
   const goToSlide = (slideIndex) => setCurrentIndex(slideIndex);
 
   const handlePostView = (e) => {
@@ -38,7 +40,10 @@ function MediaSlider({ slides }) {
     };
 
     if (isReplyComment) {
-      const commentId = isReplyComment.id?.replace("replies-single-comment-", "");
+      const commentId = isReplyComment.id?.replace(
+        "replies-single-comment-",
+        ""
+      );
       if (commentId) handleModal("commentId", commentId);
     } else if (isCommentPost) {
       const postId = isCommentPost.id?.replace("comment-single-post-", "");
@@ -93,26 +98,49 @@ function MediaSlider({ slides }) {
 
   return (
     <Box sx={sliderStyles}>
-      {slides.length > 1 && <Box sx={arrowStyles("left")} onClick={goToPrevious}><ChevronLeft /></Box>}
-      {slides.length > 1 && <Box sx={arrowStyles("right")} onClick={goToNext}><ChevronRight /></Box>}
+      {slides.length > 1 && (
+        <Box sx={arrowStyles("left")} onClick={goToPrevious}>
+          <ChevronLeft />
+        </Box>
+      )}
+      {slides.length > 1 && (
+        <Box sx={arrowStyles("right")} onClick={goToNext}>
+          <ChevronRight />
+        </Box>
+      )}
 
       {slides[currentIndex].type === "image" ? (
-        <Box onClick={handlePostView} sx={{ width: "100%", height: "100%", backgroundImage: `url(${slides[currentIndex]?.url})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+        <Box
+          onClick={handlePostView}
+          sx={{
+            width: "100%",
+            height: "100%",
+            backgroundImage: `url(${slides[currentIndex]?.url})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
       ) : (
         <FeedVideoCard
           handleCurrentVideoMute={handleCurrentVideoMute}
           setCurrentVideo={setCurrentVideo}
           handlePostView={handlePostView}
           url={slides[currentIndex]?.url}
+          post_id={slides[currentIndex]?.post_id}
         />
       )}
 
       <Box sx={dotsContainerStyles}>
-        {slides.length > 1 && slides.map((_, idx) => (
-          <Box key={idx} sx={dotStyles(idx === currentIndex)} onClick={() => goToSlide(idx)}>
-            <CircleIcon fontSize="small" />
-          </Box>
-        ))}
+        {slides.length > 1 &&
+          slides.map((_, idx) => (
+            <Box
+              key={idx}
+              sx={dotStyles(idx === currentIndex)}
+              onClick={() => goToSlide(idx)}
+            >
+              <CircleIcon fontSize="small" />
+            </Box>
+          ))}
       </Box>
     </Box>
   );

@@ -1,7 +1,7 @@
 .post-status-icon {
     display: flex;
     gap: 1rem;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     cursor: pointer;
     /* border-radius: 40px; */

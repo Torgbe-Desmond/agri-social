@@ -28,6 +28,8 @@ const CreateGroupModal = () => {
 
   const [createGroup, { isLoading, error }] = useCreateGroupMutation();
 
+  console.log("error", error);
+
   const handleMediaUpload = (event) => {
     const uploadedFile = event.target.files[0];
     if (uploadedFile) {
@@ -90,7 +92,8 @@ const CreateGroupModal = () => {
         <Stack spacing={2}>
           {error && (
             <Alert severity="error">
-              {error?.data?.message || "Something went wrong while creating the group."}
+              {error?.data?.message ||
+                "Something went wrong while creating the group."}
             </Alert>
           )}
 
@@ -120,18 +123,19 @@ const CreateGroupModal = () => {
             type="file"
             onChange={handleMediaUpload}
           />
-          <label htmlFor="image-upload">
-            <Button
-              component="span"
-              variant="outlined"
-              startIcon={<ImageIcon />}
-              disabled={isLoading}
-              sx={{ borderRadius: "32px" }}
-            >
-              Upload Image
-            </Button>
-          </label>
-
+          {!file && (
+            <label htmlFor="image-upload">
+              <Button
+                component="span"
+                variant="outlined"
+                startIcon={<ImageIcon />}
+                disabled={isLoading}
+                sx={{ borderRadius: "32px" }}
+              >
+                Upload Image
+              </Button>
+            </label>
+          )}
           {/* Image Preview */}
           {media && (
             <Box

@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { clearSearch, searchUser } from "../../Features/SearchSlice";
 import ComponentStack from "../HandleStack/HandleStack";
+import "./TopHeader.css";
 
 const TopHeader = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -71,7 +72,7 @@ const TopHeader = () => {
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "40px",
-      height: "45px",
+
       backgroundColor: isDarkMode
         ? theme.palette.background.paper
         : theme.palette.grey[100],

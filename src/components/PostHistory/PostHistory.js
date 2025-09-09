@@ -195,36 +195,30 @@ function PostHistory() {
         />
       </Container>
 
-      {/* Content */}
-      {isLoading ? (
-        <Box className="circular__progress">
-          <CircularProgress size={20} />
-        </Box>
-      ) : (
-        filteredData.map((post, index) => {
-          const isLast = index === filteredData.length - 1;
-          return (
-            <div
-              key={post.post_id}
-              ref={(el) => {
-                itemRefs.current[index] = el;
-                if (isLast) lastPostRef(el);
-              }}
-            >
-              <PostHistoryCard post={post} />
-            </div>
-          );
-        })
-      )}
-      {fetchError && (
-        <ErrorInfoAndReload
-          setFetchError={setFetchError}
-          isError={fetchError}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          refetch={refetch}
-        />
-      )}
+      {filteredData.map((post, index) => {
+        const isLast = index === filteredData.length - 1;
+        return (
+          <div
+            key={post.post_id}
+            ref={(el) => {
+              itemRefs.current[index] = el;
+              if (isLast) lastPostRef(el);
+            }}
+          >
+            <PostHistoryCard post={post} />
+          </div>
+        );
+      })}
+      {fetchError ||
+        (isLoading && (
+          <ErrorInfoAndReload
+            setFetchError={setFetchError}
+            isError={fetchError}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            refetch={refetch}
+          />
+        ))}
     </Box>
   );
 }

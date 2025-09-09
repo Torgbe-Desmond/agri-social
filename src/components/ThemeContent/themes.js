@@ -20,7 +20,7 @@ export const AppLightTheme = createTheme({
       main: "#3AAA49",
     },
   },
-  ...commonTypography,
+  // ...commonTypography,
 });
 
 export const AppSilverTheme = createTheme({
@@ -80,16 +80,16 @@ export const AppDarkTheme = createTheme({
   shape: {
     borderRadius: 8, // slightly rounded corners
   },
-  components: {
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: "none", // remove default gradients
-        },
-      },
-    },
-  },
-  ...commonTypography,
+  // components: {
+  //   MuiPaper: {
+  //     styleOverrides: {
+  //       root: {
+  //         backgroundImage: "none", // remove default gradients
+  //       },
+  //     },
+  //   },
+  // },
+  // ...commonTypography,
 });
 
 export const AppPalenightTheme = createTheme({
@@ -289,7 +289,7 @@ export const AppNordTheme = createTheme({
     },
   },
   typography: {
-    fontFamily: `"Roboto Mono", "monospace"`,
+    // fontFamily: `"Roboto Mono", "monospace"`,
   },
 });
 

@@ -14,10 +14,20 @@ import DeleteNotificationModal from "../Notification/DeleteNotificationModal";
 import DynamicView from "../DynamicView/DynamicView";
 import PostView from "../PostView/PostView";
 import MediaModal from "../MediaModal/MediaModal";
+import SellerInfoModal from "../SellerInfoModal/SellerInfoModal";
+import ActionModal from "../ActionModal/ActionModal";
+import SessionExpiredModal from "../SessionExpiredModal/SessionExpiredModal";
+import RequestJoinGroup from "../RequestJoinGroup/RequestJoinGroup";
+import AcceptJoinGroupRequest from "../AcceptJoinGroupRequest/AcceptJoinGroupRequest";
 
 export const _componentMap = {
   MediaModal: (props) => <MediaModal {...props} />,
+  RequestJoinGroup: (props) => <RequestJoinGroup {...props} />,
+  SessionExpired: (props) => <SessionExpiredModal {...props} />,
+  AcceptJoinGroupRequest: (props) => <AcceptJoinGroupRequest {...props} />,
+  // DeletePost: (props) => <ActionModal {...props} />,
   DynamicView: (props) => <DynamicView {...props} />,
+  SellerInfo: (props) => <SellerInfoModal {...props} />,
   CreatePost: (props) => <CreatePost {...props} />,
   PostView: (props) => <PostView {...props} />,
   DeletePost: (props) => <DeletePostModal {...props} />,
@@ -33,5 +43,3 @@ export const _componentMap = {
   CreateConversation: (props) => <CreateConversationModal {...props} />,
   DeleteNotification: (props) => <DeleteNotificationModal {...props} />,
 };
-
-// // "Server error: This result object does not return rows. It has been closed automatically."

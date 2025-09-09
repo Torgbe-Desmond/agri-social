@@ -31,6 +31,7 @@ function FeedVideoCard({
 
   useEffect(() => {
     const level = calculateViewedLevel(currentTime, duration);
+  
 
     if (level !== lastLevel) {
       console.log("view level:", level);

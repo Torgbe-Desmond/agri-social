@@ -23,6 +23,7 @@ import EmojiPickerPopover from "../EmojiPickerPopover/EmojiPickerPopover";
 
 import "./PostComment.css";
 import Success from "../Success/Success";
+import ErrorInfoAndReload from "../Errors/ErrorInfoAndReload";
 
 function PostComment() {
   const { post_id } = useParams();
@@ -44,6 +45,8 @@ function PostComment() {
   const { message, setMessage } = useError();
   const [post, setPost] = useState();
   const [scrolling, setScrolling] = useState(0);
+  const [fetchError, setFetchError] = useState(false);
+  const [repliesFetchError, setRepliesFetchError] = useState(false);
 
   // ---- Refs ----
   const postScrollRef = useRef();
@@ -56,10 +59,14 @@ function PostComment() {
   const [addCommentMutation, { isLoading: isAddingComment, isSuccess }] =
     useAddCommentMutation();
 
-  const { data: postData, isLoading: singlePostLoading } = useGetPostQuery(
-    post_id,
-    { skip: !post_id }
-  );
+  const {
+    data: postData,
+    isLoading: singlePostLoading,
+    error,
+    isError: singlePostIsError,
+    isFetching: singlePostIsFetching,
+    refetch: singlePostRefetch,
+  } = useGetPostQuery(post_id, { skip: !post_id });
 
   const {
     data = {},
@@ -86,6 +93,14 @@ function PostComment() {
       setMessage(commentsError.data.detail);
     }
   }, [isError, commentsError, setMessage]);
+
+  useEffect(() => {
+    setFetchError(singlePostIsError);
+  }, [singlePostIsError]);
+
+  useEffect(() => {
+    setRepliesFetchError(isError);
+  }, [isError]);
 
   useEffect(() => {
     const node = postScrollRef.current;
@@ -238,7 +253,6 @@ function PostComment() {
   return (
     <Box className="post__comment" ref={postScrollRef}>
       <Success isSuccess={isSuccess} />
-
       <Comment_Header
         name="Post"
         systemPrefersDark={systemPrefersDark}
@@ -246,6 +260,16 @@ function PostComment() {
       />
 
       <CommentSinglePost ref={itemRef} post={post} />
+
+      {fetchError && (
+        <ErrorInfoAndReload
+          setFetchError={setFetchError}
+          isError={fetchError}
+          isLoading={singlePostLoading}
+          isFetching={singlePostIsFetching}
+          refetch={singlePostRefetch}
+        />
+      )}
 
       {allComments.length > 0 && <ReplyIndicator />}
 
@@ -260,12 +284,23 @@ function PostComment() {
         scrollAnchorRef={scrollAnchorRef}
       />
 
+      {repliesFetchError ||
+        (commentsLoading && (
+          <ErrorInfoAndReload
+            setFetchError={setRepliesFetchError}
+            isError={repliesFetchError}
+            isLoading={commentsLoading}
+            isFetching={isFetchingReplies}
+            refetch={refetchReplies}
+          />
+        ))}
+
       <CommentChat
         message={comment}
         setFile={setFile}
         media={media}
         file={file}
-        isAddingComment={isAddingComment}
+        isAddingComment={isAddingComment} 
         setMedia={setMedia}
         v_media={v_media}
         setMessage={setComment}
@@ -273,21 +308,13 @@ function PostComment() {
         setSelectedTags={setSelectedTags}
         setVMedia={setVMedia}
         handleMediaUpload={handleMediaUpload}
-        openDrawer={openDrawer}
         handleAddComment={handleAddComment}
-        systemPrefersDark={systemPrefersDark}
         emojiAnchor={emojiAnchor}
         closeEmojiPicker={() => setEmojiAnchor(null)}
         onEmojiSelect={onEmojiSelect}
         openEmojiPicker={(e) => setEmojiAnchor(e.currentTarget)}
-        toggleDrawer={(val) => () => setOpenDrawer(val)}
       />
 
-      {/* <EmojiPickerPopover
-        anchorEl={emojiAnchor}
-        onClose={() => setEmojiAnchor(null)}
-        onEmojiSelect={onEmojiSelect}
-      /> */}
     </Box>
   );
 }

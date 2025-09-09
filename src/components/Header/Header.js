@@ -47,7 +47,7 @@ function Header({
     <Box ref={feedRef} className="resuable">
       <Box
         sx={{
-          bgcolor: theme.palette.background.paper, // 👈 Theme-based background
+          bgcolor: theme.palette.background.paper, 
           color: theme.palette.text.primary,
           borderBottom: `1px solid ${theme.palette.divider}`,
         }}

@@ -6,6 +6,8 @@ import {
   ListItem,
   ListItemText,
   CircularProgress,
+  useTheme,
+  Typography,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
@@ -21,6 +23,7 @@ const Widgets = () => {
   const reference_id = localStorage.getItem("reference_id");
   const navigate = useNavigate();
   const [follow, { isLoading: isFollowingLoading }] = useFollowMutation();
+  const theme = useTheme();
 
   const [offset, setOffset] = useState(1);
   const limit = 10;
@@ -85,7 +88,7 @@ const Widgets = () => {
           overflowY: "auto",
         }}
       >
-        <h2>People</h2>
+        <Typography variant="h6">People</Typography>
 
         <List dense>
           {userData.map((user, index) => {
@@ -101,10 +104,10 @@ const Widgets = () => {
                   py: 1,
                   cursor: "pointer",
                   "&:hover": {
-                    backgroundColor: "#e8fef1",
-                    color: "#088a6a",
-                    cursor: "pointer",
-                    borderRadius: 40,
+                    backgroundColor: theme.palette.action.hover,
+                    borderRadius: "30px",
+                    color: theme.palette.primary.main,
+                    transition: "color 100ms ease-out",
                   },
                 }}
               >
@@ -144,7 +147,6 @@ const Widgets = () => {
           isFetching={isFetching}
           refetch={refetch}
         />
-
       </Box>
     </Box>
   );
