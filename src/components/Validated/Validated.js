@@ -57,7 +57,7 @@ function Validated() {
   useEffect(() => {
     if (error?.status === 401) {
       setIsAuthenticated(false);
-      handleSessionExpired();
+      // handleSessionExpired();
     } else if (data?.status) {
       const reference_id = localStorage.getItem("reference_id");
       setIsAuthenticated(data?.status);

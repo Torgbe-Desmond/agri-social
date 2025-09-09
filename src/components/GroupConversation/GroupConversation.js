@@ -3,7 +3,7 @@ import { Box, IconButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useSocket } from "../Socket/Socket";
-import { sendMessage } from "../../Features/MessageSlice";
+// import { sendMessage } from "../../Features/MessageSlice";
 
 import ConversationHeader from "./ConversationHeader";
 import MessageList from "./MessageList";
@@ -77,38 +77,38 @@ function GroupConversation() {
 
   const handleGoBack = () => navigate(-1);
 
-  const handleSend = async () => {
-    if (!message) return;
+  // const handleSend = async () => {
+  //   if (!message) return;
 
-    const formData = new FormData();
-    const member_ids = [recipient_id, user?.refernce_id];
-    formData.append("member_ids", member_ids);
-    formData.append("content", message);
-    files.forEach((file) => formData.append("files", file));
-    if (conversation_id) formData.append("conversation_id", conversation_id);
+  //   const formData = new FormData();
+  //   const member_ids = [recipient_id, userDetails?.refernce_id];
+  //   formData.append("member_ids", member_ids);
+  //   formData.append("content", message);
+  //   files.forEach((file) => formData.append("files", file));
+  //   if (conversation_id) formData.append("conversation_id", conversation_id);
 
-    const payload = await sendMessage({
-      formData,
-      conversation_id, // 👈 pass conversation_id
-      receiver_id: recipient_id, // 👈 pass receiver_id
-    }).unwrap();
+  //   const payload = await sendMessage({
+  //     formData,
+  //     conversation_id, // 👈 pass conversation_id
+  //     receiver_id: recipient_id, // 👈 pass receiver_id
+  //   }).unwrap();
 
-    setChatMessages((prev) => [
-      ...prev,
-      {
-        sender_id: user?.id,
-        conversation_id,
-        images: payload?.vidoes || null,
-        videos: payload?.images || null,
-        content: payload?.content,
-        profilePicture: user?.user_image || "/user-avatar.png",
-      },
-    ]);
+  //   setChatMessages((prev) => [
+  //     ...prev,
+  //     {
+  //       sender_id: userDetails?.id,
+  //       conversation_id,
+  //       images: payload?.vidoes || null,
+  //       videos: payload?.images || null,
+  //       content: payload?.content,
+  //       profilePicture: userDetails?.user_image || "/user-avatar.png",
+  //     },
+  //   ]);
 
-    setMessage("");
-    setFile([]);
-    setUploadedFiles([]);
-  };
+  //   setMessage("");
+  //   setFiles([]);
+  //   setUploadedFiles([]);
+  // };
 
   return (
     <Box className="group">
